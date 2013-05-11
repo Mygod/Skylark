@@ -1,0 +1,39 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mygod.Skylark.Site" %>
+<%@ Import Namespace="Mygod.Skylark" %>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <link href="css/modern.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="/javascript/generic.js"></script>
+    <asp:ContentPlaceHolder ID="Head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body class="modern-ui">
+    <form id="form" runat="server">
+    <div class="page">
+        <div class="page-header">
+            <div class="page-header-content">
+                <h1><a href="/" class="h">云雀™</a></h1>
+            </div>
+        </div>
+        <div class="page-region">
+            <div class="page-region-content" style="padding-left: 20px;">
+                <div><a href="http://mygod.apphb.com/Online/Skylark/">云雀™</a> 是由 <a href="http://mygod.apphb.com/">Mygod 工作室™</a> 出品的一款强大的网盘。</div>
+                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)", Helper.GetSize(CurrentDrive.AvailableFreeSpace), 
+                                                    Helper.GetSize(CurrentDrive.TotalSize), 
+                                                    100.0 * CurrentDrive.AvailableFreeSpace / CurrentDrive.TotalSize) %></div>
+                <hr />
+                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+        
+                </asp:ContentPlaceHolder>
+                <div class="center">Powered by <a href="http://mygod.apphb.com">Mygod 工作室™</a></div>
+                <div class="center">Copyright &copy; 2013 云雀™ V<%=CurrentAssembly.GetName().Version %></div>
+            </div>
+        </div>
+    </div>
+    </form>
+</body>
+</html>

@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{D2B8C41F-655D-458B-82C7-9BC1E073B306}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Mygod.Skylark</RootNamespace>
+    <AssemblyName>Skylark</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\Readme.txt" />
+    <Content Include="Default.aspx" />
+    <Content Include="css\modern-responsive.css" />
+    <Content Include="css\modern.css" />
+    <Content Include="css\theme-dark.css" />
+    <Content Include="Download.aspx" />
+    <Content Include="favicon.ico" />
+    <Content Include="Files\Readme.txt" />
+    <Content Include="Global.asax" />
+    <Content Include="Image\Busy.png" />
+    <Content Include="Image\Directory.png" />
+    <Content Include="Image\File.png" />
+    <Content Include="javascript\generic.js" />
+    <Content Include="plugins\CryptoJS\aes-min.js" />
+    <Content Include="plugins\CryptoJS\aes.js" />
+    <Content Include="plugins\CryptoJS\cipher-core-min.js" />
+    <Content Include="plugins\CryptoJS\cipher-core.js" />
+    <Content Include="plugins\CryptoJS\core-min.js" />
+    <Content Include="plugins\CryptoJS\core.js" />
+    <Content Include="plugins\CryptoJS\enc-base64-min.js" />
+    <Content Include="plugins\CryptoJS\enc-base64.js" />
+    <Content Include="plugins\CryptoJS\enc-utf16-min.js" />
+    <Content Include="plugins\CryptoJS\enc-utf16.js" />
+    <Content Include="plugins\CryptoJS\evpkdf-min.js" />
+    <Content Include="plugins\CryptoJS\evpkdf.js" />
+    <Content Include="plugins\CryptoJS\format-hex-min.js" />
+    <Content Include="plugins\CryptoJS\format-hex.js" />
+    <Content Include="plugins\CryptoJS\hmac-min.js" />
+    <Content Include="plugins\CryptoJS\hmac.js" />
+    <Content Include="plugins\CryptoJS\lib-typedarrays-min.js" />
+    <Content Include="plugins\CryptoJS\lib-typedarrays.js" />
+    <Content Include="plugins\CryptoJS\md5-min.js" />
+    <Content Include="plugins\CryptoJS\md5.js" />
+    <Content Include="plugins\CryptoJS\mode-cfb-min.js" />
+    <Content Include="plugins\CryptoJS\mode-cfb.js" />
+    <Content Include="plugins\CryptoJS\mode-ctr-gladman-min.js" />
+    <Content Include="plugins\CryptoJS\mode-ctr-gladman.js" />
+    <Content Include="plugins\CryptoJS\mode-ctr-min.js" />
+    <Content Include="plugins\CryptoJS\mode-ctr.js" />
+    <Content Include="plugins\CryptoJS\mode-ecb-min.js" />
+    <Content Include="plugins\CryptoJS\mode-ecb.js" />
+    <Content Include="plugins\CryptoJS\mode-ofb-min.js" />
+    <Content Include="plugins\CryptoJS\mode-ofb.js" />
+    <Content Include="plugins\CryptoJS\pad-ansix923-min.js" />
+    <Content Include="plugins\CryptoJS\pad-ansix923.js" />
+    <Content Include="plugins\CryptoJS\pad-iso10126-min.js" />
+    <Content Include="plugins\CryptoJS\pad-iso10126.js" />
+    <Content Include="plugins\CryptoJS\pad-iso97971-min.js" />
+    <Content Include="plugins\CryptoJS\pad-iso97971.js" />
+    <Content Include="plugins\CryptoJS\pad-nopadding-min.js" />
+    <Content Include="plugins\CryptoJS\pad-nopadding.js" />
+    <Content Include="plugins\CryptoJS\pad-zeropadding-min.js" />
+    <Content Include="plugins\CryptoJS\pad-zeropadding.js" />
+    <Content Include="plugins\CryptoJS\pbkdf2-min.js" />
+    <Content Include="plugins\CryptoJS\pbkdf2.js" />
+    <Content Include="plugins\CryptoJS\rabbit-legacy-min.js" />
+    <Content Include="plugins\CryptoJS\rabbit-legacy.js" />
+    <Content Include="plugins\CryptoJS\rabbit-min.js" />
+    <Content Include="plugins\CryptoJS\rabbit.js" />
+    <Content Include="plugins\CryptoJS\rc4-min.js" />
+    <Content Include="plugins\CryptoJS\rc4.js" />
+    <Content Include="plugins\CryptoJS\ripemd160-min.js" />
+    <Content Include="plugins\CryptoJS\ripemd160.js" />
+    <Content Include="plugins\CryptoJS\sha1-min.js" />
+    <Content Include="plugins\CryptoJS\sha1.js" />
+    <Content Include="plugins\CryptoJS\sha224-min.js" />
+    <Content Include="plugins\CryptoJS\sha224.js" />
+    <Content Include="plugins\CryptoJS\sha256-min.js" />
+    <Content Include="plugins\CryptoJS\sha256.js" />
+    <Content Include="plugins\CryptoJS\sha3-min.js" />
+    <Content Include="plugins\CryptoJS\sha3.js" />
+    <Content Include="plugins\CryptoJS\sha384-min.js" />
+    <Content Include="plugins\CryptoJS\sha384.js" />
+    <Content Include="plugins\CryptoJS\sha512-min.js" />
+    <Content Include="plugins\CryptoJS\sha512.js" />
+    <Content Include="plugins\CryptoJS\tripledes-min.js" />
+    <Content Include="plugins\CryptoJS\tripledes.js" />
+    <Content Include="plugins\CryptoJS\x64-core-min.js" />
+    <Content Include="plugins\CryptoJS\x64-core.js" />
+    <Content Include="plugins\fineuploader\fineuploader-3.5.0.css" />
+    <Content Include="plugins\fineuploader\iframe.xss.response-3.5.0.js" />
+    <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.js" />
+    <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
+    <Content Include="plugins\fineuploader\loading.gif" />
+    <Content Include="plugins\fineuploader\processing.gif" />
+    <Content Include="Upload.aspx" />
+    <Content Include="View.aspx" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Download.aspx.cs">
+      <DependentUpon>Download.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Download.aspx.designer.cs">
+      <DependentUpon>Download.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DownloadablePage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Helper.cs" />
+    <Compile Include="Site.Master.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Site.Master.designer.cs">
+      <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Upload.aspx.cs">
+      <DependentUpon>Upload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Upload.aspx.designer.cs">
+      <DependentUpon>Upload.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="View.aspx.cs">
+      <DependentUpon>View.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="View.aspx.designer.cs">
+      <DependentUpon>View.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Site.Master" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:12584/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
