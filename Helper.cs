@@ -125,9 +125,9 @@ namespace Mygod.Skylark
         {
             return server.MapPath("~/Files/" + path);
         }
-        public static string GetDataPath(this HttpServerUtility server, string path)
+        public static string GetDataPath(this HttpServerUtility server, string path, bool isFile = true)
         {
-            return server.MapPath("~/Data/" + path);
+            return server.MapPath("~/Data/" + (isFile ? path + ".data" : Combine(path, ".data")));
         }
 
         public static XElement GetElement(string path)
