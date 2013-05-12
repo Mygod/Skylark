@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Web;
 using System.Web.Routing;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using System.Xml.Linq;
 using Microsoft.Win32;
 
@@ -59,56 +64,6 @@ namespace Mygod.Skylark
             }
         }
 
-        public static string GetRelativePath(this HttpContext context)
-        {
-            return (context.Server.UrlDecode(context.Request.QueryString.ToString()) ?? string.Empty).Replace('\\', '/').Trim('/');
-        }
-
-        public static string Combine(params string[] paths)
-        {
-            var result = string.Empty;
-            foreach (var path in paths.Select(path => path.Trim('/')))
-            {
-                if (!string.IsNullOrEmpty(result)) result += '/';
-                result += path;
-            }
-            return result;
-        }
-
-        public static bool IsReady(string path)
-        {
-            try
-            {
-                return XDocument.Load(path).Element("file").Attribute("state").Value == "ready";
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static string GetDefaultMime(string path)
-        {
-            return XDocument.Load(path).Element("file").Attribute("mime").Value;
-        }
-
-        public static void SetDefaultMime(string path, string value)
-        {
-            var doc = XDocument.Load(path);
-            var root = doc.Element("file");
-            root.SetAttributeValue("mime", value);
-            doc.Save(path);
-        }
-
-        public static string GetFilePath(this HttpServerUtility server, string path)
-        {
-            return server.MapPath("~/Files/" + path);
-        }
-        public static string GetDataPath(this HttpServerUtility server, string path)
-        {
-            return server.MapPath("~/Data/" + path);
-        }
-
         private static readonly string[] Units = new[] { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         public static string GetSize(long size)
         {
@@ -134,7 +89,116 @@ namespace Mygod.Skylark
                 return null;
             }
         }
+
+        public static string GetAttributeValue(this XElement e, XName name)
+        {
+            var attr = e.Attribute(name);
+            return attr == null ? null : attr.Value;
+        }
+
+        public static IEnumerable<string> GetSelectedFiles(this RepeaterItemCollection collection)
+        {
+            return from RepeaterItem item in collection where ((CheckBox) item.FindControl("Check")).Checked
+                   select ((HtmlInputHidden)item.FindControl("Hidden")).Value;
+        }
     }
+
+    public static class FileHelper
+    {
+        public static string GetRelativePath(this HttpContext context)
+        {
+            return (context.Server.UrlDecode(context.Request.QueryString.ToString()) ?? String.Empty).Replace('\\', '/').Trim('/');
+        }
+
+        public static string Combine(params string[] paths)
+        {
+            var result = String.Empty;
+            foreach (var path in paths.Select(path => path.Trim('/')))
+            {
+                if (!String.IsNullOrEmpty(result)) result += '/';
+                result += path;
+            }
+            return result;
+        }
+
+        public static string GetFilePath(this HttpServerUtility server, string path)
+        {
+            return server.MapPath("~/Files/" + path);
+        }
+        public static string GetDataPath(this HttpServerUtility server, string path)
+        {
+            return server.MapPath("~/Data/" + path);
+        }
+
+        public static XElement GetElement(string path)
+        {
+            try
+            {
+                return XDocument.Load(path).Element("file");
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static string GetFileValue(string path, string attribute)
+        {
+            try
+            {
+                return GetElement(path).GetAttributeValue(attribute);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public static void SetFileValue(string path, string attribute, string value)
+        {
+            XDocument doc;
+            try
+            {
+                doc = XDocument.Load(path);
+            }
+            catch
+            {
+                doc = new XDocument(new XElement("file"));
+            }
+            var root = doc.Element("file");
+            root.SetAttributeValue(attribute, value);
+            doc.Save(path);
+        }
+
+        public static bool IsReady(string path)
+        {
+            return GetFileValue(path, "state") == "ready";
+        }
+
+        public static string GetDefaultMime(string path)
+        {
+            return GetFileValue(path, "mime");
+        }
+        public static void SetDefaultMime(string path, string value)
+        {
+            SetFileValue(path, "mime", value);
+        }
+
+        public static void CancelControl(this HttpServerUtility server, string dataPath)
+        {
+            if (File.Exists(dataPath))
+            {
+                var element = GetElement(dataPath);
+                if (element.GetAttributeValue("state") != "ready")
+                    try
+                    {
+                        Process.GetProcessById(int.Parse(element.GetAttributeValue("id"))).Kill();
+                    }
+                    catch { }
+            }
+            else if (Directory.Exists(dataPath)) foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath))
+                server.CancelControl(stuff);
+        }
+    }
+
     public static class R
     {
         private static readonly TimeSpan Offset = NtpClient.GetNetworkTime("time.windows.com") - DateTime.UtcNow;

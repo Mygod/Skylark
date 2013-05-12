@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 
 namespace Mygod.Skylark
@@ -12,14 +13,19 @@ namespace Mygod.Skylark
         protected DirectoryInfo InfoDirectory;
         protected FileInfo InfoFile;
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected void Page_Init(object sender, EventArgs e)
         {
             RelativePath = Context.GetRelativePath();
             var absolutePath = Path.Combine(Server.MapPath("~/Files/"), RelativePath);
             Title = ("浏览 " + RelativePath).TrimEnd();
             InfoDirectory = new DirectoryInfo(absolutePath);
             InfoFile = new FileInfo(absolutePath);
-            if (IsPostBack || !InfoDirectory.Exists) return;
+            if (!IsPostBack) RebindData();
+        }
+
+        private void RebindData()
+        {
+            if (!InfoDirectory.Exists) return;
             DirectoryList.DataSource = InfoDirectory.EnumerateDirectories();
             DirectoryList.DataBind();
             FileList.DataSource = InfoDirectory.EnumerateFiles();
@@ -41,16 +47,11 @@ namespace Mygod.Skylark
 
         protected void DirectoryCommand(object source, RepeaterCommandEventArgs e)
         {
-            var path = Helper.Combine(RelativePath, e.CommandArgument.ToString());
+            var path = FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value);
             switch (e.CommandName)
             {
-                case "Delete":
-                    Directory.Delete(Server.GetFilePath(path), true);
-                    Directory.Delete(Server.GetDataPath(path), true);
-                    Response.Redirect(Request.RawUrl);
-                    break;
                 case "Rename":
-                    var newPath = Helper.Combine(RelativePath, Hidden.Value);
+                    var newPath = FileHelper.Combine(RelativePath, Hidden.Value);
                     Directory.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
                     Directory.Move(Server.GetDataPath(path), Server.GetDataPath(newPath));
                     Response.Redirect(Request.RawUrl);
@@ -60,16 +61,11 @@ namespace Mygod.Skylark
 
         protected void FileCommand(object source, RepeaterCommandEventArgs e)
         {
-            var path = Helper.Combine(RelativePath, e.CommandArgument.ToString());
+            var path = FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value);
             switch (e.CommandName)
             {
-                case "Delete":
-                    File.Delete(Server.GetFilePath(path));
-                    File.Delete(Server.GetDataPath(path));
-                    Response.Redirect(Request.RawUrl);
-                    break;
                 case "Rename":
-                    var newPath = Helper.Combine(RelativePath, Hidden.Value);
+                    var newPath = FileHelper.Combine(RelativePath, Hidden.Value);
                     File.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
                     File.Move(Server.GetDataPath(path), Server.GetDataPath(newPath));
                     Response.Redirect(Request.RawUrl);
@@ -79,7 +75,7 @@ namespace Mygod.Skylark
 
         protected void NewFolder(object sender, EventArgs e)
         {
-            var path = Helper.Combine(RelativePath, Hidden.Value);
+            var path = FileHelper.Combine(RelativePath, Hidden.Value);
             Directory.CreateDirectory(Server.GetFilePath(path));
             Directory.CreateDirectory(Server.GetDataPath(path));
             Response.Redirect(Request.RawUrl);
@@ -92,6 +88,28 @@ namespace Mygod.Skylark
             Response.Redirect(Request.RawUrl);
         }
 
+        protected void Delete(object sender, EventArgs e)
+        {
+            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Delete(dir);
+            foreach (var file in FileList.Items.GetSelectedFiles()) Delete(file);
+            Response.Redirect(Request.RawUrl);
+        }
+        private void Delete(string fileName)
+        {
+            string path = FileHelper.Combine(RelativePath, fileName), dataPath = Server.GetDataPath(path);
+            Server.CancelControl(dataPath);
+            if (File.Exists(dataPath))
+            {
+                File.Delete(dataPath);
+                File.Delete(Server.GetFilePath(path));
+            }
+            else if (Directory.Exists(dataPath))
+            {
+                Directory.Delete(dataPath, true);
+                Directory.Delete(Server.GetFilePath(path), true);
+            }
+        }
+
         protected static string GetMimeType(string mime)
         {
             var extension = Helper.GetDefaultExtension(mime);
@@ -100,7 +118,7 @@ namespace Mygod.Skylark
 
         protected void ModifyMime(object sender, EventArgs e)
         {
-            Helper.SetDefaultMime(Server.GetDataPath(RelativePath), Hidden.Value);
+            FileHelper.SetDefaultMime(Server.GetDataPath(RelativePath), Hidden.Value);
             Response.Redirect(Request.RawUrl);
         }
     }

@@ -21,7 +21,7 @@
         </div>
         <div class="page-region">
             <div class="page-region-content" style="padding-left: 20px;">
-                <div><a href="http://mygod.apphb.com/Online/Skylark/">云雀™</a> 是由 <a href="http://mygod.apphb.com/">Mygod 工作室™</a> 出品的一款强大的网盘。</div>
+                <div><a href="http://mygod.apphb.com/Online/Skylark/">云雀™</a>，您的云存储伴侣。</div>
                 <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)", Helper.GetSize(CurrentDrive.AvailableFreeSpace), 
                                                     Helper.GetSize(CurrentDrive.TotalSize), 
                                                     100.0 * CurrentDrive.AvailableFreeSpace / CurrentDrive.TotalSize) %></div>

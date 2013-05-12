@@ -56,14 +56,12 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\Readme.txt" />
     <Content Include="Default.aspx" />
     <Content Include="css\modern-responsive.css" />
     <Content Include="css\modern.css" />
     <Content Include="css\theme-dark.css" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
-    <Content Include="Files\Readme.txt" />
     <Content Include="Global.asax" />
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
@@ -192,6 +190,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Site.Master" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Data\" />
+    <Folder Include="Files\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

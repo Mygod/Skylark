@@ -9,8 +9,8 @@ namespace Mygod.Skylark
         {
             string path = Context.GetRelativePath(), dataPath = Server.GetDataPath(path), 
                    mime = (RouteData.GetRouteString("Mime") ?? string.Empty).Trim('/');
-            if (string.IsNullOrWhiteSpace(mime)) mime = Helper.GetDefaultMime(dataPath);
-            while (!Helper.IsReady(dataPath)) Thread.Sleep(1000);   // keep sleeping until finished or being aborted
+            if (string.IsNullOrWhiteSpace(mime)) mime = FileHelper.GetDefaultMime(dataPath);
+            while (!FileHelper.IsReady(dataPath)) Thread.Sleep(1000);   // keep sleeping until finished or being aborted
             DownloadFile(Server.GetFilePath(path), mime, true);
         }
     }
