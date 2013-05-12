@@ -68,6 +68,10 @@
     <Content Include="Image\Directory.png" />
     <Content Include="Image\File.png" />
     <Content Include="javascript\generic.js" />
+    <Content Include="Offline\Default.aspx" />
+    <Content Include="Offline\MygodOfflineDownloader.exe" />
+    <Content Include="Offline\Start.aspx" />
+    <Content Include="Offline\YouTube.aspx" />
     <Content Include="plugins\CryptoJS\aes-min.js" />
     <Content Include="plugins\CryptoJS\aes.js" />
     <Content Include="plugins\CryptoJS\cipher-core-min.js" />
@@ -167,6 +171,28 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper.cs" />
+    <Compile Include="Offline\Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Offline\Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Offline\Start.aspx.cs">
+      <DependentUpon>Start.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Offline\Start.aspx.designer.cs">
+      <DependentUpon>Start.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Offline\YouTube.aspx.cs">
+      <DependentUpon>YouTube.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Offline\YouTube.aspx.designer.cs">
+      <DependentUpon>YouTube.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="PublicHelper.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

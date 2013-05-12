@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
@@ -13,15 +14,24 @@ namespace Mygod.Skylark
         protected DirectoryInfo InfoDirectory;
         protected FileInfo InfoFile;
 
-        protected void Page_Init(object sender, EventArgs e)
+        protected void Page_PreInit(object sender, EventArgs e)
         {
             RelativePath = Context.GetRelativePath();
             var absolutePath = Path.Combine(Server.MapPath("~/Files/"), RelativePath);
             Title = ("浏览 " + RelativePath).TrimEnd();
             InfoDirectory = new DirectoryInfo(absolutePath);
             InfoFile = new FileInfo(absolutePath);
-            if (!IsPostBack) RebindData();
         }
+
+        protected void Page_Init(object sender, EventArgs e)
+        {
+            if (!IsPostBack) RebindData();
+            if (InfoFile.Exists
+                && FileHelper.GetFileValue(Server.GetDataPath(RelativePath), "state").StartsWith("download", StringComparison.Ordinal))
+                RefreshOffline();
+        }
+
+        #region Directory
 
         private void RebindData()
         {
@@ -53,7 +63,7 @@ namespace Mygod.Skylark
                 case "Rename":
                     var newPath = FileHelper.Combine(RelativePath, Hidden.Value);
                     Directory.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
-                    Directory.Move(Server.GetDataPath(path), Server.GetDataPath(newPath));
+                    Directory.Move(Server.GetDataPath(path), Server.GetDataPath(newPath, false));
                     Response.Redirect(Request.RawUrl);
                     break;
             }
@@ -77,38 +87,27 @@ namespace Mygod.Skylark
         {
             var path = FileHelper.Combine(RelativePath, Hidden.Value);
             Directory.CreateDirectory(Server.GetFilePath(path));
-            Directory.CreateDirectory(Server.GetDataPath(path));
-            Response.Redirect(Request.RawUrl);
-        }
-
-        protected void OfflineDownload(object sender, EventArgs e)
-        {
-            Process.Start(new ProcessStartInfo(Server.MapPath("~/MygodOfflineDownloader.exe"),
-                string.Format("\"{0}\" \"{1}\"", Hidden.Value, RelativePath)) { WorkingDirectory = Server.MapPath("~") });
+            Directory.CreateDirectory(Server.GetDataPath(path, false));
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Delete(object sender, EventArgs e)
         {
-            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Delete(dir);
-            foreach (var file in FileList.Items.GetSelectedFiles()) Delete(file);
+            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Delete(dir, false);
+            foreach (var file in FileList.Items.GetSelectedFiles()) Delete(file, true);
             Response.Redirect(Request.RawUrl);
         }
-        private void Delete(string fileName)
+        private void Delete(string fileName, bool isFile)
         {
-            string path = FileHelper.Combine(RelativePath, fileName), dataPath = Server.GetDataPath(path);
+            string path = FileHelper.Combine(RelativePath, fileName), dataPath = Server.GetDataPath(path, isFile);
             Server.CancelControl(dataPath);
-            if (File.Exists(dataPath))
-            {
-                File.Delete(dataPath);
-                File.Delete(Server.GetFilePath(path));
-            }
-            else if (Directory.Exists(dataPath))
-            {
-                Directory.Delete(dataPath, true);
-                Directory.Delete(Server.GetFilePath(path), true);
-            }
+            FileHelper.DeleteWithRetries(dataPath);
+            FileHelper.DeleteWithRetries(Server.GetFilePath(path));
         }
+
+        #endregion
+
+        #region File - ready
 
         protected static string GetMimeType(string mime)
         {
@@ -121,5 +120,83 @@ namespace Mygod.Skylark
             FileHelper.SetDefaultMime(Server.GetDataPath(RelativePath), Hidden.Value);
             Response.Redirect(Request.RawUrl);
         }
+
+        #endregion
+
+        #region File - downloading
+
+        protected string Url, Status, FileSize, DownloadedFileSize, AverageDownloadSpeed, StartTime, SpentTime, RemainingTime,
+                         EndingTime, Percentage;
+
+        private void RefreshOffline()
+        {
+            Url = FileSize = DownloadedFileSize = AverageDownloadSpeed = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
+            Percentage = "0";
+            string path = Server.GetFilePath(RelativePath), xmlPath = Server.GetDataPath(RelativePath);
+            var file = FileHelper.GetElement(xmlPath);
+            Url = string.Format("<a href=\"{0}\">{0}</a>", file.Attribute("url").Value);
+            var attr = file.Attribute("startTime");
+            var startTime = Helper.Parse(attr.Value);
+            StartTime = startTime.ToChineseString();
+            attr = file.Attribute("message");
+            if (attr != null)
+            {
+                Status = "发生错误，具体信息：" + attr.Value;
+                Never();
+                return;
+            }
+            attr = file.Attribute("size");
+            if (attr == null) return;
+            var fileSize = long.Parse(attr.Value);
+            FileSize = Helper.GetSize(fileSize);
+            var downloadedFileSize = File.Exists(path) ? new FileInfo(path).Length : 0;
+            DownloadedFileSize = string.Format("{0} ({1}%)", Helper.GetSize(downloadedFileSize),
+                                    Percentage = (100.0 * downloadedFileSize / fileSize).ToString(CultureInfo.InvariantCulture));
+            attr = file.Attribute("endTime");
+            if (attr == null)
+            {
+                bool impossibleEnds;
+                try
+                {
+                    impossibleEnds = Process.GetProcessById(int.Parse(file.Attribute("id").Value)).ProcessName != "MygodOfflineDownloader";
+                }
+                catch
+                {
+                    impossibleEnds = true;
+                }
+                Status = impossibleEnds ? "已被咔嚓（请删除后重新开始任务）" : "正在下载";
+                if (impossibleEnds) Never();
+                else
+                {
+                    var spentTime = Helper.UtcNow - startTime;
+                    SpentTime = spentTime.ToString("g");
+                    var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
+                    AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);
+                    var remainingTime =
+                        new TimeSpan((long)(spentTime.Ticks * (fileSize - downloadedFileSize) / (double)downloadedFileSize));
+                    RemainingTime = remainingTime.ToString("g");
+                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                }
+            }
+            else
+            {
+                Status = "下载完毕，刷新开始下载";
+                RemainingTime = new TimeSpan(0).ToString("g");
+                var endingTime = Helper.Parse(attr.Value);
+                EndingTime = endingTime.ToChineseString();
+                var spentTime = endingTime - startTime;
+                SpentTime = spentTime.ToString("g");
+                var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
+                AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);
+            }
+        }
+
+        private void Never()
+        {
+            RemainingTime = "永远";
+            EndingTime = "地球毁灭时";
+        }
+
+        #endregion
     }
 }

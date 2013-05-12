@@ -1,4 +1,6 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mygod.Skylark.Site" %>
+<%@ Import Namespace="System.Globalization" %>
+<%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="Mygod.Skylark" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -7,6 +9,8 @@
     <title></title>
     <link href="css/modern.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
+    <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>
     <script type="text/javascript" src="/javascript/generic.js"></script>
     <asp:ContentPlaceHolder ID="Head" runat="server">
     </asp:ContentPlaceHolder>
@@ -22,9 +26,10 @@
         <div class="page-region">
             <div class="page-region-content" style="padding-left: 20px;">
                 <div><a href="http://mygod.apphb.com/Online/Skylark/">云雀™</a>，您的云存储伴侣。</div>
-                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)", Helper.GetSize(CurrentDrive.AvailableFreeSpace), 
-                                                    Helper.GetSize(CurrentDrive.TotalSize), 
-                                                    100.0 * CurrentDrive.AvailableFreeSpace / CurrentDrive.TotalSize) %></div>
+                <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture)); %>
+                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)", Helper.GetSize(currentDrive.AvailableFreeSpace), 
+                                                    Helper.GetSize(currentDrive.TotalSize), 
+                                                    100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
                 <hr />
                 <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
         

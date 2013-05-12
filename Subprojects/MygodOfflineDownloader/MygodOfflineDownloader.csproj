@@ -51,8 +51,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="..\..\Helper.cs">
-      <Link>Helper.cs</Link>
+    <Compile Include="..\..\PublicHelper.cs">
+      <Link>PublicHelper.cs</Link>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

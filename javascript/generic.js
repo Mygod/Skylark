@@ -3,6 +3,12 @@
     return input.replace(/\s/g, '').length < 1;
 }
 
+function getQueryString() {
+    var i = location.href.indexOf('?');
+    if (i < 0) return null;
+    return location.href.substr(i + 1);
+};
+
 function getQueryStringRegExp(name) {
     var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i");
     if (reg.test(location.href)) return unescape(RegExp.$2.replace(/\+/g, " "));

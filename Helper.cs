@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml.Linq;
-using Microsoft.Win32;
+using Mygod.Skylark.Offline;
 
 namespace Mygod.Skylark
 {
-    public static class Helper
+    public static partial class Helper
     {
         private static readonly object Locker = new object();
         private static readonly MethodInfo GetMimeMappingMethodInfo;
@@ -38,36 +38,22 @@ namespace Mygod.Skylark
             lock (Locker) return (string) GetMimeMappingMethodInfo.Invoke(null, new object[] { fileName });
         }
 
-        public static string GetDefaultExtension(string mimeType)
-        {
-            try
-            {
-                var key = Registry.ClassesRoot.OpenSubKey(@"MIME\Database\Content Type\" + mimeType, false);
-                var value = key != null ? key.GetValue("Extension", null) : null;
-                return value != null ? value.ToString() : null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static string GetMime(string contentType)
-        {
-            try
-            {
-                return contentType.Split(';')[0]; // kill that "; charset=utf-8" stupid stuff
-            }
-            catch
-            {
-                return contentType;
-            }
-        }
-
         private static readonly string[] Units = new[] { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         public static string GetSize(long size)
         {
             double byt = size;
+            byte i = 0;
+            while (byt > 1000)
+            {
+                byt /= 1024;
+                i++;
+            }
+            var bytesstring = size.ToString("N");
+            return byt.ToString("N") + " " + Units[i] + " (" + bytesstring.Remove(bytesstring.Length - 3) + " 字节)";
+        }
+        public static string GetSize(double size)
+        {
+            var byt = size;
             byte i = 0;
             while (byt > 1000)
             {
@@ -101,6 +87,40 @@ namespace Mygod.Skylark
             return from RepeaterItem item in collection where ((CheckBox) item.FindControl("Check")).Checked
                    select ((HtmlInputHidden)item.FindControl("Hidden")).Value;
         }
+
+        public static void NewOfflineTask(this HttpServerUtility server, string url, string relativePath)
+        {
+            Process.Start(new ProcessStartInfo(server.MapPath("~/Offline/MygodOfflineDownloader.exe"),
+                String.Format("\"{0}\" \"{1}\"", LinkConverter.Decode(url), relativePath)) { WorkingDirectory = server.MapPath("~/") });
+        }
+
+        public static DateTime Parse(string value)
+        {
+            return DateTime.SpecifyKind(DateTime.Parse(value), DateTimeKind.Unspecified);
+        }
+
+        public static string ToChineseString(this DateTime value)
+        {
+            return value.AddHours(8).ToString("yyyy.M.d H:mm:ss.fff");
+        }
+
+        public static string UrlDecode(this string str)
+        {
+            return Uri.UnescapeDataString(str);
+        }
+
+        public static string UrlEncode(this string str)
+        {
+            return Uri.EscapeDataString(str);
+        }
+
+        public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
+        {
+            return "%T%E".Replace("%T", link.Parent.Title).Replace("%A", link.Parent.Author)
+                .Replace("%E", ignoreExtensions ? string.Empty : link.Extension).Replace("\\", "＼").Replace("/", "／")
+                .Replace(":", "：").Replace("*", "＊").Replace("?", "？").Replace("\"", "＂").Replace("<", "＜").Replace(">", "＞")
+                .Replace("|", "｜");
+        }
     }
 
     public static class FileHelper
@@ -127,7 +147,7 @@ namespace Mygod.Skylark
         }
         public static string GetDataPath(this HttpServerUtility server, string path, bool isFile = true)
         {
-            return server.MapPath("~/Data/" + (isFile ? path + ".data" : Combine(path, ".data")));
+            return server.MapPath("~/Data/" + (isFile ? path + ".data" : path));
         }
 
         public static XElement GetElement(string path)
@@ -197,55 +217,175 @@ namespace Mygod.Skylark
             else if (Directory.Exists(dataPath)) foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath))
                 server.CancelControl(stuff);
         }
-    }
 
-    public static class R
-    {
-        private static readonly TimeSpan Offset = NtpClient.GetNetworkTime("time.windows.com") - DateTime.UtcNow;
-        public static DateTime UtcNow { get { return DateTime.SpecifyKind(DateTime.UtcNow.Add(Offset), DateTimeKind.Unspecified); } }
-    }
-
-    /// <summary>
-    /// Static class to receive the time from a NTP server.
-    /// </summary>
-    public static class NtpClient
-    {
-        /// <summary>
-        /// Gets the current DateTime from <paramref name="ntpServer"/>.
-        /// </summary>
-        /// <param name="ntpServer">The hostname of the NTP server.</param>
-        /// <returns>A DateTime containing the current time.</returns>
-        public static DateTime GetNetworkTime(string ntpServer)
+        internal static void DeleteWithRetries(string path)
         {
-            var address = Dns.GetHostEntry(ntpServer).AddressList;
-            if (address == null || address.Length == 0)
-                throw new ArgumentException("Could not resolve ip address from '" + ntpServer + "'.", "ntpServer");
-            var ep = new IPEndPoint(address[0], 123);
-            return GetNetworkTime(ep);
+        retry:
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+                else if (Directory.Exists(path)) Directory.Delete(path, true);
+            }
+            catch
+            {
+                Thread.Sleep(100);
+                goto retry;
+            }
+        }
+    }
+
+    public static class LinkConverter
+    {
+        public static string Base64Encode(string str)
+        {
+            return Convert.ToBase64String(Encoding.Default.GetBytes(str));
         }
 
-        /// <summary>
-        /// Gets the current DateTime form <paramref name="ep"/> IPEndPoint.
-        /// </summary>
-        /// <param name="ep">The IPEndPoint to connect to.</param>
-        /// <returns>A DateTime containing the current time.</returns>
-        private static DateTime GetNetworkTime(EndPoint ep)
+        public static string Base64Decode(string str)
         {
-            var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            s.Connect(ep);
-            var ntpData = new byte[48]; // RFC 2030 
-            ntpData[0] = 0x1B;
-            for (var i = 1; i < 48; i++) ntpData[i] = 0;
-            s.Send(ntpData);
-            s.Receive(ntpData);
-            const byte offsetTransmitTime = 40;
-            ulong intpart = 0;
-            ulong fractpart = 0;
-            for (var i = 0; i <= 3; i++) intpart = 256 * intpart + ntpData[offsetTransmitTime + i];
-            for (var i = 4; i <= 7; i++) fractpart = 256 * fractpart + ntpData[offsetTransmitTime + i];
-            var milliseconds = (intpart * 1000 + fractpart * 1000 / 0x100000000L);
-            s.Close();
-            return new DateTime(1900, 1, 1) + TimeSpan.FromTicks((long)milliseconds * TimeSpan.TicksPerMillisecond);
+            return Encoding.Default.GetString(Convert.FromBase64String(str));
+        }
+
+        public static string PublicEncode(string link, string linkpre, string prefix, string suffix, string name)
+        {
+            if (String.IsNullOrEmpty(link)) throw new ArgumentNullException("link");
+            if (link.ToLower().StartsWith(linkpre.ToLower(), StringComparison.Ordinal))
+                throw new ArgumentException("该链接已经是" + name + "下载链接。");
+            return linkpre + Base64Encode(prefix + link + suffix);
+        }
+
+        public static string PublicDecode(string link, string linkpre, string prefix, string suffix, string name)
+        {
+            if (String.IsNullOrEmpty(link)) throw new ArgumentNullException("link");
+            if (!link.ToLower().StartsWith(linkpre.ToLower(), StringComparison.Ordinal))
+                throw new ArgumentException("该链接不是" + name + "下载链接。");
+            link = link.TrimEnd('\\', '/', ' ', '\t', '\r', '\n');
+            var and = link.IndexOf('&');
+            if (and >= 0) link = link.Substring(0, and);
+            var result = Base64Decode(link.Substring(linkpre.Length));
+            return result.Substring(prefix.Length, result.Length - prefix.Length - suffix.Length);
+        }
+
+        public static string ThunderEncode(string link)
+        {
+            return PublicEncode(link, "thunder://", "AA", "ZZ", "迅雷");
+        }
+
+        public static string ThunderDecode(string link)
+        {
+            return PublicDecode(link, "thunder://", "AA", "ZZ", "迅雷");
+        }
+
+        public static string FlashGetEncode(string link)
+        {
+            return PublicEncode(link, "flashget://", "[FLASHGET]", "[FLASHGET]", "快车");
+        }
+
+        public static string FlashGetDecode(string link)
+        {
+            return PublicDecode(link, "flashget://", "[FLASHGET]", "[FLASHGET]", "快车");
+        }
+
+        public static string QQDLEncode(string link)
+        {
+            return PublicEncode(link, "qqdl://", String.Empty, String.Empty, "旋风");
+        }
+
+        public static string QQDLDecode(string link)
+        {
+            return PublicDecode(link, "qqdl://", String.Empty, String.Empty, "旋风");
+        }
+
+        public static string RayFileEncode(string link)
+        {
+            return PublicEncode(link, "fs2you://", String.Empty, String.Empty, "RayFile");
+        }
+
+        public static string RayFileDecode(string link)
+        {
+            return PublicDecode(link, "fs2you://", String.Empty, String.Empty, "RayFile");
+        }
+
+        public static string Reverse(string value)
+        {
+            return value.Reverse().Aggregate(string.Empty, (c, s) => c + s);
+        }
+
+        public static string Encode(LinkType to, string i)
+        {
+            switch (to)
+            {
+                case LinkType.Normal:
+                    return i;
+                case LinkType.Thunder:
+                    return ThunderEncode(i);
+                case LinkType.FlashGet:
+                    return FlashGetEncode(i);
+                case LinkType.QQDL:
+                    return QQDLEncode(i);
+                case LinkType.RayFile:
+                    return RayFileEncode(i);
+                default:
+                    throw new ArgumentException("未知的链接格式！");
+            }
+        }
+
+        private static string Decode(LinkType from, string i)
+        {
+            switch (from)
+            {
+                case LinkType.Normal:
+                    return i;
+                case LinkType.Thunder:
+                    return ThunderDecode(i);
+                case LinkType.FlashGet:
+                    return FlashGetDecode(i);
+                case LinkType.QQDL:
+                    return QQDLDecode(i);
+                case LinkType.RayFile:
+                    return RayFileDecode(i);
+                default:
+                    throw new ArgumentException("未知的链接格式！");
+            }
+        }
+
+        public static string Decode(string i)
+        {
+            var result = i;
+            var type = GetUrlType(result);
+            while (type != LinkType.Normal)
+            {
+                result = Decode(type, result);
+                type = GetUrlType(result);
+            }
+            return result;
+        }
+
+        public static LinkType GetUrlType(string i)
+        {
+            var l = i.ToLower();
+            if (l.StartsWith("thunder://", StringComparison.Ordinal)) return LinkType.Thunder;
+            if (l.StartsWith("flashget://", StringComparison.Ordinal)) return LinkType.FlashGet;
+            if (l.StartsWith("qqdl://", StringComparison.Ordinal)) return LinkType.QQDL;
+            return l.StartsWith("fs2you://", StringComparison.Ordinal) ? LinkType.RayFile : LinkType.Normal;
+        }
+    }
+
+    public enum LinkType
+    {
+        Normal, Thunder, FlashGet, QQDL, RayFile
+    }
+
+    public static class Rbase64
+    {
+        public static string Encode(string value)
+        {
+            return LinkConverter.Base64Encode(LinkConverter.Reverse(value));
+        }
+
+        public static string Decode(string value)
+        {
+            return LinkConverter.Reverse(LinkConverter.Base64Decode(value));
         }
     }
 }

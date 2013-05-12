@@ -40,27 +40,27 @@ namespace Mygod.Skylark.OfflineDownloader
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal)) fileName += extension;
 
                 path = Path.Combine(path, fileName);
-                xmlPath = Path.Combine("Data", path);
+                xmlPath = Path.Combine("Data", path + ".data");
                 path = Path.Combine("Files", path);
 
                 doc = new XDocument();
                 root = new XElement("file", new XAttribute("url", e.Args[0]), new XAttribute("state", "downloading"),
                                     new XAttribute("id", Process.GetCurrentProcess().Id), new XAttribute("fileName", fileName),
-                                    new XAttribute("startTime", R.UtcNow), new XAttribute("mime", mime));
+                                    new XAttribute("startTime", Helper.UtcNow), new XAttribute("mime", mime));
                 doc.Add(root);
                 if (fileLength != null) root.SetAttributeValue("size", fileLength);
                 doc.Save(xmlPath);
 
                 stream.CopyTo(fileStream = File.Create(path));
 
-                root.SetAttributeValue("endTime", R.UtcNow);
+                root.SetAttributeValue("endTime", Helper.UtcNow);
                 root.SetAttributeValue("state", "ready");
                 doc.Save(xmlPath);
             }
             catch (Exception exc)
             {
                 if (doc == null || root == null) return;
-                root.SetAttributeValue("state", "error");
+                root.SetAttributeValue("state", "download-error");
                 root.SetAttributeValue("message", exc.Message);
                 doc.Save(xmlPath);
             }
