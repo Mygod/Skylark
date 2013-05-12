@@ -99,9 +99,10 @@ namespace Mygod.Skylark
             return DateTime.SpecifyKind(DateTime.Parse(value), DateTimeKind.Unspecified);
         }
 
-        public static string ToChineseString(this DateTime value)
+        public static string ToChineseString(this DateTime value, bool offset = true)
         {
-            return value.AddHours(8).ToString("yyyy.M.d H:mm:ss.fff");
+            if (offset) value = value.AddHours(8);
+            return value.ToString("yyyy.M.d H:mm:ss.fff");
         }
 
         public static string UrlDecode(this string str)

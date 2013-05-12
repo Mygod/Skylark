@@ -14,9 +14,9 @@
         var url = getQueryStringRegExp("URL");
         if (url) $("#link-box").val($.base64reversed.decode(url));
         $("#magic-button").click(function () {
-            var url = "/NiGuan/" + $.base64reversed.encode($("#link-box").val());
-            var str = getQueryString();
-            if (str) url += '?' + str;
+            var url = "/NiGuan/?Url=" + $.base64reversed.encode($("#link-box").val());
+            var path = getQueryStringRegExp("path");
+            if (path) url += '&Path=' + path;
             location.href = url;
         });
     </script>

@@ -46,14 +46,14 @@ namespace Mygod.Skylark.OfflineDownloader
                 doc = new XDocument();
                 root = new XElement("file", new XAttribute("url", e.Args[0]), new XAttribute("state", "downloading"),
                                     new XAttribute("id", Process.GetCurrentProcess().Id), new XAttribute("fileName", fileName),
-                                    new XAttribute("startTime", Helper.UtcNow), new XAttribute("mime", mime));
+                                    new XAttribute("startTime", DateTime.UtcNow), new XAttribute("mime", mime));
                 doc.Add(root);
                 if (fileLength != null) root.SetAttributeValue("size", fileLength);
                 doc.Save(xmlPath);
 
                 stream.CopyTo(fileStream = File.Create(path));
 
-                root.SetAttributeValue("endTime", Helper.UtcNow);
+                root.SetAttributeValue("endTime", DateTime.UtcNow);
                 root.SetAttributeValue("state", "ready");
                 doc.Save(xmlPath);
             }

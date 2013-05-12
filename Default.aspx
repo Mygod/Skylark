@@ -51,7 +51,7 @@
     </script>
     <div>
         <asp:LinkButton runat="server" Text="[新建文件夹]" OnClick="NewFolder" OnClientClick="return NewFolder();" />
-        <a href="/Offline/?/<%=RelativePath %>">[新建离线下载任务]</a>
+        <a href="/Offline/?Path=<%=Server.UrlEncode(RelativePath) %>">[新建离线下载任务]</a>
         <a href="javascript:$('input:checkbox').prop('checked', selectAll = !selectAll);">[全选]</a>
         <a href="javascript:InvertSelection();">[反选]</a>
         <asp:LinkButton runat="server" Text="[删除选中项]" OnClick="Delete" OnClientClick="return DeleteConfirm();" />
@@ -116,7 +116,7 @@
         }
     </script>
     <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
-    <div>修改日期：<%=InfoFile.LastWriteTime.ToSuper().ToChineseString() %></div>
+    <div>修改日期：<%=InfoFile.LastWriteTime.ToChineseString(false) %></div>
     <div>默认类型：<%=GetMimeType(mime) %>
         <asp:LinkButton ID="LinkButton1" runat="server" Text="[修改]" OnClick="ModifyMime" OnClientClick="return ModifyMime();" />
     </div>

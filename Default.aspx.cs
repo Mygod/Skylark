@@ -168,7 +168,7 @@ namespace Mygod.Skylark
                 if (impossibleEnds) Never();
                 else
                 {
-                    var spentTime = Helper.UtcNow - startTime;
+                    var spentTime = DateTime.UtcNow - startTime;
                     SpentTime = spentTime.ToString("g");
                     var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
                     AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);

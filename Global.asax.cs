@@ -10,8 +10,8 @@ namespace Mygod.Skylark
         {
             RouteTable.Routes.MapPageRoute("Browse", "Browse", "~/");
             RouteTable.Routes.MapPageRoute("Download", "Download", "~/Download.aspx");
-            RouteTable.Routes.MapPageRoute("NiGuan", "NiGuan/{*Rbase64}", "~/Offline/YouTube.aspx");
-            RouteTable.Routes.MapPageRoute("Offline", "Offline/{Rbase64}", "~/Offline/Start.aspx", true);
+            RouteTable.Routes.MapPageRoute("NiGuan", "NiGuan", "~/Offline/YouTube.aspx");
+            RouteTable.Routes.MapPageRoute("Offline", "Offline/Start", "~/Offline/Start.aspx", true);
             RouteTable.Routes.MapPageRoute("Upload", "Upload", "~/Upload.aspx");
             RouteTable.Routes.MapPageRoute("View", "View/{*Mime}", "~/View.aspx");
         }
