@@ -21,7 +21,7 @@ namespace Mygod.Skylark.Offline
         {
             var path = Context.GetRelativePath();
             Server.NewOfflineTask(MediaFireDirectLinkExtractor.Match(new WebClient().DownloadString("http://www.mediafire.com/?"
-                + LinkBox.Text)).Groups[1].Value, path);
+                + MediaFireBox.Text)).Groups[1].Value, path);
             Response.Redirect("/?/" + path);
         }
     }
