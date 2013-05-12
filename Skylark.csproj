@@ -62,6 +62,7 @@
     <Content Include="css\theme-dark.css" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
+    <Content Include="Files\readme.txt" />
     <Content Include="Global.asax" />
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
@@ -191,9 +192,9 @@
   <ItemGroup>
     <Content Include="Site.Master" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Files\" />
+    <Content Include="Data\readme.txt.data" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
