@@ -63,7 +63,7 @@ namespace Mygod.Skylark
                 case "Rename":
                     var newPath = FileHelper.Combine(RelativePath, Hidden.Value);
                     Directory.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
-                    Directory.Move(Server.GetDataPath(path), Server.GetDataPath(newPath, false));
+                    Directory.Move(Server.GetDataPath(path, false), Server.GetDataPath(newPath, false));
                     Response.Redirect(Request.RawUrl);
                     break;
             }

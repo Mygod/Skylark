@@ -107,12 +107,12 @@ namespace Mygod.Skylark
 
         public static string UrlDecode(this string str)
         {
-            return Uri.UnescapeDataString(str);
+            return HttpUtility.UrlDecode(str);
         }
 
         public static string UrlEncode(this string str)
         {
-            return Uri.EscapeDataString(str);
+            return HttpUtility.UrlEncode(str);
         }
 
         public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
@@ -309,7 +309,7 @@ namespace Mygod.Skylark
 
         public static string Reverse(string value)
         {
-            return value.Reverse().Aggregate(string.Empty, (c, s) => c + s);
+            return string.Join(null, value.Reverse());
         }
 
         public static string Encode(LinkType to, string i)

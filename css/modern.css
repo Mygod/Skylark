@@ -6535,3 +6535,7 @@ img {
 .bold {
     font-weight: bold;
 }
+
+.nowrap {
+    white-space: nowrap;
+}

@@ -14,6 +14,7 @@
     <% if (InfoDirectory.Exists)
        { %>
     <div id="manual-fine-uploader"></div>
+    <div>（支持多选、拖放，自动覆盖已有文件）</div>
     <script src="plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
     <script type="text/javascript">
         function NewFolder() {
@@ -25,6 +26,9 @@
             return $("input:checked").length > 0 && confirm("确定要删除吗？此操作没有后悔药吃。");
         }
         var selectAll = false;
+        function SelectAll() {
+            $('input:checkbox').prop('checked', selectAll = !selectAll);
+        }
         function InvertSelection() {
             var checked = $("input:checkbox:checked");
             $("input:checkbox:not(:checked)").prop("checked", true);
@@ -52,7 +56,7 @@
     <div>
         <asp:LinkButton runat="server" Text="[新建文件夹]" OnClick="NewFolder" OnClientClick="return NewFolder();" />
         <a href="/Offline/?Path=<%=Server.UrlEncode(RelativePath) %>">[新建离线下载任务]</a>
-        <a href="javascript:$('input:checkbox').prop('checked', selectAll = !selectAll);">[全选]</a>
+        <a href="javascript:SelectAll();">[全选]</a>
         <a href="javascript:InvertSelection();">[反选]</a>
         <asp:LinkButton runat="server" Text="[删除选中项]" OnClick="Delete" OnClientClick="return DeleteConfirm();" />
     </div>
@@ -60,11 +64,11 @@
         <asp:Repeater runat="server" ID="DirectoryList" OnItemCommand="DirectoryCommand">
             <ItemTemplate>
                 <tr>
-                    <td style="width: 65px;">
+                    <td class="nowrap">
                         <asp:CheckBox ID="Check" runat="server" Text=' <img src="/Image/Directory.png" alt="目录" />' />
                     </td>
                     <td><a href="?/<%#FileHelper.Combine(RelativePath, Eval("Name").ToString()) %>"><%#Eval("Name") %></a></td>
-                    <td style="width: 77px;">
+                    <td class="nowrap">
                         <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
                         <asp:LinkButton runat="server" Text="[重命名]" CommandName="Rename"
                                         OnClientClick='<%#string.Format("return Rename(\"{0}\");", Eval("Name"))%>' />
@@ -75,14 +79,14 @@
         <asp:Repeater runat="server" ID="FileList" OnItemCommand="FileCommand">
             <ItemTemplate>
                 <tr>
-                    <td style="width: 65px;">
+                    <td class="nowrap">
                         <asp:CheckBox ID="Check" runat="server" Text='<%#FileHelper.IsReady(
                             Server.GetDataPath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
                                 ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
                                 : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>' />
                     </td>
                     <td><a href="?/<%#FileHelper.Combine(RelativePath, Eval("Name").ToString()) %>"><%#Eval("Name") %></a></td>
-                    <td style="width: 77px;">
+                    <td class="nowrap">
                         <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
                         <asp:LinkButton runat="server" Text="[重命名]" CommandName="Rename"
                                         OnClientClick='<%#string.Format("return Rename(\"{0}\");", Eval("Name"))%>' />
