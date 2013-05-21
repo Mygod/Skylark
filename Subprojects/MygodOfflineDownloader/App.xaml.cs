@@ -34,7 +34,9 @@ namespace Mygod.Skylark.OfflineDownloader
                         fileLength = null;
                     }
 
-                var fileName = pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'') : GetFileName(e.Args[0]);
+                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'') : GetFileName(e.Args[0]))
+                    .Replace("%1", "＼").Replace("%2", "／").Replace("%3", "：").Replace("%4", "＊").Replace("%5", "？")
+                    .Replace("%6", "＂").Replace("%7", "＜").Replace("%8", "＞").Replace("%9", "｜").Replace("%0", "%");
                 var mime = Helper.GetMime(response.ContentType);
                 var extension = Helper.GetDefaultExtension(mime);
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal)) fileName += extension;

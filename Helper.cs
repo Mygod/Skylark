@@ -91,7 +91,7 @@ namespace Mygod.Skylark
         public static void NewOfflineTask(this HttpServerUtility server, string url, string relativePath)
         {
             Process.Start(new ProcessStartInfo(server.MapPath("~/Offline/MygodOfflineDownloader.exe"),
-                String.Format("\"{0}\" \"{1}\"", LinkConverter.Decode(url), relativePath)) { WorkingDirectory = server.MapPath("~/") });
+                string.Format("\"{0}\" \"{1}\"", LinkConverter.Decode(url), relativePath)) { WorkingDirectory = server.MapPath("~/") });
         }
 
         public static DateTime Parse(string value)
@@ -112,15 +112,15 @@ namespace Mygod.Skylark
 
         public static string UrlEncode(this string str)
         {
-            return HttpUtility.UrlEncodeUnicode(str);
+            return HttpUtility.UrlEncode(str);
         }
 
         public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
         {
             return "%T%E".Replace("%T", link.Parent.Title).Replace("%A", link.Parent.Author)
-                .Replace("%E", ignoreExtensions ? string.Empty : link.Extension).Replace("\\", "＼").Replace("/", "／")
-                .Replace(":", "：").Replace("*", "＊").Replace("?", "？").Replace("\"", "＂").Replace("<", "＜").Replace(">", "＞")
-                .Replace("|", "｜");
+                .Replace("%E", ignoreExtensions ? string.Empty : link.Extension).Replace("%", "%0").Replace("\\", "%1").Replace("/", "%2")
+                .Replace(":", "%3").Replace("*", "%4").Replace("?", "%5").Replace("\"", "%6").Replace("<", "%7").Replace(">", "%8")
+                .Replace("|", "%9");
         }
     }
 
