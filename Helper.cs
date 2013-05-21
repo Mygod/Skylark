@@ -112,7 +112,7 @@ namespace Mygod.Skylark
 
         public static string UrlEncode(this string str)
         {
-            return HttpUtility.UrlEncode(str);
+            return HttpUtility.UrlEncodeUnicode(str);
         }
 
         public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
