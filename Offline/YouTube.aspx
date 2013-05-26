@@ -14,10 +14,7 @@
         var url = getQueryStringRegExp("URL");
         if (url) $("#link-box").val($.base64reversed.decode(url));
         $("#magic-button").click(function () {
-            var url = "/NiGuan/?Url=" + $.base64reversed.encode($("#link-box").val());
-            var path = getQueryStringRegExp("path");
-            if (path) url += '&Path=' + path;
-            location.href = url;
+            location.href = "?Url=" + $.base64reversed.encode($("#link-box").val());
         });
     </script>
     <div>想要直接下载你管视频？试试<a href="http://mygod.apphb.com/#Product-66">掩耳</a>！</div>

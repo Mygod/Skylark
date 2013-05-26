@@ -122,13 +122,19 @@ namespace Mygod.Skylark
                 .Replace(":", "%3").Replace("*", "%4").Replace("?", "%5").Replace("\"", "%6").Replace("<", "%7").Replace(">", "%8")
                 .Replace("|", "%9");
         }
+
+        public static bool IsAjaxRequest(this HttpRequest request)
+        {
+            var header = request.Headers["X-Requested-With"];
+            return header != null && header == "XMLHttpRequest";
+        }
     }
 
     public static class FileHelper
     {
-        public static string GetRelativePath(this HttpContext context)
+        public static string GetRelativePath(this RouteData data)
         {
-            return (context.Server.UrlDecode(context.Request.QueryString.ToString()) ?? String.Empty).Replace('\\', '/').Trim('/');
+            return data.GetRouteString("Path") ?? string.Empty;
         }
 
         public static string Combine(params string[] paths)
@@ -187,6 +193,17 @@ namespace Mygod.Skylark
             var root = doc.Element("file");
             root.SetAttributeValue(attribute, value);
             doc.Save(path);
+        }
+
+        public static long GetFileSize(this HttpServerUtility server, string path)
+        {
+            var root = GetElement(server.GetDataPath(path));
+            if (root != null && root.GetAttributeValue("state") != "ready")
+            {
+                long result;
+                if (long.TryParse(root.GetAttributeValue("size"), out result)) return result;
+            }
+            return new FileInfo(server.GetFilePath(path)).Length;
         }
 
         public static bool IsReady(string path)

@@ -8,12 +8,13 @@ namespace Mygod.Skylark
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            RouteTable.Routes.MapPageRoute("Browse", "Browse", "~/");
-            RouteTable.Routes.MapPageRoute("Download", "Download", "~/Download.aspx");
-            RouteTable.Routes.MapPageRoute("NiGuan", "NiGuan", "~/Offline/YouTube.aspx");
-            RouteTable.Routes.MapPageRoute("Offline", "Offline/Start", "~/Offline/Start.aspx", true);
-            RouteTable.Routes.MapPageRoute("Upload", "Upload", "~/Upload.aspx");
-            RouteTable.Routes.MapPageRoute("View", "View/{*Mime}", "~/View.aspx");
+            RouteTable.Routes.MapPageRoute("Browse", "Browse/{*Path}", "~/Browse.aspx", false);
+            RouteTable.Routes.MapPageRoute("Download", "Download/{*Path}", "~/Download.aspx", false);
+            RouteTable.Routes.MapPageRoute("OfflineNew", "Offline/New/{*Path}", "~/Offline/New.aspx", false);
+            RouteTable.Routes.MapPageRoute("OfflineNiGuan", "Offline/NiGuan/{*Path}", "~/Offline/YouTube.aspx", false);
+            RouteTable.Routes.MapPageRoute("OfflineStart", "Offline/Start/{*Path}", "~/Offline/Start.aspx", false);
+            RouteTable.Routes.MapPageRoute("Upload", "Upload/{*Path}", "~/Upload.aspx", false);
+            RouteTable.Routes.MapPageRoute("View", "View/{*Path}", "~/View.aspx", false);
         }
 
         protected void Session_Start(object sender, EventArgs e)

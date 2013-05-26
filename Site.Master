@@ -7,7 +7,7 @@
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
-    <link href="css/modern.css" rel="stylesheet" type="text/css" />
+    <link href="/css/modern.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>

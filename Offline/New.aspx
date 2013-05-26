@@ -1,4 +1,4 @@
-﻿<%@ Page Title="新建离线下载任务" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Mygod.Skylark.Offline.Default" %>
+﻿<%@ Page Title="新建离线下载任务" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="New.aspx.cs" Inherits="Mygod.Skylark.Offline.New" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <style type="text/css">
         .link-box {
@@ -19,7 +19,7 @@
     <div>&nbsp;</div>
     <div>请注意离线下载以下格式的文件方法比较特殊，请按照下面说的进行：（否则可能会失败）</div>
     <ul>
-        <li><a href="/NiGuan/?Path=<%=Server.UrlEncode(Path) %>">你管（YouTube）视频</a>。</li>
+        <li><a href="/NiGuan/<%=Path %>/">你管（YouTube）视频</a>。</li>
         <li>
             http://www.mediafire.com/?<asp:TextBox runat="server" ID="MediaFireBox" Width="400px" />
             <asp:Button runat="server" OnClick="MediaFire" Text="下载MediaFire网盘文件" />

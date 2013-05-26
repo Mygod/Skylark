@@ -13,7 +13,7 @@ namespace Mygod.Skylark
             {
                 foreach (var file in Request.Files.AllKeys.Select(key => Request.Files[key]))
                 {
-                    string path = FileHelper.Combine(Context.GetRelativePath(), file.FileName), dataPath = Server.GetDataPath(path);
+                    string path = FileHelper.Combine(RouteData.GetRelativePath(), file.FileName), dataPath = Server.GetDataPath(path);
                     File.Delete(dataPath);
                     using (var stream = new FileStream(Server.GetFilePath(path), FileMode.Create, FileAccess.Write, 
                         FileShare.Read)) file.InputStream.CopyTo(stream);

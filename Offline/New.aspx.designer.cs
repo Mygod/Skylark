@@ -10,7 +10,7 @@
 namespace Mygod.Skylark.Offline {
     
     
-    public partial class Default {
+    public partial class New {
         
         /// <summary>
         /// LinkBox 控件。

@@ -38,6 +38,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="SevenZipSharp, Version=0.64.4890.36034, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>plugins\SevenZipSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -56,10 +60,11 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Default.aspx" />
+    <Content Include="Browse.aspx" />
     <Content Include="css\modern-responsive.css" />
     <Content Include="css\modern.css" />
     <Content Include="css\theme-dark.css" />
+    <Content Include="Default.aspx" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
     <Content Include="Files\readme.txt" />
@@ -68,10 +73,11 @@
     <Content Include="Image\Directory.png" />
     <Content Include="Image\File.png" />
     <Content Include="javascript\generic.js" />
-    <Content Include="Offline\Default.aspx" />
+    <Content Include="Offline\New.aspx" />
     <Content Include="Offline\MygodOfflineDownloader.exe" />
     <Content Include="Offline\Start.aspx" />
     <Content Include="Offline\YouTube.aspx" />
+    <Content Include="plugins\7z.dll" />
     <Content Include="plugins\CryptoJS\aes-min.js" />
     <Content Include="plugins\CryptoJS\aes.js" />
     <Content Include="plugins\CryptoJS\cipher-core-min.js" />
@@ -144,12 +150,20 @@
     <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
     <Content Include="plugins\fineuploader\loading.gif" />
     <Content Include="plugins\fineuploader\processing.gif" />
+    <Content Include="plugins\SevenZipSharp.dll" />
     <Content Include="Upload.aspx" />
     <Content Include="View.aspx" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Browse.aspx.cs">
+      <DependentUpon>Browse.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Browse.aspx.designer.cs">
+      <DependentUpon>Browse.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -171,12 +185,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper.cs" />
-    <Compile Include="Offline\Default.aspx.cs">
-      <DependentUpon>Default.aspx</DependentUpon>
+    <Compile Include="Offline\New.aspx.cs">
+      <DependentUpon>New.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Offline\Default.aspx.designer.cs">
-      <DependentUpon>Default.aspx</DependentUpon>
+    <Compile Include="Offline\New.aspx.designer.cs">
+      <DependentUpon>New.aspx</DependentUpon>
     </Compile>
     <Compile Include="Offline\Start.aspx.cs">
       <DependentUpon>Start.aspx</DependentUpon>

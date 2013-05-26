@@ -6,20 +6,20 @@ using System.Web.UI;
 
 namespace Mygod.Skylark.Offline
 {
-    public partial class Default : Page
+    public partial class New : Page
     {
         protected string Path;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Path = Server.UrlDecode(Request.QueryString["Path"]);
+            Path = RouteData.GetRelativePath();
         }
 
         protected void Submit(object sender, EventArgs e)
         {
             foreach (var link in LinkBox.Text.Split(new[] { '\r', '\n' }).Where(link => !string.IsNullOrWhiteSpace(link)))
                 Server.NewOfflineTask(link, Path);
-            Response.Redirect("/?/" + Path);
+            Response.Redirect("/Browse/" + Path + '/');
         }
 
         private static readonly Regex MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
@@ -27,7 +27,7 @@ namespace Mygod.Skylark.Offline
         {
             Server.NewOfflineTask(MediaFireDirectLinkExtractor.Match(new WebClient().DownloadString("http://www.mediafire.com/?"
                 + MediaFireBox.Text)).Groups[1].Value, Path);
-            Response.Redirect("/?/" + Path);
+            Response.Redirect("/Browse/" + Path + '/');
         }
     }
 }
