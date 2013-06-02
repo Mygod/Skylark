@@ -347,7 +347,7 @@ namespace Mygod.Skylark
                 {
                     var spentTime = DateTime.UtcNow - startTime;
                     SpentTime = spentTime.ToString("g");
-                    var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100 - percentage) / 100.0));
+                    var remainingTime = new TimeSpan((long) (spentTime.Ticks * (100.0 / percentage - 1)));
                     RemainingTime = remainingTime.ToString("g");
                     EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
                 }
