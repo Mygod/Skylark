@@ -15,6 +15,8 @@ namespace Mygod.Skylark
             RouteTable.Routes.MapPageRoute("OfflineStart", "Offline/Start/{*Path}", "~/Offline/Start.aspx", false);
             RouteTable.Routes.MapPageRoute("Upload", "Upload/{*Path}", "~/Upload.aspx", false);
             RouteTable.Routes.MapPageRoute("View", "View/{*Path}", "~/View.aspx", false);
+
+            RouteTable.Routes.MapPageRoute("TaskDecompress", "Task/Decompress/{ID}", "~/Task/Decompress.aspx", false);
         }
 
         protected void Session_Start(object sender, EventArgs e)

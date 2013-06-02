@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 
 namespace Mygod.Skylark
 {
@@ -14,8 +13,16 @@ namespace Mygod.Skylark
                 Response.StatusCode = 404;
                 return;
             }
-            while (!FileHelper.IsReady(dataPath)) Thread.Sleep(1000);   // keep sleeping until finished or being aborted
-            DownloadFile(Server.GetFilePath(path));
+            try
+            {
+                FileHelper.WaitForReady(dataPath, 10);
+                DownloadFile(Server.GetFilePath(path));
+            }
+            catch
+            {
+                Response.StatusCode = 503;
+                Response.StatusDescription = "文件尚在处理中，请稍后再试";
+            }
         }
     }
 }

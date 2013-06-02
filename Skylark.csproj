@@ -37,29 +37,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="SevenZipSharp, Version=0.64.4890.36034, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>plugins\SevenZipSharp.dll</HintPath>
+    <Reference Include="MygodLibrary">
+      <HintPath>plugins\MygodLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="System.Web.DynamicData" />
-    <Reference Include="System.Web.Entity" />
-    <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="plugins\7z.dll" />
+    <Content Include="plugins\BackgroundRunner.exe" />
     <Content Include="Browse.aspx" />
     <Content Include="css\modern-responsive.css" />
     <Content Include="css\modern.css" />
@@ -74,10 +66,8 @@
     <Content Include="Image\File.png" />
     <Content Include="javascript\generic.js" />
     <Content Include="Offline\New.aspx" />
-    <Content Include="Offline\MygodOfflineDownloader.exe" />
     <Content Include="Offline\Start.aspx" />
     <Content Include="Offline\YouTube.aspx" />
-    <Content Include="plugins\7z.dll" />
     <Content Include="plugins\CryptoJS\aes-min.js" />
     <Content Include="plugins\CryptoJS\aes.js" />
     <Content Include="plugins\CryptoJS\cipher-core-min.js" />
@@ -150,10 +140,14 @@
     <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
     <Content Include="plugins\fineuploader\loading.gif" />
     <Content Include="plugins\fineuploader\processing.gif" />
+    <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\SevenZipSharp.dll" />
+    <Content Include="Task\Decompress.aspx" />
     <Content Include="Upload.aspx" />
     <Content Include="View.aspx" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
@@ -180,6 +174,13 @@
     </Compile>
     <Compile Include="DownloadablePage.cs">
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FileSystem.master.cs">
+      <DependentUpon>FileSystem.master</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="FileSystem.master.designer.cs">
+      <DependentUpon>FileSystem.master</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -214,6 +215,13 @@
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
+    <Compile Include="Task\Decompress.aspx.cs">
+      <DependentUpon>Decompress.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Task\Decompress.aspx.designer.cs">
+      <DependentUpon>Decompress.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Upload.aspx.cs">
       <DependentUpon>Upload.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -232,7 +240,9 @@
   <ItemGroup>
     <Content Include="Site.Master" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="FileSystem.master" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Data\readme.txt.data" />
   </ItemGroup>

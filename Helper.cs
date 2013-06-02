@@ -1,43 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Xml.Linq;
 using Mygod.Skylark.Offline;
+using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark
 {
     public static partial class Helper
     {
-        private static readonly object Locker = new object();
-        private static readonly MethodInfo GetMimeMappingMethodInfo;
-
-        static Helper()
-        {
-            var mimeMappingType = Assembly.GetAssembly(typeof(HttpRuntime)).GetType("System.Web.MimeMapping");
-            if (mimeMappingType == null) throw new SystemException("Couldn't find MimeMapping type");
-            GetMimeMappingMethodInfo = mimeMappingType.GetMethod("GetMimeMapping",
-                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-            if (GetMimeMappingMethodInfo == null) throw new SystemException("Couldn't find GetMimeMapping method");
-            if (GetMimeMappingMethodInfo.ReturnType != typeof(string))
-                throw new SystemException("GetMimeMapping method has invalid return type");
-            if (GetMimeMappingMethodInfo.GetParameters().Length != 1
-                && GetMimeMappingMethodInfo.GetParameters()[0].ParameterType != typeof(string))
-                throw new SystemException("GetMimeMapping method has invalid parameters");
-        }
-        public static string GetMimeType(string fileName)
-        {
-            lock (Locker) return (string) GetMimeMappingMethodInfo.Invoke(null, new object[] { fileName });
-        }
-
         private static readonly string[] Units = new[] { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         public static string GetSize(long size)
         {
@@ -76,22 +55,25 @@ namespace Mygod.Skylark
             }
         }
 
-        public static string GetAttributeValue(this XElement e, XName name)
-        {
-            var attr = e.Attribute(name);
-            return attr == null ? null : attr.Value;
-        }
-
         public static IEnumerable<string> GetSelectedFiles(this RepeaterItemCollection collection)
         {
             return from RepeaterItem item in collection where ((CheckBox) item.FindControl("Check")).Checked
                    select ((HtmlInputHidden)item.FindControl("Hidden")).Value;
         }
 
+        public static void StartRunner(this HttpServerUtility server, string args)
+        {
+            var info = new ProcessStartInfo(server.MapPath("~/plugins/BackgroundRunner.exe"))
+                { WorkingDirectory = server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false };
+            var process = new Process { StartInfo = info };
+            process.Start();
+            process.StandardInput.WriteLine(args);
+            process.StandardInput.Close();
+        }
+
         public static void NewOfflineTask(this HttpServerUtility server, string url, string relativePath)
         {
-            Process.Start(new ProcessStartInfo(server.MapPath("~/Offline/MygodOfflineDownloader.exe"),
-                string.Format("\"{0}\" \"{1}\"", LinkConverter.Decode(url), relativePath)) { WorkingDirectory = server.MapPath("~/") });
+            server.StartRunner(string.Format("offline-download\n{0}\n{1}", LinkConverter.Decode(url), relativePath));
         }
 
         public static DateTime Parse(string value)
@@ -118,7 +100,7 @@ namespace Mygod.Skylark
         public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
         {
             return "%T%E".Replace("%T", link.Parent.Title).Replace("%A", link.Parent.Author)
-                .Replace("%E", ignoreExtensions ? string.Empty : link.Extension).Replace("%", "%0").Replace("\\", "%1").Replace("/", "%2")
+                .Replace("%E", ignoreExtensions ? String.Empty : link.Extension).Replace("%", "%0").Replace("\\", "%1").Replace("/", "%2")
                 .Replace(":", "%3").Replace("*", "%4").Replace("?", "%5").Replace("\"", "%6").Replace("<", "%7").Replace(">", "%8")
                 .Replace("|", "%9");
         }
@@ -128,24 +110,48 @@ namespace Mygod.Skylark
             var header = request.Headers["X-Requested-With"];
             return header != null && header == "XMLHttpRequest";
         }
-    }
 
-    public static class FileHelper
-    {
-        public static string GetRelativePath(this RouteData data)
+        public static string Shorten(this DateTime value)
         {
-            return data.GetRouteString("Path") ?? string.Empty;
+            return Convert.ToBase64String(BitConverter.GetBytes(value.Ticks));
         }
 
-        public static string Combine(params string[] paths)
+        public static DateTime Deshorten(string value)
         {
-            var result = String.Empty;
-            foreach (var path in paths.Select(path => path.Trim('/')))
+            return new DateTime(BitConverter.ToInt64(Convert.FromBase64String(value), 0), DateTimeKind.Utc);
+        }
+
+        public static void KillProcess(int pid)
+        {
+            try
             {
-                if (!String.IsNullOrEmpty(result)) result += '/';
-                result += path;
+                Process.GetProcessById(pid).Kill();
             }
-            return result;
+            catch { }
+        }
+        public static bool IsBackgroundRunnerKilled(int pid)
+        {
+            try
+            {
+                return Process.GetProcessById(pid).ProcessName != "BackgroundRunner";
+            }
+            catch
+            {
+                return true;
+            }
+        }
+    }
+
+    public static partial class FileHelper
+    {
+        public static string ToCorrectUrl(this string value)
+        {
+            return value.Replace('\\', '/').Trim('/');
+        }
+
+        public static string GetRelativePath(this RouteData data)
+        {
+            return (data.GetRouteString("Path") ?? string.Empty).ToCorrectUrl();
         }
 
         public static string GetFilePath(this HttpServerUtility server, string path)
@@ -157,44 +163,6 @@ namespace Mygod.Skylark
             return server.MapPath("~/Data/" + (isFile ? path + ".data" : path));
         }
 
-        public static XElement GetElement(string path)
-        {
-            try
-            {
-                return XDocument.Load(path).Element("file");
-            }
-            catch
-            {
-                return null;
-            }
-        }
-        public static string GetFileValue(string path, string attribute)
-        {
-            try
-            {
-                return GetElement(path).GetAttributeValue(attribute);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-        public static void SetFileValue(string path, string attribute, string value)
-        {
-            XDocument doc;
-            try
-            {
-                doc = XDocument.Load(path);
-            }
-            catch
-            {
-                doc = new XDocument(new XElement("file"));
-            }
-            var root = doc.Element("file");
-            root.SetAttributeValue(attribute, value);
-            doc.Save(path);
-        }
-
         public static long GetFileSize(this HttpServerUtility server, string path)
         {
             var root = GetElement(server.GetDataPath(path));
@@ -204,11 +172,6 @@ namespace Mygod.Skylark
                 if (long.TryParse(root.GetAttributeValue("size"), out result)) return result;
             }
             return new FileInfo(server.GetFilePath(path)).Length;
-        }
-
-        public static bool IsReady(string path)
-        {
-            return GetFileValue(path, "state") == "ready";
         }
 
         public static string GetDefaultMime(string path)
@@ -224,19 +187,19 @@ namespace Mygod.Skylark
         {
             if (File.Exists(dataPath))
             {
+                if (!dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture)) return;    // ignore non-data files
                 var element = GetElement(dataPath);
                 if (element.GetAttributeValue("state") != "ready")
-                    try
-                    {
-                        Process.GetProcessById(int.Parse(element.GetAttributeValue("id"))).Kill();
-                    }
-                    catch { }
+                {
+                    var pid = element.GetAttributeValueWithDefault<int>("pid");
+                    if (pid != 0) Helper.KillProcess(pid);
+                }
             }
             else if (Directory.Exists(dataPath)) foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath))
                 server.CancelControl(stuff);
         }
 
-        internal static void DeleteWithRetries(string path)
+        public static void DeleteWithRetries(string path)
         {
         retry:
             try

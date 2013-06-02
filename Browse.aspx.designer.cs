@@ -40,6 +40,24 @@ namespace Mygod.Skylark {
         protected global::System.Web.UI.WebControls.View DirectoryView;
         
         /// <summary>
+        /// CompressionLevelList 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList CompressionLevelList;
+        
+        /// <summary>
+        /// ArchiveFilePath 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ArchiveFilePath;
+        
+        /// <summary>
         /// DirectoryList 控件。
         /// </summary>
         /// <remarks>
@@ -76,31 +94,22 @@ namespace Mygod.Skylark {
         protected global::System.Web.UI.WebControls.View FileDownloadingView;
         
         /// <summary>
-        /// Manager 控件。
+        /// FileDecompressingView 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager Manager;
+        protected global::System.Web.UI.WebControls.View FileDecompressingView;
         
         /// <summary>
-        /// Panel 控件。
+        /// FileCompressingView 控件。
         /// </summary>
         /// <remarks>
         /// 自动生成的字段。
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
-        protected global::System.Web.UI.UpdatePanel Panel;
-        
-        /// <summary>
-        /// Timer 控件。
-        /// </summary>
-        /// <remarks>
-        /// 自动生成的字段。
-        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
-        /// </remarks>
-        protected global::System.Web.UI.Timer Timer;
+        protected global::System.Web.UI.WebControls.View FileCompressingView;
         
         /// <summary>
         /// GoneView 控件。

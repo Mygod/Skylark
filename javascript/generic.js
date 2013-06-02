@@ -32,3 +32,15 @@ $.base64reversed = {
         return $.base64.decode(str).split("").reverse().join("");
     }
 };
+
+var uriParser = /^(.*)\/(Browse|Download|Offline\/New|Offline\/NiGuan|Offline\/Start|Upload|View)\/(.*)(\?.*)?$/i;
+
+function changePath() {
+    uriParser.exec(location.href);
+    var result = prompt("请输入新的位置：", unescape(RegExp.$3));
+    if (result) location.href = RegExp.$1 + "/" + RegExp.$2 + "/" + result + RegExp.$4;
+}
+
+function hideParent() {
+    $(event.target).parent().hide();
+}

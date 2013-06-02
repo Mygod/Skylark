@@ -14,12 +14,15 @@ namespace Mygod.Skylark
                 foreach (var file in Request.Files.AllKeys.Select(key => Request.Files[key]))
                 {
                     string path = FileHelper.Combine(RouteData.GetRelativePath(), file.FileName), dataPath = Server.GetDataPath(path);
-                    File.Delete(dataPath);
+                    if (File.Exists(dataPath))
+                    {
+                        Server.CancelControl(dataPath);
+                        File.Delete(dataPath);
+                    }
                     using (var stream = new FileStream(Server.GetFilePath(path), FileMode.Create, FileAccess.Write, 
                         FileShare.Read)) file.InputStream.CopyTo(stream);
-                    File.WriteAllText(dataPath,
-                                      string.Format("<?xml version=\"1.0\" encoding=\"utf-8\"?>{0}<file mime=\"{1}\" state=\"ready\" />",
-                                                    Environment.NewLine, Helper.GetMimeType(file.FileName)));
+                    FileHelper.WriteAllText(dataPath, 
+                                            string.Format("<file mime=\"{0}\" state=\"ready\" />", Helper.GetMimeType(file.FileName)));
                 }
                 Response.Write("{\"success\":true}");
             }

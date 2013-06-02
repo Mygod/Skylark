@@ -1,4 +1,4 @@
-﻿<%@ Page Title="离线下载你管视频" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="YouTube.aspx.cs" Inherits="Mygod.Skylark.Offline.YouTube" %>
+﻿<%@ Page Title="离线下载你管视频" Language="C#" MasterPageFile="~/FileSystem.Master" AutoEventWireup="true" CodeBehind="YouTube.aspx.cs" Inherits="Mygod.Skylark.Offline.YouTube" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <style type="text/css">
         #link-box {
