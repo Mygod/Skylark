@@ -21,7 +21,7 @@ namespace Mygod.Skylark.Task
             var root = XHelper.Load(xmlPath).Root;
             Archive = root.GetAttributeValue("archive");
             var targetDirectory = root.GetAttributeValue("directory");
-            TargetDirectory = string.Format("<a href=\"/Browse/{0}\">{0}</a>", TargetDirectory);
+            TargetDirectory = string.Format("<a href=\"/Browse/{0}\">{0}</a>", targetDirectory);
             var attr = root.GetAttributeValue("progress");
             if (attr == null)
             {
