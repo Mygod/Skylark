@@ -59,10 +59,11 @@
                     prefix = prefix + "/";
                     for (var i = 0; i < array.length; i++) result += prefix + array[i].value + "\r\n";
                     var box = $("#running-result");
-                    box.val(result);
-                    box.select();
-                    box.focus();
+                    var input = box.children("textarea");
+                    input.val(result);
                     box.show();
+                    input.select();
+                    input.focus();
                 }
                 function rename(oldName) {
                     var result = prompt("请输入新的名字：", oldName);
