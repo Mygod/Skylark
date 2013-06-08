@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Files\Banner.png" />
     <Content Include="plugins\7z.dll" />
     <Content Include="plugins\BackgroundRunner.exe" />
     <Content Include="Browse.aspx" />
@@ -245,6 +246,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\readme.txt.data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\Banner.png.data" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -4,13 +4,12 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using Mygod.Skylark.Offline;
+using Mygod.Net;
 using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark
@@ -85,24 +84,6 @@ namespace Mygod.Skylark
         {
             if (offset) value = value.AddHours(8);
             return value.ToString("yyyy.M.d H:mm:ss.fff");
-        }
-
-        public static string UrlDecode(this string str)
-        {
-            return HttpUtility.UrlDecode(str);
-        }
-
-        public static string UrlEncode(this string str)
-        {
-            return HttpUtility.UrlEncode(str);
-        }
-
-        public static string GetVideoFileName(this VideoLinkBase link, bool ignoreExtensions = false)
-        {
-            return "%T%E".Replace("%T", link.Parent.Title).Replace("%A", link.Parent.Author)
-                .Replace("%E", ignoreExtensions ? String.Empty : link.Extension).Replace("%", "%0").Replace("\\", "%1").Replace("/", "%2")
-                .Replace(":", "%3").Replace("*", "%4").Replace("?", "%5").Replace("\"", "%6").Replace("<", "%7").Replace(">", "%8")
-                .Replace("|", "%9");
         }
 
         public static bool IsAjaxRequest(this HttpRequest request)
@@ -213,148 +194,6 @@ namespace Mygod.Skylark
                 goto retry;
             }
         }
-    }
-
-    public static class LinkConverter
-    {
-        public static string Base64Encode(string str)
-        {
-            return Convert.ToBase64String(Encoding.Default.GetBytes(str));
-        }
-
-        public static string Base64Decode(string str)
-        {
-            return Encoding.Default.GetString(Convert.FromBase64String(str));
-        }
-
-        public static string PublicEncode(string link, string linkpre, string prefix, string suffix, string name)
-        {
-            if (String.IsNullOrEmpty(link)) throw new ArgumentNullException("link");
-            if (link.ToLower().StartsWith(linkpre.ToLower(), StringComparison.Ordinal))
-                throw new ArgumentException("该链接已经是" + name + "下载链接。");
-            return linkpre + Base64Encode(prefix + link + suffix);
-        }
-
-        public static string PublicDecode(string link, string linkpre, string prefix, string suffix, string name)
-        {
-            if (String.IsNullOrEmpty(link)) throw new ArgumentNullException("link");
-            if (!link.ToLower().StartsWith(linkpre.ToLower(), StringComparison.Ordinal))
-                throw new ArgumentException("该链接不是" + name + "下载链接。");
-            link = link.TrimEnd('\\', '/', ' ', '\t', '\r', '\n');
-            var and = link.IndexOf('&');
-            if (and >= 0) link = link.Substring(0, and);
-            var result = Base64Decode(link.Substring(linkpre.Length));
-            return result.Substring(prefix.Length, result.Length - prefix.Length - suffix.Length);
-        }
-
-        public static string ThunderEncode(string link)
-        {
-            return PublicEncode(link, "thunder://", "AA", "ZZ", "迅雷");
-        }
-
-        public static string ThunderDecode(string link)
-        {
-            return PublicDecode(link, "thunder://", "AA", "ZZ", "迅雷");
-        }
-
-        public static string FlashGetEncode(string link)
-        {
-            return PublicEncode(link, "flashget://", "[FLASHGET]", "[FLASHGET]", "快车");
-        }
-
-        public static string FlashGetDecode(string link)
-        {
-            return PublicDecode(link, "flashget://", "[FLASHGET]", "[FLASHGET]", "快车");
-        }
-
-        public static string QQDLEncode(string link)
-        {
-            return PublicEncode(link, "qqdl://", String.Empty, String.Empty, "旋风");
-        }
-
-        public static string QQDLDecode(string link)
-        {
-            return PublicDecode(link, "qqdl://", String.Empty, String.Empty, "旋风");
-        }
-
-        public static string RayFileEncode(string link)
-        {
-            return PublicEncode(link, "fs2you://", String.Empty, String.Empty, "RayFile");
-        }
-
-        public static string RayFileDecode(string link)
-        {
-            return PublicDecode(link, "fs2you://", String.Empty, String.Empty, "RayFile");
-        }
-
-        public static string Reverse(string value)
-        {
-            return string.Join(null, value.Reverse());
-        }
-
-        public static string Encode(LinkType to, string i)
-        {
-            switch (to)
-            {
-                case LinkType.Normal:
-                    return i;
-                case LinkType.Thunder:
-                    return ThunderEncode(i);
-                case LinkType.FlashGet:
-                    return FlashGetEncode(i);
-                case LinkType.QQDL:
-                    return QQDLEncode(i);
-                case LinkType.RayFile:
-                    return RayFileEncode(i);
-                default:
-                    throw new ArgumentException("未知的链接格式！");
-            }
-        }
-
-        private static string Decode(LinkType from, string i)
-        {
-            switch (from)
-            {
-                case LinkType.Normal:
-                    return i;
-                case LinkType.Thunder:
-                    return ThunderDecode(i);
-                case LinkType.FlashGet:
-                    return FlashGetDecode(i);
-                case LinkType.QQDL:
-                    return QQDLDecode(i);
-                case LinkType.RayFile:
-                    return RayFileDecode(i);
-                default:
-                    throw new ArgumentException("未知的链接格式！");
-            }
-        }
-
-        public static string Decode(string i)
-        {
-            var result = i;
-            var type = GetUrlType(result);
-            while (type != LinkType.Normal)
-            {
-                result = Decode(type, result);
-                type = GetUrlType(result);
-            }
-            return result;
-        }
-
-        public static LinkType GetUrlType(string i)
-        {
-            var l = i.ToLower();
-            if (l.StartsWith("thunder://", StringComparison.Ordinal)) return LinkType.Thunder;
-            if (l.StartsWith("flashget://", StringComparison.Ordinal)) return LinkType.FlashGet;
-            if (l.StartsWith("qqdl://", StringComparison.Ordinal)) return LinkType.QQDL;
-            return l.StartsWith("fs2you://", StringComparison.Ordinal) ? LinkType.RayFile : LinkType.Normal;
-        }
-    }
-
-    public enum LinkType
-    {
-        Normal, Thunder, FlashGet, QQDL, RayFile
     }
 
     public static class Rbase64
