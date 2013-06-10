@@ -16,7 +16,8 @@ namespace Mygod.Skylark
             try
             {
                 FileHelper.WaitForReady(dataPath, 10);
-                TransmitFile(Server.GetFilePath(path));
+                var filePath = Server.GetFilePath(path);
+                TransmitFile(filePath, Path.GetFileName(filePath));
             }
             catch
             {

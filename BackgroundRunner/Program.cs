@@ -76,7 +76,7 @@ namespace Mygod.Skylark.BackgroundRunner
                         fileLength = null;
                     }
 
-                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'') : GetFileName(url));
+                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode().UrlDecode() : GetFileName(url));
                 var mime = Helper.GetMime(response.ContentType);
                 var extension = Helper.GetDefaultExtension(mime);
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal)) fileName += extension;
