@@ -9,9 +9,11 @@
         }
     </style>
     <script type="text/javascript">
-        function pickFolderCore() {
+        function pickFolderCore(stripExtension) {
             uriParser.exec(location.href);
-            var result = prompt("请输入目标文件夹：（重名文件/文件夹将被跳过）", unescape(RegExp.$3));
+            var target = unescape(RegExp.$3);
+            if (stripExtension) target = target.replace(/\.[^\.]+?$/, "");
+            var result = prompt("请输入目标文件夹：（重名文件/文件夹将被跳过）", target);
             if (result) $("#Hidden").val(result);
             return !!result;
         }
@@ -139,7 +141,7 @@
                         <tr>
                             <td class="nowrap">
                                 <asp:CheckBox ID="Check" runat="server" Text='<%#FileHelper.IsReady(
-                                    Server.GetDataPath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
+                                    Server.GetDataFilePath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
                                         ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
                                         : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>' />
                             </td>
@@ -161,7 +163,7 @@
         </asp:View>
         <asp:View runat="server" ID="FileView">
             <script type="text/javascript">
-                function ModifyMime() {
+                function modifyMime() {
                     var oldValue = "<%=Mime %>";
                     var result = prompt("请输入新的MIME类型：", oldValue);
                     if (result && result != oldValue) {
@@ -170,24 +172,61 @@
                     }
                     return false;
                 }
-                function StartCustomMime() {
+                function startCustomMime() {
                     window.open("/View/<%=RelativePath %>?Mime=" + $("#custom-mime")[0].value);
-                } 
+                }
+                function showConvert() {
+                    $("#convert-form").show();
+                }
             </script>
             <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
             <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
-            <div>默认类型：<%=GetMimeType(Mime) %><asp:LinkButton runat="server" Text="[修改]" OnClick="ModifyMime" OnClientClick="return ModifyMime();" /></div>
             <div>
+                默认类型：<%=GetMimeType(Mime) %><asp:LinkButton runat="server" Text="[修改]" OnClick="ModifyMime"
+                    OnClientClick="return modifyMime();" />
+            </div>
+            <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
+            <div>自定义MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
+            <div>
+                <a href="/Edit/<%=RelativePath %>" target="_blank">[以纯文本格式编辑]</a>
                 <a href="/View/<%=RelativePath %>" target="_blank">[使用默认类型查看]</a>
                 <a href="/Download/<%=RelativePath %>" target="_blank">[下载链接]</a>
-                <a href="javascript:StartCustomMime();">[使用自定义MIME类型查看]</a>
+                <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
                 <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore();" />
-                <%  %>
+                <a href="javascript:showConvert();">[转换媒体文件格式]</a>
             </div>
-            <div>自定义MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
+            <div id="convert-form" style="display: none;">
+                <div>输出路径：（重名将被忽略）</div>
+                <div><asp:TextBox ID="ConvertPathBox" runat="server" Width="100%"></asp:TextBox></div>
+                <div>视频大小：（如640x480，不填表示不变）</div>
+                <div><asp:TextBox ID="ConvertSizeBox" runat="server"></asp:TextBox></div>
+                <div>视频编码：</div>
+                <div>
+                    <asp:DropDownList ID="ConvertVideoCodecBox" runat="server">
+                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                    </asp:DropDownList>
+                </div>
+                <div>音频编码：</div>
+                <div>
+                    <asp:DropDownList ID="ConvertAudioCodecBox" runat="server">
+                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                    </asp:DropDownList>
+                </div>
+                <div>字幕编码：</div>
+                <div>
+                    <asp:DropDownList ID="ConvertSubtitleCodecBox" runat="server">
+                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                    </asp:DropDownList>
+                </div>
+                <div>起始位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示从头开始）</div>
+                <div><asp:TextBox ID="ConvertStartBox" runat="server"></asp:TextBox></div>
+                <div>结束位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示到视频结束为止）</div>
+                <div><asp:TextBox ID="ConvertEndBox" runat="server"></asp:TextBox></div>
+                <div class="center"><asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" /></div>
+            </div>
         </asp:View>
         <asp:View runat="server" ID="FileDownloadingView">
-            <div>离线下载正在进行中……无聊的话来看看这堆奇怪的文字吧。</div>
+            <div>正在离线下载中……</div>
             <asp:UpdatePanel runat="server">
                 <ContentTemplate>
                     <asp:Timer runat="server" Interval="1000" />
@@ -210,8 +249,8 @@
         </asp:View>
         <asp:View runat="server" ID="FileDecompressingView">
             <div>
-                该文件正在被解压缩……
-                <a href="/Task/Decompress/<%=FileHelper.GetFileValue(Server.GetDataPath(RelativePath), "id") %>">现在去看看吧！</a>
+                正在解压缩……
+                <a href="/Task/Decompress/<%=FileHelper.GetFileValue(Server.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
             </div>
         </asp:View>
         <asp:View runat="server" ID="FileCompressingView">
@@ -221,6 +260,27 @@
                     <asp:Timer runat="server" Interval="1000" />
                     <div>当前状态：　　<%=Status %></div>
                     <div>当前文件：　　<%=CurrentFile %></div>
+                    <div>开始时间：　　<%=StartTime %></div>
+                    <div>花费时间：　　<%=SpentTime %></div>
+                    <div>预计剩余时间：<%=RemainingTime %></div>
+                    <div>预计结束时间：<%=EndingTime %></div>
+                    <div class="progress-bar">
+                        <%-- ReSharper disable UnexpectedValue --%>
+                        <div class="bar" style="width: <%=Percentage %>%;"></div>
+                        <%-- ReSharper restore UnexpectedValue --%>
+                    </div>
+                </ContentTemplate>
+            </asp:UpdatePanel>
+        </asp:View>
+        <asp:View runat="server" ID="FileConvertingView">
+            <div>正在转换格式中……</div>
+            <asp:UpdatePanel runat="server">
+                <ContentTemplate>
+                    <asp:Timer runat="server" Interval="1000" />
+                    <div>当前状态：　　<%=Status %></div>
+                    <div>当前大小：　　<%=FileSize %></div>
+                    <div>当前时刻：　　<%=CurrentTime %></div>
+                    <div>总时长：　　　<%=Duration %></div>
                     <div>开始时间：　　<%=StartTime %></div>
                     <div>花费时间：　　<%=SpentTime %></div>
                     <div>预计剩余时间：<%=RemainingTime %></div>

@@ -50,7 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Edit.aspx" />
     <Content Include="Files\Banner.png" />
+    <Content Include="Forbidden.aspx" />
     <Content Include="plugins\7z.dll" />
     <Content Include="plugins\BackgroundRunner.exe" />
     <Content Include="Browse.aspx" />
@@ -135,6 +137,16 @@
     <Content Include="plugins\CryptoJS\tripledes.js" />
     <Content Include="plugins\CryptoJS\x64-core-min.js" />
     <Content Include="plugins\CryptoJS\x64-core.js" />
+    <Content Include="plugins\ffmpeg\avcodec-55.dll" />
+    <Content Include="plugins\ffmpeg\avdevice-55.dll" />
+    <Content Include="plugins\ffmpeg\avfilter-3.dll" />
+    <Content Include="plugins\ffmpeg\avformat-55.dll" />
+    <Content Include="plugins\ffmpeg\avutil-52.dll" />
+    <Content Include="plugins\ffmpeg\ffmpeg.exe" />
+    <Content Include="plugins\ffmpeg\ffprobe.exe" />
+    <Content Include="plugins\ffmpeg\postproc-52.dll" />
+    <Content Include="plugins\ffmpeg\swresample-0.dll" />
+    <Content Include="plugins\ffmpeg\swscale-2.dll" />
     <Content Include="plugins\fineuploader\fineuploader-3.5.0.css" />
     <Content Include="plugins\fineuploader\iframe.xss.response-3.5.0.js" />
     <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.js" />
@@ -176,12 +188,26 @@
     <Compile Include="DownloadablePage.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Edit.aspx.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Edit.aspx.designer.cs">
+      <DependentUpon>Edit.aspx</DependentUpon>
+    </Compile>
     <Compile Include="FileSystem.master.cs">
       <DependentUpon>FileSystem.master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="FileSystem.master.designer.cs">
       <DependentUpon>FileSystem.master</DependentUpon>
+    </Compile>
+    <Compile Include="Forbidden.aspx.cs">
+      <DependentUpon>Forbidden.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Forbidden.aspx.designer.cs">
+      <DependentUpon>Forbidden.aspx</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

@@ -10,6 +10,7 @@ namespace Mygod.Skylark
         {
             RouteTable.Routes.MapPageRoute("Browse", "Browse/{*Path}", "~/Browse.aspx", false);
             RouteTable.Routes.MapPageRoute("Download", "Download/{*Path}", "~/Download.aspx", false);
+            RouteTable.Routes.MapPageRoute("Edit", "Edit/{*Path}", "~/Edit.aspx", false);
             RouteTable.Routes.MapPageRoute("OfflineNew", "Offline/New/{*Path}", "~/Offline/New.aspx", false);
             RouteTable.Routes.MapPageRoute("OfflineNiGuan", "Offline/NiGuan/{*Path}", "~/Offline/YouTube.aspx", false);
             RouteTable.Routes.MapPageRoute("OfflineStart", "Offline/Start/{*Path}", "~/Offline/Start.aspx", false);
@@ -17,6 +18,10 @@ namespace Mygod.Skylark
             RouteTable.Routes.MapPageRoute("View", "View/{*Path}", "~/View.aspx", false);
 
             RouteTable.Routes.MapPageRoute("TaskDecompress", "Task/Decompress/{ID}", "~/Task/Decompress.aspx", false);
+
+            RouteTable.Routes.MapPageRoute("Forbidden1", "Data", "~/Forbidden.aspx", false);
+            RouteTable.Routes.MapPageRoute("Forbidden2", "Data/", "~/Forbidden.aspx", false);
+            RouteTable.Routes.MapPageRoute("Forbidden3", "Data/{*Stuff}", "~/Forbidden.aspx", false);
         }
 
         protected void Session_Start(object sender, EventArgs e)

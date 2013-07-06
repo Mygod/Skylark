@@ -85,6 +85,78 @@ namespace Mygod.Skylark {
         protected global::System.Web.UI.WebControls.View FileView;
         
         /// <summary>
+        /// ConvertPathBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ConvertPathBox;
+        
+        /// <summary>
+        /// ConvertSizeBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ConvertSizeBox;
+        
+        /// <summary>
+        /// ConvertVideoCodecBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ConvertVideoCodecBox;
+        
+        /// <summary>
+        /// ConvertAudioCodecBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ConvertAudioCodecBox;
+        
+        /// <summary>
+        /// ConvertSubtitleCodecBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ConvertSubtitleCodecBox;
+        
+        /// <summary>
+        /// ConvertStartBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ConvertStartBox;
+        
+        /// <summary>
+        /// ConvertEndBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ConvertEndBox;
+        
+        /// <summary>
+        /// ConvertButton 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ConvertButton;
+        
+        /// <summary>
         /// FileDownloadingView 控件。
         /// </summary>
         /// <remarks>
@@ -110,6 +182,15 @@ namespace Mygod.Skylark {
         /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
         /// </remarks>
         protected global::System.Web.UI.WebControls.View FileCompressingView;
+        
+        /// <summary>
+        /// FileConvertingView 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.View FileConvertingView;
         
         /// <summary>
         /// GoneView 控件。

@@ -7,7 +7,7 @@ namespace Mygod.Skylark
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            string path = RouteData.GetRelativePath(), dataPath = Server.GetDataPath(path);
+            string path = RouteData.GetRelativePath(), dataPath = Server.GetDataFilePath(path);
             if (!File.Exists(dataPath))
             {
                 Response.StatusCode = 404;

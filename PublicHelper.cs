@@ -130,4 +130,13 @@ namespace Mygod.Skylark
             }
         }
     }
+
+    public static partial class FFmpeg
+    {
+        public static TimeSpan Parse(string value, TimeSpan defaultValue = default(TimeSpan))
+        {
+            if (string.IsNullOrWhiteSpace(value)) return defaultValue;
+            return value.Contains(":") ? TimeSpan.Parse(value) : TimeSpan.FromSeconds(double.Parse(value));
+        }
+    }
 }

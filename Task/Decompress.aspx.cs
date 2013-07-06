@@ -14,7 +14,7 @@ namespace Mygod.Skylark.Task
             Archive = Status = TargetDirectory = SpentTime = RemainingTime = EndingTime = "未知";
             CurrentFile = "无";
             Percentage = "0";
-            string id = RouteData.GetRouteString("ID"), xmlPath = Server.GetDataPath(id + ".decompress.task", false);
+            string id = RouteData.GetRouteString("ID"), xmlPath = Server.GetDataPath(id + ".decompress.task");
             var startTime = Helper.Deshorten(id);
             StartTime = startTime.ToChineseString();
             if (!File.Exists(xmlPath)) return;
@@ -73,7 +73,7 @@ namespace Mygod.Skylark.Task
 
         protected void CleanUp(object sender, EventArgs e)
         {
-            foreach (var path in Directory.EnumerateFiles(Server.GetDataPath(string.Empty, false), "*.task"))
+            foreach (var path in Directory.EnumerateFiles(Server.GetDataPath(string.Empty), "*.task"))
             {
                 var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
                 if (pid != 0) Helper.KillProcess(pid);

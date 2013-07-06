@@ -139,14 +139,22 @@ namespace Mygod.Skylark
         {
             return server.MapPath("~/Files/" + path);
         }
-        public static string GetDataPath(this HttpServerUtility server, string path, bool isFile = true)
+        public static string GetDataPath(this HttpServerUtility server, string path)
         {
-            return server.MapPath("~/Data/" + (isFile ? path + ".data" : path));
+            return server.MapPath("~/Data/" + path);
+        }
+        public static string GetDataFilePath(this HttpServerUtility server, string path)
+        {
+            return server.GetDataPath(path) + ".data";
+        }
+        public static string GetDataDirectoryPath(this HttpServerUtility server, string path)
+        {
+            return Path.Combine(server.GetDataPath(path), "Settings.directory");
         }
 
         public static long GetFileSize(this HttpServerUtility server, string path)
         {
-            var root = GetElement(server.GetDataPath(path));
+            var root = GetElement(server.GetDataFilePath(path));
             if (root != null && root.GetAttributeValue("state") != "ready")
             {
                 long result;
@@ -206,6 +214,97 @@ namespace Mygod.Skylark
         public static string Decode(string value)
         {
             return LinkConverter.Reverse(LinkConverter.Base64Decode(value));
+        }
+    }
+
+    public static partial class FFmpeg
+    {
+        public sealed class Codec
+        {
+            public Codec(string input)
+            {
+                DecodingSupported = input[1] == 'D';
+                EncodingSupported = input[2] == 'E';
+                switch (input[3])
+                {
+                    case 'V':
+                        Type = CodecType.Video;
+                        break;
+                    case 'A':
+                        Type = CodecType.Audio;
+                        break;
+                    case 'S':
+                        Type = CodecType.Subtitle;
+                        break;
+                }
+                IntraFrameOnlyCodec = input[4] == 'I';
+                LossyCompression = input[5] == 'L';
+                LosslessCompression = input[6] == 'S';
+                Name = input.Substring(8, 21).TrimEnd();
+                Description = input.Substring(29);
+            }
+
+            public bool DecodingSupported, EncodingSupported, IntraFrameOnlyCodec, LossyCompression, LosslessCompression;
+            public CodecType Type;
+            public string Name, Description;
+
+            public override string ToString()
+            {
+                var result = Description;
+                if (IntraFrameOnlyCodec) result += " (Intra frame-only codec)";
+                if (LossyCompression) result += " (Lossy compression)";
+                if (LosslessCompression) result += " (Lossless compression)";
+                return result;
+            }
+        }
+
+        public enum CodecType
+        {
+            Unknown, Video, Audio, Subtitle
+        }
+
+        private static string root, ffmpeg, ffprobe;
+        public static List<Codec> Codecs = new List<Codec>();
+
+        private static Process CreateProcess(string path, string arguments)
+        {
+            var result = new Process { StartInfo = new ProcessStartInfo(path, arguments)
+                { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, WorkingDirectory = root } };
+            result.Start();
+            return result;
+        }
+
+        public static void Initialize(HttpServerUtility server)
+        {
+            lock (Codecs)
+            {
+                if (root != null) return;
+                root = server.MapPath("~/");
+                var dirPath = Path.Combine(root, "plugins/ffmpeg");
+                ffmpeg = Path.Combine(dirPath, "ffmpeg.exe");
+                ffprobe = Path.Combine(dirPath, "ffprobe.exe");
+                var process = CreateProcess(ffmpeg, "-codecs");
+                while (!process.StandardOutput.ReadLine().Contains("-------", StringComparison.Ordinal))
+                {
+                }
+                while (!process.StandardOutput.EndOfStream) Codecs.Add(new Codec(process.StandardOutput.ReadLine()));
+            }
+        }
+
+        public static string Analyze(string path)
+        {
+            try
+            {
+                var process = CreateProcess(ffprobe, '"' + path + '"');
+                while (!process.StandardError.ReadLine().StartsWith("Input", StringComparison.Ordinal))
+                {
+                }
+                return process.StandardError.ReadToEnd();
+            }
+            catch
+            {
+                return "分析失败。";
+            }
         }
     }
 }

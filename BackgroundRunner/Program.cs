@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
 using SevenZip;
@@ -28,6 +29,9 @@ namespace Mygod.Skylark.BackgroundRunner
                 case "compress":
                     Compress(Console.ReadLine());
                     break;
+                case "convert":
+                    Convert(Console.ReadLine());
+                    break;
                 default:
                     Console.WriteLine("无法识别。");
                     break;
@@ -38,9 +42,13 @@ namespace Mygod.Skylark.BackgroundRunner
         {
             return Path.Combine("Files", path);
         }
-        private static string GetDataPath(string path, bool isFile = true)
+        private static string GetDataPath(string path)
         {
-            return Path.Combine("Data", isFile ? path + ".data" : path);
+            return Path.Combine("Data", path);
+        }
+        private static string GetDataFilePath(string path)
+        {
+            return GetDataPath(path) + ".data";
         }
 
         private static string GetFileName(string url)
@@ -76,13 +84,13 @@ namespace Mygod.Skylark.BackgroundRunner
                         fileLength = null;
                     }
 
-                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode().UrlDecode() : GetFileName(url));
+                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode() : GetFileName(url)).UrlDecode();
                 var mime = Helper.GetMime(response.ContentType);
                 var extension = Helper.GetDefaultExtension(mime);
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal)) fileName += extension;
 
                 path = Path.Combine(path, fileName);
-                xmlPath = GetDataPath(path);
+                xmlPath = GetDataFilePath(path);
                 path = GetFilePath(path);
 
                 doc = new XDocument();
@@ -113,7 +121,7 @@ namespace Mygod.Skylark.BackgroundRunner
 
         private static void Decompress(string id)
         {
-            var xmlPath = GetDataPath(id + ".decompress.task", false);
+            var xmlPath = GetDataPath(id + ".decompress.task");
             if (!File.Exists(xmlPath)) return;
             var doc = XHelper.Load(xmlPath);
             var root = doc.Element("decompress");
@@ -126,20 +134,20 @@ namespace Mygod.Skylark.BackgroundRunner
                 var progress = 0;
                 doc.Save(xmlPath);
                 string archive = root.GetAttributeValue("archive"), directory = root.GetAttributeValue("directory"),
-                       filePath = GetFilePath(directory), dataPath = GetDataPath(directory, false);
+                       filePath = GetFilePath(directory), dataPath = GetDataPath(directory);
                 if (!Directory.Exists(filePath)) Directory.CreateDirectory(filePath);
                 if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);
                 extractor = new SevenZipExtractor(GetFilePath(archive));
                 extractor.FileExtractionStarted += (sender, e) =>
                 {
-                    FileHelper.WriteAllText(GetDataPath(FileHelper.Combine(directory, e.FileInfo.FileName)),
+                    FileHelper.WriteAllText(GetDataFilePath(FileHelper.Combine(directory, e.FileInfo.FileName)),
                                             string.Format("<file state=\"decompressing\" id=\"{0}\" pid=\"{1}\" />", id, pid));
                     root.SetAttributeValue("current", e.FileInfo.FileName);
                     doc.Save(xmlPath);
                 };
                 extractor.FileExtractionFinished += (sender, e) =>
                 {
-                    FileHelper.WriteAllText(GetDataPath(FileHelper.Combine(directory, e.FileInfo.FileName)),
+                    FileHelper.WriteAllText(GetDataFilePath(FileHelper.Combine(directory, e.FileInfo.FileName)),
                         string.Format("<file mime=\"{0}\" state=\"ready\" />", Helper.GetMimeType(e.FileInfo.FileName)));
                     if (e.PercentDone == progress) return;
                     root.SetAttributeValue("progress", progress = e.PercentDone);
@@ -166,7 +174,7 @@ namespace Mygod.Skylark.BackgroundRunner
 
         private static void Compress(string path)
         {
-            var xmlPath = GetDataPath(path);
+            var xmlPath = GetDataFilePath(path);
             var doc = XHelper.Load(xmlPath);
             var root = doc.Root;
             SevenZipCompressor compressor = null;
@@ -184,7 +192,7 @@ namespace Mygod.Skylark.BackgroundRunner
                     files.AddRange(Directory.EnumerateFiles(itemFile).Select(file => Path.Combine(item, Path.GetFileName(file))));
                     foreach (var dir in Directory.EnumerateDirectories(itemFile)) queue.Enqueue(Path.Combine(item, Path.GetFileName(dir)));
                 }
-                foreach (var file in files) FileHelper.WaitForReady(GetDataPath(file));
+                foreach (var file in files) FileHelper.WaitForReady(GetDataFilePath(file));
                 compressor = new SevenZipCompressor
                     { CompressionLevel = (CompressionLevel)Enum.Parse(typeof(CompressionLevel), root.GetAttributeValue("level"), true) };
                 switch (Path.GetExtension(path).ToLowerInvariant())
@@ -217,6 +225,42 @@ namespace Mygod.Skylark.BackgroundRunner
             {
                 if (compressor == null) throw;
                 root.SetAttributeValue("message", string.Join("<br />", compressor.Exceptions.Select(e => e.Message)));
+                doc.Save(xmlPath);
+            }
+            catch (Exception exc)
+            {
+                root.SetAttributeValue("message", exc.GetMessage());
+                doc.Save(xmlPath);
+            }
+        }
+
+        private static readonly Regex TimeParser = new Regex(@"size=(.*)kB time=(.*)bitrate=", RegexOptions.Compiled);
+        private static void Convert(string path)
+        {
+            var xmlPath = GetDataFilePath(path);
+            var doc = XHelper.Load(xmlPath);
+            var root = doc.Root;
+            try
+            {
+                root.SetAttributeValue("pid", Process.GetCurrentProcess().Id);
+                doc.Save(xmlPath);
+                var input = root.GetAttributeValue("input");
+                var process = new Process { StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
+                    string.Format("-i {0}{2} {1} -y", GetFilePath(input), GetFilePath(path), 
+                    root.GetAttributeValue("arguments") ?? string.Empty))
+                    { UseShellExecute = false, RedirectStandardError = true } };
+                process.Start();
+                while (!process.StandardError.EndOfStream)
+                {
+                    var line = process.StandardError.ReadLine();
+                    var match = TimeParser.Match(line);
+                    if (!match.Success) continue;
+                    root.SetAttributeValue("size", long.Parse(match.Groups[1].Value.Trim()) << 10);
+                    root.SetAttributeValue("time", TimeSpan.Parse(match.Groups[2].Value.Trim()).Ticks);
+                    doc.Save(xmlPath);
+                }
+                root.SetAttributeValue("state", "ready");
+                root.SetAttributeValue("finishTime", DateTime.UtcNow.Ticks);
                 doc.Save(xmlPath);
             }
             catch (Exception exc)
