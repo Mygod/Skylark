@@ -96,7 +96,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 doc = new XDocument();
                 root = new XElement("file", new XAttribute("url", url), new XAttribute("state", "downloading"),
                                     new XAttribute("pid", Process.GetCurrentProcess().Id), new XAttribute("fileName", fileName),
-                                    new XAttribute("startTime", DateTime.UtcNow), new XAttribute("mime", mime));
+                                    new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("mime", mime));
                 doc.Add(root);
                 if (fileLength != null) root.SetAttributeValue("size", fileLength);
                 doc.Save(xmlPath);
@@ -244,20 +244,22 @@ namespace Mygod.Skylark.BackgroundRunner
             {
                 root.SetAttributeValue("pid", Process.GetCurrentProcess().Id);
                 doc.Save(xmlPath);
-                var input = root.GetAttributeValue("input");
                 var process = new Process { StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
-                    string.Format("-i {0}{2} {1} -y", GetFilePath(input), GetFilePath(path), 
-                    root.GetAttributeValue("arguments") ?? string.Empty))
-                    { UseShellExecute = false, RedirectStandardError = true } };
+                    string.Format("-i \"{0}\"{2} \"{1}\" -y", GetFilePath(root.GetAttributeValue("input")), GetFilePath(path), 
+                    root.GetAttributeValue("arguments") ?? string.Empty)) { UseShellExecute = false, RedirectStandardError = true } };
                 process.Start();
                 while (!process.StandardError.EndOfStream)
                 {
                     var line = process.StandardError.ReadLine();
                     var match = TimeParser.Match(line);
                     if (!match.Success) continue;
-                    root.SetAttributeValue("size", long.Parse(match.Groups[1].Value.Trim()) << 10);
-                    root.SetAttributeValue("time", TimeSpan.Parse(match.Groups[2].Value.Trim()).Ticks);
-                    doc.Save(xmlPath);
+                    try
+                    {
+                        root.SetAttributeValue("size", long.Parse(match.Groups[1].Value.Trim()) << 10);
+                        root.SetAttributeValue("time", TimeSpan.Parse(match.Groups[2].Value.Trim()).Ticks);
+                        doc.Save(xmlPath);
+                    }
+                    catch { }
                 }
                 root.SetAttributeValue("state", "ready");
                 root.SetAttributeValue("finishTime", DateTime.UtcNow.Ticks);

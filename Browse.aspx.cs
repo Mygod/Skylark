@@ -325,10 +325,9 @@ namespace Mygod.Skylark
             string path = Server.GetFilePath(RelativePath), xmlPath = Server.GetDataFilePath(RelativePath);
             var file = FileHelper.GetElement(xmlPath);
             Url = string.Format("<a href=\"{0}\">{0}</a>", file.GetAttributeValue("url"));
-            var attr = file.GetAttributeValue("startTime");
-            var startTime = Helper.Parse(attr);
+            var startTime = new DateTime(file.GetAttributeValue<long>("startTime"), DateTimeKind.Utc);
             StartTime = startTime.ToChineseString();
-            attr = file.GetAttributeValue("message");
+            var attr = file.GetAttributeValue("message");
             if (attr != null)
             {
                 Status = "发生错误，具体信息：" + attr;

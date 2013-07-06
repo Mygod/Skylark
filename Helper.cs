@@ -75,11 +75,6 @@ namespace Mygod.Skylark
             server.StartRunner(string.Format("offline-download\n{0}\n{1}", LinkConverter.Decode(url), relativePath));
         }
 
-        public static DateTime Parse(string value)
-        {
-            return DateTime.SpecifyKind(DateTime.Parse(value), DateTimeKind.Unspecified);
-        }
-
         public static string ToChineseString(this DateTime value, bool offset = true)
         {
             if (offset) value = value.AddHours(8);
