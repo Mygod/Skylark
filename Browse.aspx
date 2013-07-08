@@ -126,7 +126,7 @@
                             </td>
                             <td><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
                             <td class="nowrap">&lt;DIR&gt;</td>
-                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(Server.GetFilePath(
+                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(
                                                FileHelper.Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %></td>
                             <td class="nowrap">
                                 <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
@@ -141,14 +141,14 @@
                         <tr>
                             <td class="nowrap">
                                 <asp:CheckBox ID="Check" runat="server" Text='<%#FileHelper.IsReady(
-                                    Server.GetDataFilePath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
+                                    FileHelper.GetDataFilePath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
                                         ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
                                         : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>' />
                             </td>
                             <td><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
-                            <td class="nowrap"><%#Helper.GetSize(Server.GetFileSize(
+                            <td class="nowrap"><%#Helper.GetSize(FileHelper.GetFileSize(
                                                FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %></td>
-                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(Server.GetFilePath(
+                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(
                                                FileHelper.Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %></td>
                             <td class="nowrap">
                                 <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
@@ -250,7 +250,7 @@
         <asp:View runat="server" ID="FileDecompressingView">
             <div>
                 正在解压缩……
-                <a href="/Task/Decompress/<%=FileHelper.GetFileValue(Server.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
+                <a href="/Task/Decompress/<%=FileHelper.GetFileValue(FileHelper.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
             </div>
         </asp:View>
         <asp:View runat="server" ID="FileCompressingView">

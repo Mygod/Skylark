@@ -17,6 +17,9 @@ namespace Mygod.Skylark
             RouteTable.Routes.MapPageRoute("Upload", "Upload/{*Path}", "~/Upload.aspx", false);
             RouteTable.Routes.MapPageRoute("View", "View/{*Path}", "~/View.aspx", false);
 
+            RouteTable.Routes.MapPageRoute("Api", "Api/{Action}/{*Path}", "~/Api.aspx", false);
+
+            RouteTable.Routes.MapPageRoute("TaskCreate", "Task/Create/{Type}/{*Path}", "~/Task/Create.aspx", false);
             RouteTable.Routes.MapPageRoute("TaskDecompress", "Task/Decompress/{ID}", "~/Task/Decompress.aspx", false);
 
             RouteTable.Routes.MapPageRoute("Forbidden1", "Data", "~/Forbidden.aspx", false);

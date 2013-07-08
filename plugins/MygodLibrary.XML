@@ -1273,13 +1273,13 @@
             提供KMP匹配字符串的类。
             </summary>
         </member>
-        <member name="M:Mygod.Text.Kmp.#ctor(System.String)">
+        <member name="M:Mygod.Text.Kmp.#ctor(System.Byte[])">
             <summary>
             创建一个KMP类。如果要匹配多次，则创建实例比调用静态方法的执行效率高。
             </summary>
             <param name="pattern">用于匹配的字符串。</param>
         </member>
-        <member name="M:Mygod.Text.Kmp.Match(System.String,System.Int32)">
+        <member name="M:Mygod.Text.Kmp.Match(System.Byte[],System.Int32)">
             <summary>
             KMP匹配字符串，效率为O(N+M)，其中N是text.Length，M是pattern.Length。
             </summary>
@@ -1294,7 +1294,7 @@
             <param name="stream">要匹配的流。</param>
             <returns>返回是否找到匹配串，如果找到，偏移量会被设置在匹配的串开始。</returns>
         </member>
-        <member name="M:Mygod.Text.Kmp.MatchAll(System.String)">
+        <member name="M:Mygod.Text.Kmp.MatchAll(System.Byte[])">
             <summary>
             KMP匹配字符串，效率为O(N+M)，其中N是text.Length，M是pattern.Length。
             </summary>
@@ -1308,7 +1308,7 @@
             <param name="stream">要查找的流。</param>
             <returns>返回所有找到的位置。</returns>
         </member>
-        <member name="M:Mygod.Text.Kmp.Match(System.String,System.String,System.Int32)">
+        <member name="M:Mygod.Text.Kmp.Match(System.Byte[],System.Byte[],System.Int32)">
             <summary>
             KMP匹配字符串，效率为O(N+M)，其中N是text.Length，M是pattern.Length。
             </summary>
@@ -1317,7 +1317,7 @@
             <param name="pos">起始搜索的位置。</param>
             <returns>返回查找到的位置，如果没有匹配则返回-1。</returns>
         </member>
-        <member name="M:Mygod.Text.Kmp.Match(System.IO.Stream,System.String)">
+        <member name="M:Mygod.Text.Kmp.Match(System.IO.Stream,System.Byte[])">
             <summary>
             KMP匹配流，效率为O(N+M)，其中N是流的长度，M是pattern.Length。
             </summary>
@@ -1325,7 +1325,7 @@
             <param name="pattern">要匹配的字符串。</param>
             <returns>返回是否找到匹配串，如果找到，偏移量会被设置在匹配的串开始。</returns>
         </member>
-        <member name="M:Mygod.Text.Kmp.MatchAll(System.String,System.String)">
+        <member name="M:Mygod.Text.Kmp.MatchAll(System.Byte[],System.Byte[])">
             <summary>
             KMP匹配字符串，效率为O(N+M)，其中N是text.Length，M是pattern.Length。
             </summary>
@@ -1333,7 +1333,7 @@
             <param name="pattern">要匹配的字符串。</param>
             <returns>返回找到的所有位置。</returns>
         </member>
-        <member name="M:Mygod.Text.Kmp.MatchAll(System.IO.Stream,System.String)">
+        <member name="M:Mygod.Text.Kmp.MatchAll(System.IO.Stream,System.Byte[])">
             <summary>
             KMP匹配字符串，效率为O(N+M)，其中N是text.Length，M是pattern.Length。
             </summary>
@@ -1344,6 +1344,11 @@
         <member name="P:Mygod.Text.Kmp.Pattern">
             <summary>
             获取或设置模式串，即用于匹配的字符串。
+            </summary>
+        </member>
+        <member name="T:Mygod.Text.Kmp.Searcher">
+            <summary>
+            一个更加低级、可扩展的 KMP 搜索实现。
             </summary>
         </member>
         <member name="T:Mygod.Windows.Automation.Peers.AutoCompleteBoxAutomationPeer">

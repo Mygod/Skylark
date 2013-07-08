@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Web.UI;
 
 namespace Mygod.Skylark
@@ -16,7 +15,7 @@ namespace Mygod.Skylark
                 tempPath += '/' + dir;
                 Response.Write(" &gt; <a href=\"/Browse" + tempPath + "/\">" + dir + "</a>");
             }
-            if (Directory.Exists(Server.GetFilePath(relativePath))) Response.Write(" &gt;");
+            if (!FileHelper.IsFile(FileHelper.GetFilePath(relativePath))) Response.Write(" &gt;");
         }
     }
 }

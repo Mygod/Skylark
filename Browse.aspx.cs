@@ -2,11 +2,9 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Xml.Linq;
 using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark
@@ -20,7 +18,7 @@ namespace Mygod.Skylark
         protected void Page_PreInit(object sender, EventArgs e)
         {
             RelativePath = RouteData.GetRelativePath();
-            var absolutePath = Server.GetFilePath(RelativePath);
+            var absolutePath = FileHelper.GetFilePath(RelativePath);
             Title = ("浏览 " + RelativePath).TrimEnd();
             InfoDirectory = new DirectoryInfo(absolutePath);
             InfoFile = new FileInfo(absolutePath);
@@ -47,7 +45,7 @@ namespace Mygod.Skylark
             }
             else if (InfoFile.Exists)
             {
-                string dataPath = Server.GetDataFilePath(RelativePath), state = FileHelper.GetFileValue(dataPath, "state");
+                string dataPath = FileHelper.GetDataFilePath(RelativePath), state = FileHelper.GetFileValue(dataPath, "state");
                 switch (state)
                 {
                     case "ready":
@@ -106,13 +104,11 @@ namespace Mygod.Skylark
 
         protected void DirectoryCommand(object source, RepeaterCommandEventArgs e)
         {
-            var path = FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value);
             switch (e.CommandName)
             {
                 case "Rename":
-                    var newPath = FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode());
-                    Directory.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
-                    Directory.Move(Server.GetDataPath(path), Server.GetDataPath(newPath));
+                    FileHelper.Move(FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value), 
+                                    FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
                     Response.Redirect(Request.RawUrl);
                     break;
             }
@@ -120,13 +116,11 @@ namespace Mygod.Skylark
 
         protected void FileCommand(object source, RepeaterCommandEventArgs e)
         {
-            var path = FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value);
             switch (e.CommandName)
             {
                 case "Rename":
-                    var newPath = FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode());
-                    File.Move(Server.GetFilePath(path), Server.GetFilePath(newPath));
-                    File.Move(Server.GetDataFilePath(path), Server.GetDataFilePath(newPath));
+                    FileHelper.Move(FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value),
+                                    FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
                     Response.Redirect(Request.RawUrl);
                     break;
             }
@@ -134,107 +128,35 @@ namespace Mygod.Skylark
 
         protected void NewFolder(object sender, EventArgs e)
         {
-            var path = FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode());
-            Directory.CreateDirectory(Server.GetFilePath(path));
-            Directory.CreateDirectory(Server.GetDataPath(path));
+            FileHelper.CreateDirectory(FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Move(object sender, EventArgs e)
         {
-            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Move(dir, false);
-            foreach (var file in FileList.Items.GetSelectedFiles()) Move(file, true);
+            foreach (var source in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
+                .Select(fileName => FileHelper.Combine(RelativePath, fileName)))
+                FileHelper.Move(source, FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
             Response.Redirect(Request.RawUrl);
         }
-        private void Move(string fileName, bool isFile)
-        {
-            string path = FileHelper.Combine(RelativePath, fileName), 
-                   dataPath = isFile ? Server.GetDataFilePath(path) : Server.GetDataPath(path),
-                   target = FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(path)), targetFile = Server.GetFilePath(target);
-            if (Directory.Exists(targetFile) || File.Exists(targetFile)) return;
-            Server.CancelControl(dataPath);
-            if (isFile)
-            {
-                File.Move(Server.GetFilePath(path), targetFile);
-                File.Move(dataPath, Server.GetDataFilePath(target));
-            }
-            else
-            {
-                Directory.Move(Server.GetFilePath(path), targetFile);
-                Directory.Move(dataPath, Server.GetDataPath(target));
-            }
-        }
-
         protected void Copy(object sender, EventArgs e)
         {
-            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Copy(dir, false);
-            foreach (var file in FileList.Items.GetSelectedFiles()) Copy(file, true);
+            foreach (var source in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
+                .Select(fileName => FileHelper.Combine(RelativePath, fileName)))
+                FileHelper.Copy(source, FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
             Response.Redirect(Request.RawUrl);
         }
-        private void Copy(string fileName, bool isFile)
-        {
-            string path = FileHelper.Combine(RelativePath, fileName), 
-                   dataPath = isFile ? Server.GetDataFilePath(path) : Server.GetDataPath(path),
-                   target = FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(path)), targetFile = Server.GetFilePath(target);
-            if (Directory.Exists(targetFile) || File.Exists(targetFile)) return;
-            Server.CancelControl(dataPath);
-            if (isFile)
-            {
-                File.Copy(Server.GetFilePath(path), targetFile);
-                File.Copy(dataPath, Server.GetDataFilePath(target));
-            }
-            else
-            {
-                DirectoryCopy(Server.GetFilePath(path), targetFile);
-                DirectoryCopy(dataPath, Server.GetDataPath(target));
-            }
-        }
-        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
-        {
-            var dir = new DirectoryInfo(sourceDirName);
-            var dirs = dir.GetDirectories();
-            if (!dir.Exists)
-                throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDirName);
-            if (!Directory.Exists(destDirName)) Directory.CreateDirectory(destDirName);
-            var files = dir.GetFiles();
-            foreach (var file in files)
-            {
-                var path = Path.Combine(destDirName, file.Name);
-                file.CopyTo(path, false);
-            }
-            if (copySubDirs) foreach (var subdir in dirs)
-            {
-                var temppath = Path.Combine(destDirName, subdir.Name);
-                DirectoryCopy(subdir.FullName, temppath);
-            }
-        }
-
         protected void Delete(object sender, EventArgs e)
         {
-            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) Delete(dir, false);
-            foreach (var file in FileList.Items.GetSelectedFiles()) Delete(file, true);
+            foreach (var path in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
+                .Select(fileName => FileHelper.Combine(RelativePath, fileName))) FileHelper.Delete(path);
             Response.Redirect(Request.RawUrl);
-        }
-        private void Delete(string fileName, bool isFile)
-        {
-            string path = FileHelper.Combine(RelativePath, fileName), 
-                   dataPath = isFile ? Server.GetDataFilePath(path) : Server.GetDataPath(path);
-            Server.CancelControl(dataPath);
-            FileHelper.DeleteWithRetries(dataPath);
-            FileHelper.DeleteWithRetries(Server.GetFilePath(path));
         }
 
         protected void Compress(object sender, EventArgs e)
         {
-            var root = new XElement("file", new XAttribute("state", "compressing"), new XAttribute("baseFolder", RelativePath),
-                                    new XAttribute("startTime", DateTime.UtcNow.Ticks),
-                                    new XAttribute("mime", Helper.GetMimeType(ArchiveFilePath.Text)),
-                                    new XAttribute("level", CompressionLevelList.SelectedValue));
-            foreach (var dir in DirectoryList.Items.GetSelectedFiles()) root.Add(new XElement("directory", dir));
-            foreach (var file in FileList.Items.GetSelectedFiles()) root.Add(new XElement("file", file));
-            new XDocument(root).Save(Server.GetDataFilePath(ArchiveFilePath.Text));
-            File.WriteAllText(Server.GetFilePath(ArchiveFilePath.Text), string.Empty);  // temp
-            Server.StartRunner("compress\n" + ArchiveFilePath.Text);
+            TaskHelper.CreateCompress(ArchiveFilePath.Text, DirectoryList.Items.GetSelectedFiles()
+                .Union(FileList.Items.GetSelectedFiles()), RelativePath, CompressionLevelList.SelectedValue);
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
         }
 
@@ -246,8 +168,7 @@ namespace Mygod.Skylark
 
         private void RefreshFile()
         {
-            FFmpeg.Initialize(Server);
-            FFmpegResult = FFmpeg.Analyze(Server.GetFilePath(RelativePath));
+            FFmpegResult = FFmpeg.Analyze(FileHelper.GetFilePath(RelativePath));
             ConvertPathBox.Text = RelativePath;
             foreach (var codec in FFmpeg.Codecs.Where(codec => codec.EncodingSupported))
             {
@@ -275,40 +196,20 @@ namespace Mygod.Skylark
 
         protected void ModifyMime(object sender, EventArgs e)
         {
-            FileHelper.SetDefaultMime(Server.GetDataFilePath(RelativePath), Hidden.Value.UrlDecode());
+            FileHelper.SetDefaultMime(FileHelper.GetDataFilePath(RelativePath), Hidden.Value.UrlDecode());
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Decompress(object sender, EventArgs e)
         {
-            var id = DateTime.UtcNow.Shorten();
-            new XDocument(new XElement("decompress", new XAttribute("archive", RelativePath),
-                          new XAttribute("directory", Hidden.Value.UrlDecode()))).Save(Server.GetDataPath(id + ".decompress.task"));
-            Server.StartRunner("decompress\n" + id);
-            Response.Redirect("/Task/Decompress/" + id);
+            Response.Redirect("/Task/Decompress/" + TaskHelper.CreateDecompress(RelativePath, Hidden.Value.UrlDecode()));
         }
 
-        private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
         protected void Convert(object sender, EventArgs e)
         {
-            var filePath = Server.GetFilePath(ConvertPathBox.Text);
-            if (File.Exists(filePath)) return;
-            File.WriteAllText(filePath, string.Empty);
-            var arguments = string.Empty;
-            if (!string.IsNullOrWhiteSpace(ConvertSizeBox.Text)) arguments += " -s " + ConvertSizeBox.Text;
-            if (ConvertVideoCodecBox.SelectedIndex != 0) arguments += " -vcodec " + ConvertVideoCodecBox.SelectedItem.Value;
-            if (ConvertAudioCodecBox.SelectedIndex != 0) arguments += " -acodec " + ConvertAudioCodecBox.SelectedItem.Value;
-            if (ConvertSubtitleCodecBox.SelectedIndex != 0) arguments += " -scodec " + ConvertSubtitleCodecBox.SelectedItem.Value;
-            TimeSpan duration = TimeSpan.Parse(DurationParser.Match(FFmpegResult).Groups[1].Value), 
-                     start = FFmpeg.Parse(ConvertStartBox.Text), end = FFmpeg.Parse(ConvertEndBox.Text, duration);
-            if (start <= TimeSpan.Zero) start = TimeSpan.Zero; else arguments += " -ss " + ConvertStartBox.Text;
-            if (end >= duration) end = duration; else arguments += " -to " + ConvertEndBox.Text;
-            new XDocument(new XElement("file", new XAttribute("state", "converting"), new XAttribute("input", RelativePath), 
-                                       new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("arguments", arguments),
-                                       new XAttribute("duration", (end - start).Ticks),
-                                       new XAttribute("mime", Helper.GetMimeType(ConvertPathBox.Text))))
-                .Save(Server.GetDataFilePath(ConvertPathBox.Text));
-            Server.StartRunner("convert\n" + ConvertPathBox.Text);
+            TaskHelper.CreateConvert(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text, ConvertVideoCodecBox.SelectedValue, 
+                                 ConvertAudioCodecBox.SelectedValue, ConvertSubtitleCodecBox.SelectedValue, 
+                                 ConvertStartBox.Text, ConvertEndBox.Text);
             Response.Redirect("/Browse/" + ConvertPathBox.Text.ToCorrectUrl());
         }
 
@@ -322,7 +223,7 @@ namespace Mygod.Skylark
         {
             Url = FileSize = DownloadedFileSize = AverageDownloadSpeed = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
             Percentage = "0";
-            string path = Server.GetFilePath(RelativePath), xmlPath = Server.GetDataFilePath(RelativePath);
+            string path = FileHelper.GetFilePath(RelativePath), xmlPath = FileHelper.GetDataFilePath(RelativePath);
             var file = FileHelper.GetElement(xmlPath);
             Url = string.Format("<a href=\"{0}\">{0}</a>", file.GetAttributeValue("url"));
             var startTime = new DateTime(file.GetAttributeValue<long>("startTime"), DateTimeKind.Utc);
@@ -368,7 +269,7 @@ namespace Mygod.Skylark
             Status = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
             CurrentFile = "无";
             Percentage = "0";
-            var xmlPath = Server.GetDataFilePath(RelativePath);
+            var xmlPath = FileHelper.GetDataFilePath(RelativePath);
             if (!File.Exists(xmlPath)) return;
             var root = XHelper.Load(xmlPath).Root;
             var attr = root.GetAttributeValue("progress");
@@ -409,7 +310,7 @@ namespace Mygod.Skylark
         {
             Status = CurrentTime = Duration = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
             Percentage = "0";
-            var xmlPath = Server.GetDataFilePath(RelativePath);
+            var xmlPath = FileHelper.GetDataFilePath(RelativePath);
             if (!File.Exists(xmlPath)) return;
             var root = XHelper.Load(xmlPath).Root;
             var attr = root.GetAttributeValue("time");

@@ -53,7 +53,7 @@ namespace Mygod.Skylark
             Response.Headers["Content-Length"] = responseLength.ToString(CultureInfo.InvariantCulture);
             Response.Cache.SetCacheability(HttpCacheability.Public); //required for etag output
             Response.Cache.SetETag(etag); //required for IE9 resumable downloads
-            if (!string.IsNullOrEmpty(mime)) Response.ContentType = mime;
+            Response.ContentType = mime ?? "application/octet-stream";
             if (!string.IsNullOrEmpty(fileName)) Response.AddHeader("Content-Disposition", "attachment;filename="
                 + HttpUtility.UrlEncode(fileName, Encoding.UTF8).Replace("+", "%20"));
             Response.TransmitFile(filePath, startIndex, responseLength);

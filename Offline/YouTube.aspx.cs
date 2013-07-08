@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Web.UI;
-using Mygod.Net;
 
 namespace Mygod.Skylark.Offline
 {
@@ -9,9 +8,10 @@ namespace Mygod.Skylark.Offline
     {
         protected void GetEmAll()
         {
-            string url = Server.UrlDecode(Request.QueryString["Url"]), path = RouteData.GetRelativePath();
+            string url = Rbase64.Decode(Request.QueryString["Url"].UrlDecode()), path = RouteData.GetRelativePath();
             if (string.IsNullOrWhiteSpace(url)) return;
-            foreach (var video in Net.YouTube.Video.GetVideoFromLink(Client, LinkConverter.Decode(Rbase64.Decode(url))))
+            var client = new WebClient();
+            foreach (var video in Net.YouTube.Video.GetVideoFromLink(client, url))
             {
                 Response.Write(string.Format("<h3><a href=\"{1}\">{0}</a></h3>{2}", video.Title, video.Url, Environment.NewLine));
                 foreach (var link in video.FmtStreamMap)
@@ -23,7 +23,5 @@ namespace Mygod.Skylark.Offline
                 }
             }
         }
-
-        public static readonly WebClient Client = new WebClient();
     }
 }

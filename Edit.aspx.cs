@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Web.UI;
 
 namespace Mygod.Skylark
@@ -12,7 +13,7 @@ namespace Mygod.Skylark
         {
             relativePath = RouteData.GetRelativePath();
             Title = ("编辑 " + relativePath).TrimEnd();
-            absolutePath = Server.GetFilePath(relativePath);
+            absolutePath = FileHelper.GetFilePath(relativePath);
             if (!File.Exists(absolutePath))
             {
                 Response.Redirect("/Browse/" + relativePath, true);
@@ -23,7 +24,7 @@ namespace Mygod.Skylark
 
         protected void Save(object sender, EventArgs e)
         {
-            File.WriteAllText(absolutePath, TextArea.Value);
+            File.WriteAllText(absolutePath, TextArea.Value, Encoding.UTF8);
             Response.Redirect("/Browse/" + relativePath, true);
         }
     }

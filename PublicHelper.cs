@@ -83,7 +83,7 @@ namespace Mygod.Skylark
         {
             try
             {
-                return XHelper.Load(path).Element("file");
+                return XHelper.Load(path).Root;
             }
             catch
             {

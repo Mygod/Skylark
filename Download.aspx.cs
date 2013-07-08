@@ -7,7 +7,8 @@ namespace Mygod.Skylark
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            string path = RouteData.GetRelativePath(), dataPath = Server.GetDataFilePath(path);
+            string path = RouteData.GetRelativePath(), filePath = FileHelper.GetFilePath(path), 
+                   dataPath = FileHelper.GetDataFilePath(path);
             if (!File.Exists(dataPath))
             {
                 Response.StatusCode = 404;
@@ -15,14 +16,15 @@ namespace Mygod.Skylark
             }
             try
             {
-                FileHelper.WaitForReady(dataPath, 10);
-                var filePath = Server.GetFilePath(path);
+                int timeout;
+                if (!int.TryParse(Request.QueryString["Timeout"], out timeout)) timeout = 10;
+                FileHelper.WaitForReady(dataPath, timeout);
                 TransmitFile(filePath, Path.GetFileName(filePath));
             }
             catch
             {
                 Response.StatusCode = 503;
-                Response.StatusDescription = "文件尚在处理中，请稍后再试";
+                Response.StatusDescription = "File is not ready yet";
             }
         }
     }
