@@ -75,6 +75,16 @@
                     }
                     return false;
                 }
+                var appParser = /^http:\/\/(.*?)\/Browse\/(.*?)$/;
+                function pickApp() {
+                    var result = prompt("请输入目标云雀：（请使用“http://……/Browse/……”的格式）",
+                                                 "http://skylark.apphb.com/Browse/");
+                    if (appParser.test(result)) {
+                        $("#Hidden").val(result);
+                        return true;
+                    }
+                    return false;
+                }
                 var manualuploader = new qq.FineUploader({
                     element: $('#manual-fine-uploader')[0],
                     request: {
@@ -96,6 +106,7 @@
                 <asp:LinkButton runat="server" Text="[移动到]" OnClick="Move" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[复制到]" OnClick="Copy" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[删除选中项]" OnClick="Delete" OnClientClick="return deleteConfirm();" />
+                <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy" OnClientClick="return pickApp();" />
             </div>
             <div id="running-result" style="display: none;">
                 <a href="javascript:hideParent();">[隐藏]</a><br />

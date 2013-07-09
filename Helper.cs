@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
@@ -77,12 +78,12 @@ namespace Mygod.Skylark
 
         public static string Shorten(this DateTime value)
         {
-            return Convert.ToBase64String(BitConverter.GetBytes(value.Ticks));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value.Ticks.ToString(CultureInfo.InvariantCulture)));
         }
 
         public static DateTime Deshorten(string value)
         {
-            return new DateTime(BitConverter.ToInt64(Convert.FromBase64String(value), 0), DateTimeKind.Utc);
+            return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))), DateTimeKind.Utc);
         }
 
         public static void KillProcess(int pid)
@@ -149,10 +150,6 @@ namespace Mygod.Skylark
         public static string GetDefaultMime(string path)
         {
             return GetFileValue(path, "mime");
-        }
-        public static void SetDefaultMime(string path, string value)
-        {
-            SetFileValue(path, "mime", value);
         }
 
         private static bool CheckFile(string path, bool? overwrite = null)
@@ -344,6 +341,25 @@ namespace Mygod.Skylark
                                        new XAttribute("mime", Helper.GetMimeType(target))))
                 .Save(FileHelper.GetDataFilePath(target));
             StartRunner("convert\n" + target);
+        }
+
+        public static string CreateCrossAppCopy(string domain, string path, string target)
+        {
+            var id = DateTime.UtcNow.Shorten();
+            new XDocument(new XElement("crossAppCopy", new XAttribute("domain", domain), new XAttribute("path", path.ToCorrectUrl()), 
+                new XAttribute("target", target))).Save(FileHelper.GetDataPath(id + ".crossAppCopy.task"));
+            StartRunner("cross-app-copy\n" + id);
+            return id;
+        }
+
+        public static void CleanUp()
+        {
+            foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(string.Empty), "*.task"))
+            {
+                var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
+                if (pid != 0) Helper.KillProcess(pid);
+                FileHelper.DeleteWithRetries(path);
+            }
         }
     }
 

@@ -49,9 +49,12 @@ namespace Mygod.Skylark.Task
                 {
                     var spentTime = DateTime.UtcNow - startTime;
                     SpentTime = spentTime.ToString("g");
-                    var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
-                    RemainingTime = remainingTime.ToString("g");
-                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                    if (percentage > 0)
+                    {
+                        var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
+                        RemainingTime = remainingTime.ToString("g");
+                        EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                    }
                 }
             }
             else
@@ -73,12 +76,7 @@ namespace Mygod.Skylark.Task
 
         protected void CleanUp(object sender, EventArgs e)
         {
-            foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(string.Empty), "*.task"))
-            {
-                var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
-                if (pid != 0) Helper.KillProcess(pid);
-                FileHelper.DeleteWithRetries(path);
-            }
+            TaskHelper.CleanUp();
         }
     }
 }

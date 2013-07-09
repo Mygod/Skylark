@@ -129,6 +129,11 @@ namespace Mygod.Skylark
                 Thread.Sleep(1000);
             }
         }
+
+        public static void SetDefaultMime(string path, string value)
+        {
+            SetFileValue(path, "mime", value);
+        }
     }
 
     public static partial class FFmpeg

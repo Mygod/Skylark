@@ -157,6 +157,7 @@
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\SevenZipSharp.dll" />
     <Content Include="Task\Create.aspx" />
+    <Content Include="Task\CrossAppCopy.aspx" />
     <Content Include="Task\Decompress.aspx" />
     <Content Include="Upload.aspx" />
     <Content Include="View.aspx" />
@@ -257,6 +258,13 @@
     </Compile>
     <Compile Include="Task\Create.aspx.designer.cs">
       <DependentUpon>Create.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Task\CrossAppCopy.aspx.cs">
+      <DependentUpon>CrossAppCopy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Task\CrossAppCopy.aspx.designer.cs">
+      <DependentUpon>CrossAppCopy.aspx</DependentUpon>
     </Compile>
     <Compile Include="Task\Decompress.aspx.cs">
       <DependentUpon>Decompress.aspx</DependentUpon>

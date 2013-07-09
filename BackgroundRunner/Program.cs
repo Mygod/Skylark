@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
@@ -31,6 +32,9 @@ namespace Mygod.Skylark.BackgroundRunner
                     break;
                 case "convert":
                     Convert(Console.ReadLine());
+                    break;
+                case "cross-app-copy":
+                    CrossAppCopy(Console.ReadLine());
                     break;
                 default:
                     Console.WriteLine("无法识别。");
@@ -95,7 +99,7 @@ namespace Mygod.Skylark.BackgroundRunner
 
                 doc = new XDocument();
                 root = new XElement("file", new XAttribute("url", url), new XAttribute("state", "downloading"),
-                                    new XAttribute("pid", Process.GetCurrentProcess().Id), new XAttribute("fileName", fileName),
+                                    new XAttribute("pid", Pid), new XAttribute("fileName", fileName),
                                     new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("mime", mime));
                 doc.Add(root);
                 if (fileLength != null) root.SetAttributeValue("size", fileLength);
@@ -124,12 +128,11 @@ namespace Mygod.Skylark.BackgroundRunner
             var xmlPath = GetDataPath(id + ".decompress.task");
             if (!File.Exists(xmlPath)) return;
             var doc = XHelper.Load(xmlPath);
-            var root = doc.Element("decompress");
+            var root = doc.Root;
             SevenZipExtractor extractor = null;
             try
             {
-                var pid = Process.GetCurrentProcess().Id;
-                root.SetAttributeValue("pid", pid);
+                root.SetAttributeValue("pid", Pid);
                 root.SetAttributeValue("progress", 0);
                 var progress = 0;
                 doc.Save(xmlPath);
@@ -141,7 +144,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 extractor.FileExtractionStarted += (sender, e) =>
                 {
                     FileHelper.WriteAllText(GetDataFilePath(FileHelper.Combine(directory, e.FileInfo.FileName)),
-                                            string.Format("<file state=\"decompressing\" id=\"{0}\" pid=\"{1}\" />", id, pid));
+                                            string.Format("<file state=\"decompressing\" id=\"{0}\" pid=\"{1}\" />", id, Pid));
                     root.SetAttributeValue("current", e.FileInfo.FileName);
                     doc.Save(xmlPath);
                 };
@@ -180,7 +183,7 @@ namespace Mygod.Skylark.BackgroundRunner
             SevenZipCompressor compressor = null;
             try
             {
-                root.SetAttributeValue("pid", Process.GetCurrentProcess().Id);
+                root.SetAttributeValue("pid", Pid);
                 doc.Save(xmlPath);
                 string baseFolder = root.GetAttributeValue("baseFolder"), baseFileFolder = GetFilePath(baseFolder);
                 var queue = new Queue<string>();
@@ -235,6 +238,7 @@ namespace Mygod.Skylark.BackgroundRunner
         }
 
         private static readonly Regex TimeParser = new Regex(@"size=(.*)kB time=(.*)bitrate=", RegexOptions.Compiled);
+        private static readonly int Pid = Process.GetCurrentProcess().Id;
         private static void Convert(string path)
         {
             var xmlPath = GetDataFilePath(path);
@@ -242,7 +246,7 @@ namespace Mygod.Skylark.BackgroundRunner
             var root = doc.Root;
             try
             {
-                root.SetAttributeValue("pid", Process.GetCurrentProcess().Id);
+                root.SetAttributeValue("pid", Pid);
                 doc.Save(xmlPath);
                 var process = new Process { StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
                     string.Format("-i \"{0}\"{2} \"{1}\" -y", GetFilePath(root.GetAttributeValue("input")), GetFilePath(path), 
@@ -270,6 +274,87 @@ namespace Mygod.Skylark.BackgroundRunner
                 root.SetAttributeValue("message", exc.GetMessage());
                 doc.Save(xmlPath);
             }
+        }
+
+        private static readonly WebClient Client = new WebClient();
+        private static bool CopyFile(string domain, string path, string target, XDocument doc, string xmlPath,
+                                     ref long fileCopied, ref long sizeCopied, bool logging = true)
+        {
+            var targetFile = FileHelper.Combine(target, Path.GetFileName(path));
+            doc.Root.SetAttributeValue("current", targetFile);
+            doc.Save(xmlPath);
+            try
+            {
+                var root = XDocument.Parse(Client.DownloadString(string.Format("http://{0}/Api/Details/{1}", domain, path))).Root;
+                if (root.GetAttributeValue("status") != "ok") throw new ExternalException(root.GetAttributeValue("message"));
+                OfflineDownload(string.Format("http://{0}/Download/{1}", domain, path), target);
+                var file = root.Element("file");
+                FileHelper.SetDefaultMime(GetDataFilePath(targetFile), file.GetAttributeValue("mime"));
+                fileCopied++;
+                sizeCopied += file.GetAttributeValue<long>("size");
+                doc.Root.SetAttributeValue("fileCopied", fileCopied);
+                doc.Root.SetAttributeValue("sizeCopied", sizeCopied);
+                doc.Save(xmlPath);
+                return true;
+            }
+            catch (Exception exc)
+            {
+                if (logging)
+                {
+                    doc.Root.SetAttributeValue("message", (doc.Root.GetAttributeValue("message") ?? string.Empty)
+                        + string.Format("复制 /{0} 时发生了错误：{2}{1}{2}", targetFile, exc.GetMessage(), Environment.NewLine));
+                    doc.Save(xmlPath);
+                }
+                return false;
+            }
+        }
+        private static void CopyDirectory(string domain, string path, string target, XDocument doc, string xmlPath,
+                                          ref long fileCopied, ref long sizeCopied)
+        {
+            doc.Root.SetAttributeValue("current", FileHelper.Combine(target, Path.GetFileName(path)));
+            doc.Save(xmlPath);
+            try
+            {
+                var root = XDocument.Parse(Client.DownloadString(string.Format("http://{0}/Api/List/{1}", domain, path))).Root;
+                if (root.GetAttributeValue("status") != "ok") throw new ExternalException(root.GetAttributeValue("message"));
+                foreach (var element in root.Elements())
+                {
+                    var name = element.GetAttributeValue("name");
+                    switch (element.Name.LocalName)
+                    {
+                        case "directory":
+                            CopyDirectory(domain, FileHelper.Combine(path, name), FileHelper.Combine(target, name), doc, xmlPath,
+                                          ref fileCopied, ref sizeCopied);
+                            break;
+                        case "file":
+                            CopyFile(domain, FileHelper.Combine(path, name), target, doc, xmlPath, ref fileCopied, ref sizeCopied);
+                            break;
+                    }
+                }
+            }
+            catch (Exception exc)
+            {
+                doc.Root.SetAttributeValue("message", (doc.Root.GetAttributeValue("message") ?? string.Empty)
+                    + string.Format("复制 /{0} 时发生了错误：{2}{1}{2}", target, exc.GetMessage(), Environment.NewLine));
+                doc.Save(xmlPath);
+            }
+        }
+        private static void CrossAppCopy(string id)
+        {
+            var xmlPath = GetDataPath(id + ".crossAppCopy.task");
+            if (!File.Exists(xmlPath)) return;
+            var doc = XHelper.Load(xmlPath);
+            string domain = doc.Root.GetAttributeValue("domain"), path = doc.Root.GetAttributeValue("path"),
+                   target = doc.Root.GetAttributeValue("target");
+            long fileCopied = 0, sizeCopied = 0;
+            doc.Root.SetAttributeValue("pid", Pid);
+            doc.Save(xmlPath);
+            if (!CopyFile(domain, path, target, doc, xmlPath, ref fileCopied, ref sizeCopied, false))
+                CopyDirectory(domain, path, target, doc, xmlPath, ref fileCopied, ref sizeCopied);
+            var current = doc.Root.Attribute("current");
+            if (current != null) current.Remove();
+            doc.Root.SetAttributeValue("finished", DateTime.UtcNow.Ticks);
+            doc.Save(xmlPath);
         }
     }
 }

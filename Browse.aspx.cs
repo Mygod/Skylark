@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
@@ -86,11 +87,14 @@ namespace Mygod.Skylark
             if (impossibleEnds) Never();
             else
             {
-                TimeSpan spentTime = DateTime.UtcNow - startTime,
-                         remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
+                var spentTime = DateTime.UtcNow - startTime;
                 SpentTime = spentTime.ToString("g");
-                RemainingTime = remainingTime.ToString("g");
-                EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                if (percentage > 0)
+                {
+                    var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
+                    RemainingTime = remainingTime.ToString("g");
+                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                }
             }
         }
 
@@ -158,6 +162,15 @@ namespace Mygod.Skylark
             TaskHelper.CreateCompress(ArchiveFilePath.Text, DirectoryList.Items.GetSelectedFiles()
                 .Union(FileList.Items.GetSelectedFiles()), RelativePath, CompressionLevelList.SelectedValue);
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
+        }
+
+        private static readonly Regex AppParser = new Regex(@"^http:\/\/(.*?)\/Browse\/(.*?)$", RegexOptions.Compiled);
+        protected void CrossAppCopy(object sender, EventArgs e)
+        {
+            var match = AppParser.Match(Hidden.Value);
+            if (!match.Success) return;
+            Response.Redirect("/Task/CrossAppCopy/" +
+                TaskHelper.CreateCrossAppCopy(match.Groups[1].Value, match.Groups[2].Value.UrlDecode(), RelativePath));
         }
 
         #endregion
@@ -251,10 +264,13 @@ namespace Mygod.Skylark
                 SpentTime = spentTime.ToString("g");
                 var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
                 AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);
-                var remainingTime =
-                    new TimeSpan((long)(spentTime.Ticks * (fileSize - downloadedFileSize) / (double)downloadedFileSize));
-                RemainingTime = remainingTime.ToString("g");
-                EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                if (downloadedFileSize > 0)
+                {
+                    var remainingTime =
+                        new TimeSpan((long)(spentTime.Ticks * (fileSize - downloadedFileSize) / (double)downloadedFileSize));
+                    RemainingTime = remainingTime.ToString("g");
+                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
+                }
             }
         }
 
@@ -287,9 +303,8 @@ namespace Mygod.Skylark
             }
             var percentage = byte.Parse(Percentage = attr);
             attr = root.GetAttributeValue("current");
-            if (!string.IsNullOrEmpty(attr))
-                //CurrentFile = string.Format("<a href=\"/Browse/{0}\">{1}</a>", FileHelper.Combine(TargetDirectory, attr), attr);
-                CurrentFile = attr;
+            if (!string.IsNullOrEmpty(attr)) CurrentFile = string.Format("<a href=\"/Browse/{0}\">{1}</a>", 
+                FileHelper.Combine(root.GetAttributeValue("baseFolder"), attr), attr);
             attr = root.GetAttributeValue("message");
             if (attr != null)
             {

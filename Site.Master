@@ -31,10 +31,9 @@
                                                     Helper.GetSize(currentDrive.TotalSize), 
                                                     100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
                 <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
-        
                 </asp:ContentPlaceHolder>
                 <div class="center">Powered by <a href="http://mygod.apphb.com">Mygod 工作室™</a></div>
-                <div class="center">Copyright &copy; 2013 云雀™ V<%=CurrentAssembly.GetName().Version %></div>
+                <div class="center">Copyright &copy; 2013 云雀™ V<%=CurrentAssembly.GetName().Version %> Beta</div>
             </div>
         </div>
     </div>

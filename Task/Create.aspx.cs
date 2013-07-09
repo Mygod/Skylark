@@ -30,6 +30,16 @@ namespace Mygod.Skylark.Task
                     case "decompress":
                         result.SetAttributeValue("id", TaskHelper.CreateDecompress(path, Request.QueryString["Target"].UrlDecode()));
                         break;
+                    case "convert":
+                        TaskHelper.CreateConvert(path, Request.QueryString["Target"].UrlDecode(), Request.QueryString["Size"].UrlDecode(), 
+                            Request.QueryString["VCodec"].UrlDecode(), Request.QueryString["ACodec"].UrlDecode(), 
+                            Request.QueryString["SCodec"].UrlDecode(), Request.QueryString["Start"].UrlDecode(), 
+                            Request.QueryString["End"].UrlDecode());
+                        break;
+                    case "cross-app-copy":
+                        result.SetAttributeValue("id", TaskHelper.CreateCrossAppCopy(Request.QueryString["Domain"].UrlDecode(), 
+                                                                                     Request.QueryString["Path"].UrlDecode(), path));
+                        break;
                     default:
                         throw new FormatException("无法识别的 Type！");
                 }
@@ -38,7 +48,7 @@ namespace Mygod.Skylark.Task
             catch (Exception exc)
             {
                 result.SetAttributeValue("status", "error");
-                result.SetAttributeValue("message", exc.Message);
+                result.SetAttributeValue("message", exc.GetMessage());
             }
             Response.Write(result.ToString());
         }

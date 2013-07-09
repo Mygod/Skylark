@@ -52,7 +52,7 @@ namespace Mygod.Skylark
             catch (Exception exc)
             {
                 result.SetAttributeValue("status", "error");
-                result.SetAttributeValue("message", exc.Message);
+                result.SetAttributeValue("message", exc.GetMessage());
             }
             Response.Write(result.ToString());
         }
