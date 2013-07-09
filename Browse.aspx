@@ -203,7 +203,7 @@
                 <a href="/View/<%=RelativePath %>" target="_blank">[使用默认类型查看]</a>
                 <a href="/Download/<%=RelativePath %>" target="_blank">[下载链接]</a>
                 <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
-                <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore();" />
+                <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore(true);" />
                 <a href="javascript:showConvert();">[转换媒体文件格式]</a>
             </div>
             <div id="convert-form" style="display: none;">
