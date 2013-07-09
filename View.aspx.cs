@@ -7,7 +7,7 @@ namespace Mygod.Skylark
         protected void Page_Load(object sender, EventArgs e)
         {
             string path = RouteData.GetRelativePath(), dataPath = FileHelper.GetDataFilePath(path), 
-                   mime = (RouteData.GetRouteString("Mime") ?? string.Empty).Trim('/');
+                   mime = Request.QueryString["Mime"];
             if (string.IsNullOrWhiteSpace(mime)) mime = FileHelper.GetDefaultMime(dataPath);
             try
             {

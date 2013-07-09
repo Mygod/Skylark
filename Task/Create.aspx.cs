@@ -36,7 +36,7 @@ namespace Mygod.Skylark.Task
                             Request.QueryString["SCodec"].UrlDecode(), Request.QueryString["Start"].UrlDecode(), 
                             Request.QueryString["End"].UrlDecode());
                         break;
-                    case "cross-app-copy":
+                    case "crossappcopy":
                         result.SetAttributeValue("id", TaskHelper.CreateCrossAppCopy(Request.QueryString["Domain"].UrlDecode(), 
                                                                                      Request.QueryString["Path"].UrlDecode(), path));
                         break;

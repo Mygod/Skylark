@@ -83,7 +83,7 @@ namespace Mygod.Skylark
             var client = new WebClient();
             foreach (var video in Net.YouTube.Video.GetVideoFromLink(client, url))
             {
-                var element = new XElement("video", new XAttribute("Title", video.Title), new XAttribute("Url", video.Url));
+                var element = new XElement("video", new XAttribute("title", video.Title), new XAttribute("url", video.Url));
                 foreach (var link in video.FmtStreamMap)
                 {
                     element.Add(new XElement("download", new XAttribute("type", link.ToString()), new XAttribute("link",

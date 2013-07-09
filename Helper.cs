@@ -418,15 +418,15 @@ namespace Mygod.Skylark
 
             public XElement ToElement()
             {
-                var element = new XElement("Codec");
-                element.SetAttributeValueWithDefault("Name", Name);
-                element.SetAttributeValueWithDefault("Description", Description);
-                element.SetAttributeValueWithDefault("DecodingSupported", DecodingSupported);
-                element.SetAttributeValueWithDefault("EncodingSupported", EncodingSupported);
-                element.SetAttributeValueWithDefault("Type", Type);
-                element.SetAttributeValueWithDefault("IntraFrameOnlyCodec", IntraFrameOnlyCodec);
-                element.SetAttributeValueWithDefault("LossyCompression", LossyCompression);
-                element.SetAttributeValueWithDefault("LosslessCompression", LosslessCompression);
+                var element = new XElement("codec");
+                element.SetAttributeValueWithDefault("name", Name);
+                element.SetAttributeValueWithDefault("description", Description);
+                element.SetAttributeValueWithDefault("decodingSupported", DecodingSupported);
+                element.SetAttributeValueWithDefault("encodingSupported", EncodingSupported);
+                element.SetAttributeValueWithDefault("type", Type);
+                element.SetAttributeValueWithDefault("intraFrameOnlyCodec", IntraFrameOnlyCodec);
+                element.SetAttributeValueWithDefault("lossyCompression", LossyCompression);
+                element.SetAttributeValueWithDefault("losslessCompression", LosslessCompression);
                 return element;
             }
         }
