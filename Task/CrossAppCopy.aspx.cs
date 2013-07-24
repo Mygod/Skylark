@@ -39,7 +39,7 @@ namespace Mygod.Skylark.Task
             attr = root.GetAttributeValue("finished");
             if (string.IsNullOrEmpty(attr))
             {
-                var impossibleEnds = Helper.IsBackgroundRunnerKilled(pid);
+                var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(pid);
                 Status = impossibleEnds ? "已被咔嚓（请重新开始任务）" : "正在复制";
                 if (impossibleEnds) EndingTime = "地球毁灭时";
                 else SpentTime = (DateTime.UtcNow - startTime).ToString("g");

@@ -4,7 +4,7 @@
     </asp:ContentPlaceHolder>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
-    <div>当前位置：<a href="javascript:changePath();">[编辑]</a> <a href="/Browse/">根目录</a><% WritePath(); %></div>
+    <div>当前位置：　　<a href="javascript:changePath();">[编辑]</a> <a href="/Browse/">云雀™</a><% WritePath(); %></div>
     <hr />
     <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
     </asp:ContentPlaceHolder>

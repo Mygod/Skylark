@@ -18,27 +18,35 @@ namespace Mygod.Skylark.BackgroundRunner
     {
         private static void Main()
         {
-            Console.WriteLine("恭喜你得到了这款无聊的程序！随便打点东西吧。");
-            switch (Console.ReadLine().ToLowerInvariant())
+            try
             {
-                case "offline-download":
-                    OfflineDownload(Console.ReadLine(), Console.ReadLine());
-                    break;
-                case "decompress":
-                    Decompress(Console.ReadLine());
-                    break;
-                case "compress":
-                    Compress(Console.ReadLine());
-                    break;
-                case "convert":
-                    Convert(Console.ReadLine());
-                    break;
-                case "cross-app-copy":
-                    CrossAppCopy(Console.ReadLine());
-                    break;
-                default:
-                    Console.WriteLine("无法识别。");
-                    break;
+                Console.WriteLine("恭喜你得到了这款无聊的程序！随便打点东西吧。");
+                switch (Console.ReadLine().ToLowerInvariant())
+                {
+                    case "offline-download":
+                        OfflineDownload(Console.ReadLine(), Console.ReadLine());
+                        break;
+                    case "decompress":
+                        Decompress(Console.ReadLine());
+                        break;
+                    case "compress":
+                        Compress(Console.ReadLine());
+                        break;
+                    case "convert":
+                        Convert(Console.ReadLine());
+                        break;
+                    case "cross-app-copy":
+                        CrossAppCopy(Console.ReadLine());
+                        break;
+                    default:
+                        Console.WriteLine("无法识别。");
+                        break;
+                }
+            }
+            catch (Exception exc)
+            {
+                File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow, exc.GetMessage(),
+                                                                    Environment.NewLine));
             }
         }
 
@@ -113,7 +121,7 @@ namespace Mygod.Skylark.BackgroundRunner
             }
             catch (Exception exc)
             {
-                if (doc == null || root == null) return;
+                if (doc == null || root == null) throw;
                 root.SetAttributeValue("message", exc.Message);
                 doc.Save(xmlPath);
             }
@@ -136,7 +144,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 root.SetAttributeValue("progress", 0);
                 var progress = 0;
                 doc.Save(xmlPath);
-                string archive = root.GetAttributeValue("archive"), directory = root.GetAttributeValue("directory"),
+                string archive = root.GetAttributeValue("archive"), directory = root.GetAttributeValue("directory").Replace('/', '\\'),
                        filePath = GetFilePath(directory), dataPath = GetDataPath(directory);
                 if (!Directory.Exists(filePath)) Directory.CreateDirectory(filePath);
                 if (!Directory.Exists(dataPath)) Directory.CreateDirectory(dataPath);

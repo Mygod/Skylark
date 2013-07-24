@@ -63,8 +63,8 @@
             <summary>
             创建新的IniFile。
             </summary>
-            <param name="sFilePath">Ini文件路径。</param>
-            <param name="iStringLong">文本长度，如果超过会被截断。</param>
+            <param name="filePath">Ini文件路径。</param>
+            <param name="stringLong">文本长度，如果超过会被截断。</param>
         </member>
         <member name="M:Mygod.IO.IniFile.ReadIniData(System.String,System.String,System.String)">
             <summary>
@@ -94,6 +94,11 @@
             </summary>
             <param name="iniFile">属于的Ini文件。</param>
             <param name="sectionName">节名。</param>
+        </member>
+        <member name="M:Mygod.IO.IniSection.Remove">
+            <summary>
+            从该文件中删除此节。
+            </summary>
         </member>
         <member name="P:Mygod.IO.IniSection.IniFile">
             <summary>

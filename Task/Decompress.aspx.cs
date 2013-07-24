@@ -42,7 +42,7 @@ namespace Mygod.Skylark.Task
             attr = root.GetAttributeValue("finished");
             if (string.IsNullOrEmpty(attr))
             {
-                var impossibleEnds = Helper.IsBackgroundRunnerKilled(root.GetAttributeValueWithDefault<int>("pid"));
+                var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(root.GetAttributeValueWithDefault<int>("pid"));
                 Status = impossibleEnds ? "已被咔嚓（请重新开始任务）" : "正在解压";
                 if (impossibleEnds) Never();
                 else

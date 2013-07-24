@@ -85,26 +85,6 @@ namespace Mygod.Skylark
         {
             return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))), DateTimeKind.Utc);
         }
-
-        public static void KillProcess(int pid)
-        {
-            try
-            {
-                Process.GetProcessById(pid).Kill();
-            }
-            catch { }
-        }
-        public static bool IsBackgroundRunnerKilled(int pid)
-        {
-            try
-            {
-                return Process.GetProcessById(pid).ProcessName != "BackgroundRunner";
-            }
-            catch
-            {
-                return true;
-            }
-        }
     }
 
     public static partial class FileHelper
@@ -213,7 +193,7 @@ namespace Mygod.Skylark
                 if (element.GetAttributeValue("state") != "ready")
                 {
                     var pid = element.GetAttributeValueWithDefault<int>("pid");
-                    if (pid != 0) Helper.KillProcess(pid);
+                    if (pid != 0) TaskHelper.KillProcess(pid);
                 }
             }
             else if (Directory.Exists(dataPath))
@@ -273,6 +253,27 @@ namespace Mygod.Skylark
         }
     }
 
+    public static class Config
+    {
+        private const string ConfigFile = "global.config";
+        public static long MaxWorkerCount
+        {
+            get
+            {
+                try
+                {
+                    return FileHelper.GetElement(FileHelper.GetDataPath(ConfigFile))
+                        .GetAttributeValueWithDefault<long>("MaxWorkerCount", 10);
+                }
+                catch
+                {
+                    return 10;
+                }
+            }
+            set { FileHelper.GetElement(FileHelper.GetDataPath(ConfigFile)).SetAttributeValue("MaxWorkerCount", value); }
+        }
+    }
+
     public static class TaskHelper
     {
         private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled),
@@ -283,6 +284,7 @@ namespace Mygod.Skylark
             var info = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
                 { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false };
             var process = new Process { StartInfo = info };
+            while (CurrentWorkers >= Config.MaxWorkerCount) Thread.Sleep(1000);
             process.Start();
             process.StandardInput.WriteLine(args);
             process.StandardInput.Close();
@@ -290,7 +292,7 @@ namespace Mygod.Skylark
 
         public static void CreateOffline(string url, string relativePath)
         {
-            StartRunner(string.Format("offline-download\n{0}\n{1}", LinkConverter.Decode(url), relativePath));
+            StartRunner(String.Format("offline-download\n{0}\n{1}", LinkConverter.Decode(url), relativePath));
         }
         public static void CreateOfflineMediaFire(string id, string relativePath)
         {
@@ -301,14 +303,14 @@ namespace Mygod.Skylark
         public static void CreateCompress(string archiveFilePath, IEnumerable<string> files, string baseFolder = null, 
                                           string compressionLevel = null)
         {
-            baseFolder = baseFolder ?? string.Empty;
+            baseFolder = baseFolder ?? String.Empty;
             var root = new XElement("file", new XAttribute("state", "compressing"), new XAttribute("startTime", DateTime.UtcNow.Ticks),
                                     new XAttribute("baseFolder", baseFolder), new XAttribute("mime", Helper.GetMimeType(archiveFilePath)),
                                     new XAttribute("level", compressionLevel ?? "Ultra"));
             foreach (var file in files) root.Add(new XElement(
                 FileHelper.IsFile(FileHelper.GetFilePath(FileHelper.Combine(baseFolder, file))) ? "file" : "directory", file));
             new XDocument(root).Save(FileHelper.GetDataFilePath(archiveFilePath));
-            File.WriteAllText(FileHelper.GetFilePath(archiveFilePath), string.Empty);   // temp
+            File.WriteAllText(FileHelper.GetFilePath(archiveFilePath), String.Empty);   // temp
             StartRunner("compress\n" + archiveFilePath);
         }
         public static string CreateDecompress(string path, string target)
@@ -325,12 +327,12 @@ namespace Mygod.Skylark
         {
             var filePath = FileHelper.GetFilePath(target);
             if (File.Exists(filePath)) return;
-            File.WriteAllText(filePath, string.Empty);
-            var arguments = string.Empty;
-            if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
-            if (!string.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
-            if (!string.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
-            if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
+            File.WriteAllText(filePath, String.Empty);
+            var arguments = String.Empty;
+            if (!String.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
+            if (!String.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
+            if (!String.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
+            if (!String.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
             TimeSpan duration = TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
                      start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
             if (start <= TimeSpan.Zero) start = TimeSpan.Zero; else arguments += " -ss " + startPoint;
@@ -354,13 +356,35 @@ namespace Mygod.Skylark
 
         public static void CleanUp()
         {
-            foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(string.Empty), "*.task"))
+            foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(String.Empty), "*.task"))
             {
                 var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
-                if (pid != 0) Helper.KillProcess(pid);
+                if (pid != 0) KillProcess(pid);
                 FileHelper.DeleteWithRetries(path);
             }
         }
+
+        public static void KillProcess(int pid)
+        {
+            try
+            {
+                Process.GetProcessById(pid).Kill();
+            }
+            catch { }
+        }
+        public static bool IsBackgroundRunnerKilled(int pid)
+        {
+            try
+            {
+                return Process.GetProcessById(pid).ProcessName != "BackgroundRunner";
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        public static long CurrentWorkers { get { return Process.GetProcessesByName("BackgroundRunner").LongLength; } }
     }
 
     public static class Rbase64

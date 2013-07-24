@@ -38,11 +38,15 @@ namespace Mygod.Skylark
             {
                 Views.SetActiveView(DirectoryView);
                 if (IsPostBack) return;
-                DirectoryList.DataSource = InfoDirectory.EnumerateDirectories();
+                var dirs = InfoDirectory.EnumerateDirectories().ToList();
+                DirectoryList.DataSource = dirs;
                 DirectoryList.DataBind();
-                FileList.DataSource = InfoDirectory.EnumerateFiles();
+                DirectoryCount = dirs.Count.ToString(CultureInfo.InvariantCulture);
+                var files = InfoDirectory.EnumerateFiles().ToList();
+                FileList.DataSource = files;
                 FileList.DataBind();
-                ArchiveFilePath.Text = FileHelper.Combine(RelativePath, "Files.7z");
+                FileCount = files.Count.ToString(CultureInfo.InvariantCulture);
+                ArchiveFilePath.Text = string.IsNullOrWhiteSpace(RelativePath) ? "Files.7z" : (RelativePath + ".7z");
             }
             else if (InfoFile.Exists)
             {
@@ -82,7 +86,7 @@ namespace Mygod.Skylark
         private void Update(DateTime startTime, double percentage, int pid)
         {
             StartTime = startTime.ToChineseString();
-            var impossibleEnds = Helper.IsBackgroundRunnerKilled(pid);
+            var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(pid);
             Status = impossibleEnds ? "已被咔嚓（请重新开始任务）" : "正在进行";
             if (impossibleEnds) Never();
             else
@@ -105,6 +109,8 @@ namespace Mygod.Skylark
         }
 
         #region Directory
+
+        protected string DirectoryCount, FileCount;
 
         protected void DirectoryCommand(object source, RepeaterCommandEventArgs e)
         {
@@ -255,7 +261,7 @@ namespace Mygod.Skylark
             var downloadedFileSize = File.Exists(path) ? new FileInfo(path).Length : 0;
             DownloadedFileSize = string.Format("{0} ({1}%)", Helper.GetSize(downloadedFileSize),
                                     Percentage = (100.0 * downloadedFileSize / fileSize).ToString(CultureInfo.InvariantCulture));
-            var impossibleEnds = Helper.IsBackgroundRunnerKilled(file.GetAttributeValueWithDefault<int>("pid"));
+            var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(file.GetAttributeValueWithDefault<int>("pid"));
             Status = impossibleEnds ? "已被咔嚓（请删除后重新开始任务）" : "正在下载";
             if (impossibleEnds) Never();
             else
