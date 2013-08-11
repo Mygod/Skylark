@@ -253,27 +253,6 @@ namespace Mygod.Skylark
         }
     }
 
-    public static class Config
-    {
-        private const string ConfigFile = "global.config";
-        public static long MaxWorkerCount
-        {
-            get
-            {
-                try
-                {
-                    return FileHelper.GetElement(FileHelper.GetDataPath(ConfigFile))
-                        .GetAttributeValueWithDefault<long>("MaxWorkerCount", 10);
-                }
-                catch
-                {
-                    return 10;
-                }
-            }
-            set { FileHelper.GetElement(FileHelper.GetDataPath(ConfigFile)).SetAttributeValue("MaxWorkerCount", value); }
-        }
-    }
-
     public static class TaskHelper
     {
         private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled),
@@ -284,7 +263,6 @@ namespace Mygod.Skylark
             var info = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
                 { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false };
             var process = new Process { StartInfo = info };
-            while (CurrentWorkers >= Config.MaxWorkerCount) Thread.Sleep(1000);
             process.Start();
             process.StandardInput.WriteLine(args);
             process.StandardInput.Close();
@@ -351,6 +329,17 @@ namespace Mygod.Skylark
             new XDocument(new XElement("crossAppCopy", new XAttribute("domain", domain), new XAttribute("path", path.ToCorrectUrl()), 
                 new XAttribute("target", target))).Save(FileHelper.GetDataPath(id + ".crossAppCopy.task"));
             StartRunner("cross-app-copy\n" + id);
+            return id;
+        }
+
+        public static string CreateFtpUpload(string source, IEnumerable<string> files, string target)
+        {
+            var id = DateTime.UtcNow.Shorten();
+            var root = new XElement("ftpUpload", new XAttribute("source", source), new XAttribute("target", target));
+            foreach (var file in files) root.Add(new XElement(
+                FileHelper.IsFile(FileHelper.GetFilePath(FileHelper.Combine(source, file))) ? "file" : "directory", file));
+            new XDocument(root).Save(FileHelper.GetDataPath(id + ".ftpUpload.task"));
+            StartRunner("ftp-upload\n" + id);
             return id;
         }
 

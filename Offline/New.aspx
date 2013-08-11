@@ -11,11 +11,12 @@
     <h2 class="center">新建离线下载任务</h2>
     <div>离线下载，即将目标服务器上的文件弄到云雀™上再让你下载的简单伎俩。（当你和服务器之间有厚障壁时这个玩意儿很有用，因此推荐离线下载国外的地址，也可以提升速度）</div>
     <div>要新建任务只需把地址（一个或多个）粘贴到下面那个矩形中，然后按下那个神奇的按钮即可。</div>
-    <div>支持协议：http https thunder flashget qqdl fs2you</div>
+    <div>支持协议：http https thunder flashget qqdl fs2you ftp</div>
     <p><asp:TextBox ID="LinkBox" runat="server" TextMode="MultiLine" CssClass="link-box"></asp:TextBox></p>
     <div class="center"><asp:Button runat="server" Text="神奇的按钮！" OnClick="Submit" /></div>
     <div>点了神奇的按钮后就会回到刚才的目录。如果没有出现你创建的任务，尝试刷新一下。</div>
-    <div>反复刷新也没有用？研究表明有时候会有这种奇怪的情况，此时只需再次启动任务即可。（如果可能请尝试手动打开是否成功）</div>
+    <div>反复刷新也没有用？研究表明有时候会有这种奇怪的情况，你可以去<a href="/Task/Log/">人事部记过处分记录</a>看看有没有错误信息。如果没有，你可以尝试再次启动任务即可。（如果可能请尝试手动打开是否成功）</div>
+    <div>下载 FTP 文件需要使用这样的格式：ftp://[username:password@]host/dir/file（你的用户名和密码不会被保留，也不会在下载进度上显示）</div>
     <div>&nbsp;</div>
     <div>请注意离线下载以下格式的文件方法比较特殊，请按照下面说的进行：（否则可能会失败）</div>
     <ul>

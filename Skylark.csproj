@@ -160,6 +160,7 @@
     <Content Include="Task\Create.aspx" />
     <Content Include="Task\CrossAppCopy.aspx" />
     <Content Include="Task\Decompress.aspx" />
+    <Content Include="Task\FtpUpload.aspx" />
     <Content Include="Task\Log.aspx" />
     <Content Include="Task\Query.aspx" />
     <Content Include="Upload.aspx" />
@@ -282,6 +283,13 @@
     </Compile>
     <Compile Include="Task\Decompress.aspx.designer.cs">
       <DependentUpon>Decompress.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Task\FtpUpload.aspx.cs">
+      <DependentUpon>FtpUpload.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Task\FtpUpload.aspx.designer.cs">
+      <DependentUpon>FtpUpload.aspx</DependentUpon>
     </Compile>
     <Compile Include="Task\Log.aspx.cs">
       <DependentUpon>Log.aspx</DependentUpon>

@@ -179,6 +179,12 @@ namespace Mygod.Skylark
                 TaskHelper.CreateCrossAppCopy(match.Groups[1].Value, match.Groups[2].Value.UrlDecode(), RelativePath));
         }
 
+        protected void FtpUpload(object sender, EventArgs e)
+        {
+            Response.Redirect("/Task/FtpUpload/" + TaskHelper.CreateFtpUpload(RelativePath,
+                DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles()), Hidden.Value));
+        }
+
         #endregion
 
         #region File - ready

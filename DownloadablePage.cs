@@ -15,8 +15,7 @@ namespace Mygod.Skylark
         protected void TransmitFile(string filePath, string fileName = null, string mime = null)
         {
             var fileInfo = new FileInfo(filePath);
-            var responseLength = fileInfo.Exists ? fileInfo.Length : 0;
-            var startIndex = 0;
+            long responseLength = fileInfo.Exists ? fileInfo.Length : 0, startIndex = 0;
             var etag = '"' + HttpUtility.UrlEncode(filePath, Encoding.UTF8) + File.GetLastWriteTimeUtc(filePath).ToString("r") + '"';
 
             // if the "If-Match" exists and is different to etag (or is equal to any "*" with no resource)
@@ -42,8 +41,8 @@ namespace Mygod.Skylark
             if (Request.Headers["Range"] != null && (Request.Headers["If-Range"] == null || Request.Headers["If-Range"] == etag))
             {
                 var match = Regex.Match(Request.Headers["Range"], @"bytes=(\d*)-(\d*)");
-                startIndex = Parse<int>(match.Groups[1].Value);
-                responseLength = (Parse<int?>(match.Groups[2].Value) + 1 ?? fileInfo.Length) - startIndex;
+                startIndex = Parse<long>(match.Groups[1].Value);
+                responseLength = (Parse<long?>(match.Groups[2].Value) + 1 ?? fileInfo.Length) - startIndex;
                 Response.StatusCode = (int)HttpStatusCode.PartialContent;
                 Response.Headers["Content-Range"] = "bytes " + startIndex + "-" + (startIndex + responseLength - 1)
                                                              + "/" + fileInfo.Length;

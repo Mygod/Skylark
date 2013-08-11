@@ -10,6 +10,6 @@
 namespace Mygod.Skylark.Task {
     
     
-    public partial class Default {
+    public partial class FtpUpload {
     }
 }

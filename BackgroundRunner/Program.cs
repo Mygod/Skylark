@@ -26,6 +26,9 @@ namespace Mygod.Skylark.BackgroundRunner
                     case "offline-download":
                         OfflineDownload(Console.ReadLine(), Console.ReadLine());
                         break;
+                    case "ftp-upload":
+                        FtpUpload(Console.ReadLine());
+                        break;
                     case "decompress":
                         Decompress(Console.ReadLine());
                         break;
@@ -63,6 +66,7 @@ namespace Mygod.Skylark.BackgroundRunner
             return GetDataPath(path) + ".data";
         }
 
+        private static readonly Regex AccountRemover = new Regex(@"^ftp:\/\/[^\/]*?:[^\/]*?@", RegexOptions.Compiled);
         private static string GetFileName(string url)
         {
             url = url.TrimEnd('/', '\\');
@@ -95,21 +99,29 @@ namespace Mygod.Skylark.BackgroundRunner
                     {
                         fileLength = null;
                     }
+                if (fileLength < 0) fileLength = null;
 
                 var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode() : GetFileName(url)).UrlDecode();
-                var mime = Helper.GetMime(response.ContentType);
-                var extension = Helper.GetDefaultExtension(mime);
+                string mime, extension;
+                try
+                {
+                    mime = Helper.GetMime(response.ContentType);
+                    extension = Helper.GetDefaultExtension(mime);
+                }
+                catch
+                {
+                    extension = Path.GetExtension(fileName);
+                    mime = Helper.GetDefaultExtension(extension);
+                }
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal)) fileName += extension;
 
                 path = Path.Combine(path, fileName);
                 xmlPath = GetDataFilePath(path);
                 path = GetFilePath(path);
 
-                doc = new XDocument();
-                root = new XElement("file", new XAttribute("url", url), new XAttribute("state", "downloading"),
-                                    new XAttribute("pid", Pid), new XAttribute("fileName", fileName),
-                                    new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("mime", mime));
-                doc.Add(root);
+                doc = new XDocument(root = new XElement("file", new XAttribute("url", AccountRemover.Replace(url, "ftp://")),
+                    new XAttribute("state", "downloading"), new XAttribute("pid", Pid), new XAttribute("fileName", fileName),
+                    new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("mime", mime ?? "application/octet-stream")));
                 if (fileLength != null) root.SetAttributeValue("size", fileLength);
                 doc.Save(xmlPath);
 
@@ -128,6 +140,85 @@ namespace Mygod.Skylark.BackgroundRunner
             finally
             {
                 if (fileStream != null) fileStream.Close();
+            }
+        }
+
+        private static void FtpUpload(string id)
+        {
+            var xmlPath = GetDataPath(id + ".ftpUpload.task");
+            if (!File.Exists(xmlPath)) return;
+            var doc = XHelper.Load(xmlPath);
+            var root = doc.Root;
+            try
+            {
+                root.SetAttributeValue("pid", Pid);
+                string source = root.GetAttributeValue("source"), target = root.GetAttributeValue("target");
+                root.SetAttributeValue("target", AccountRemover.Replace(target, "ftp://"));
+                doc.Save(xmlPath);
+                var queue = new Queue<string>();
+                foreach (var e in root.ElementsCaseInsensitive("directory")) queue.Enqueue(e.Value);
+                var files = new List<string>();
+                var total = 0L;
+                foreach (var file in root.ElementsCaseInsensitive("file").Select(e => e.Value))
+                {
+                    files.Add(file);
+                    total += new FileInfo(GetFilePath(FileHelper.Combine(source, file))).Length;
+                }
+                while (queue.Count > 0)
+                {
+                    string item = queue.Dequeue(), itemFile = GetFilePath(FileHelper.Combine(source, item));
+                    foreach (var file in Directory.EnumerateFiles(itemFile).Select(file => Path.Combine(item, Path.GetFileName(file))))
+                    {
+                        files.Add(file);
+                        total += new FileInfo(GetFilePath(FileHelper.Combine(source, file))).Length;
+                    }
+                    foreach (var dir in Directory.EnumerateDirectories(itemFile)) queue.Enqueue(Path.Combine(item, Path.GetFileName(dir)));
+                    var request = (FtpWebRequest)WebRequest.Create(Path.Combine(target, item));
+                    request.UseBinary = true;
+                    request.UsePassive = true;
+                    request.KeepAlive = true;
+                    request.Method = WebRequestMethods.Ftp.MakeDirectory;
+                    request.GetResponse().Close();
+                }
+                foreach (var file in files) FileHelper.WaitForReady(GetDataFilePath(file));
+                root.SetAttributeValue("total", total);
+                var completed = 0L;
+                foreach (var file in files)
+                {
+                    root.SetAttributeValue("completed", completed);
+                    root.SetAttributeValue("current", file);
+                    doc.Save(xmlPath);
+                    var request = (FtpWebRequest)WebRequest.Create(Path.Combine(target, file));
+                    request.UseBinary = true;
+                    request.UsePassive = true;
+                    request.KeepAlive = true;
+                    request.Method = WebRequestMethods.Ftp.UploadFile;
+                    using (var src = File.OpenRead(GetFilePath(FileHelper.Combine(source, file))))
+                    using (var dst = request.GetRequestStream())
+                    {
+                        var byteBuffer = new byte[1048576];
+                        var bytesSent = src.Read(byteBuffer, 0, 1048576);
+                        while (bytesSent != 0)
+                        {
+                            dst.Write(byteBuffer, 0, bytesSent);
+                            completed += bytesSent;
+                            root.SetAttributeValue("completed", completed);
+                            doc.Save(xmlPath);
+                            bytesSent = src.Read(byteBuffer, 0, 1048576);
+                        }
+                    }
+                    request.GetResponse().Close();
+                }
+                var current = root.Attribute("current");
+                if (current != null) current.Remove();
+                root.SetAttributeValue("state", "ready");
+                root.SetAttributeValue("finishTime", DateTime.UtcNow.Ticks);
+                doc.Save(xmlPath);
+            }
+            catch (Exception exc)
+            {
+                root.SetAttributeValue("message", exc.GetMessage());
+                doc.Save(xmlPath);
             }
         }
 

@@ -23,6 +23,10 @@ namespace Mygod.Skylark.Task
                     case "offline-mediafire":
                         TaskHelper.CreateOfflineMediaFire(Request.QueryString["ID"], path);
                         break;
+                    case "ftpupload":
+                        TaskHelper.CreateFtpUpload(path, Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()),
+                                                   Request.QueryString["Target"].UrlDecode());
+                        break;
                     case "compress":
                         TaskHelper.CreateCompress(path, Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()), 
                                                   Request.QueryString["BaseFolder"].UrlDecode(), Request.QueryString["CompressionLevel"]);

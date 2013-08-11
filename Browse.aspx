@@ -13,13 +13,16 @@
             uriParser.exec(location.href);
             var target = unescape(RegExp.$3);
             if (stripExtension) target = target.replace(/\.[^\.]+?$/, "");
-            var result = prompt("请输入目标文件夹：（重名文件/文件夹将被跳过）", target);
-            if (result) $("#Hidden").val(result);
-            return !!result;
+            return pickCore("请输入目标文件夹：（重名文件/文件夹将被跳过）", target);
         }
         function pickFolder() {
             if ($("input:checked").length == 0) return true;
             return pickFolderCore();
+        }
+        function pickCore(text, defaultText) {
+            var result = prompt(text, defaultText);
+            if (result) $("#Hidden").val(result);
+            return !!result;
         }
     </script>
 </asp:Content>
@@ -29,13 +32,11 @@
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
             <div id="manual-fine-uploader"></div>
-            <div>该目录下有 <%=DirectoryCount %> 个目录，<%=FileCount %> 个文件。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
+            <div>该目录下有 <%=DirectoryCount %> 个目录，<%=FileCount %>个文件。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
             <script src="/plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
             <script type="text/javascript">
                 function newFolder() {
-                    var result = prompt("请输入文件夹名：", "");
-                    if (result) $("#Hidden").val(result);
-                    return !!result;
+                    return pickCore("请输入文件夹名：", "");
                 }
                 function deleteConfirm() {
                     return $("input:checked").length > 0 && confirm("确定要删除吗？此操作没有后悔药吃。");
@@ -85,6 +86,10 @@
                     }
                     return false;
                 }
+                function pickFtp() {
+                    return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，你的用户名和密码不会被保留，" +
+                                    "也不会在上传进度上显示）", "");
+                }
                 var manualuploader = new qq.FineUploader({
                     element: $('#manual-fine-uploader')[0],
                     request: {
@@ -102,11 +107,12 @@
                 <a href="javascript:doSelectAll();">[全选]</a>
                 <a href="javascript:invertSelection();">[反选]</a>
                 <a href="javascript:showCompressConfig();">[压缩选中项]</a>
-                <a href="javascript:getDownloadLink();">[生成选中项的下载链接]</a>
+                <a href="javascript:getDownloadLink();">[生成下载链接]</a>
                 <asp:LinkButton runat="server" Text="[移动到]" OnClick="Move" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[复制到]" OnClick="Copy" OnClientClick="return pickFolder();" />
-                <asp:LinkButton runat="server" Text="[删除选中项]" OnClick="Delete" OnClientClick="return deleteConfirm();" />
+                <asp:LinkButton runat="server" Text="[删除]" OnClick="Delete" OnClientClick="return deleteConfirm();" />
                 <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy" OnClientClick="return pickApp();" />
+                <asp:LinkButton runat="server" Text="[上传到 FTP]" OnClick="FtpUpload" OnClientClick="return pickFtp();" />
             </div>
             <div id="running-result" style="display: none;">
                 <a href="javascript:hideParent();">[隐藏]</a><br />
@@ -176,7 +182,7 @@
             <script type="text/javascript">
                 function modifyMime() {
                     var oldValue = "<%=Mime %>";
-                    var result = prompt("请输入新的MIME类型：", oldValue);
+                    var result = prompt("请输入新的 MIME 类型：", oldValue);
                     if (result && result != oldValue) {
                         $("#Hidden").val(result);
                         return true;
