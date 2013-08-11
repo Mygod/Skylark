@@ -104,7 +104,7 @@ namespace Mygod.Skylark
             if (element.GetAttributeValue("state") == "ready" || element.GetAttributeValue("size") == null)
                 element.SetAttributeValue("size", info.Length);
             element.SetAttributeValue("lastWriteTimeUtc", info.LastWriteTimeUtc);
-            element.Add(new XElement("ffmpeg", new XCData(FFmpeg.Analyze(info.FullName))));
+            element.Add(new XElement("ffmpeg", FFmpeg.Analyze(info.FullName)));
             result.Add(element);
         }
     }

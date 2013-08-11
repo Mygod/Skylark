@@ -32,7 +32,7 @@
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
             <div id="manual-fine-uploader"></div>
-            <div>该目录下有 <%=DirectoryCount %> 个目录，<%=FileCount %>个文件。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
+            <div>该目录下有&nbsp;<%=DirectoryCount %>&nbsp;个目录，<%=FileCount %>&nbsp;个文件。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
             <script src="/plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
             <script type="text/javascript">
                 function newFolder() {

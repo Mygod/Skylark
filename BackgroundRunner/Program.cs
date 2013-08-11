@@ -422,7 +422,10 @@ namespace Mygod.Skylark.BackgroundRunner
                     switch (element.Name.LocalName)
                     {
                         case "directory":
-                            CopyDirectory(domain, FileHelper.Combine(path, name), FileHelper.Combine(target, name), doc, xmlPath,
+                            var dir = FileHelper.Combine(target, name);
+                            Directory.CreateDirectory(GetFilePath(dir));
+                            Directory.CreateDirectory(GetDataPath(dir));
+                            CopyDirectory(domain, FileHelper.Combine(path, name), dir, doc, xmlPath,
                                           ref fileCopied, ref sizeCopied);
                             break;
                         case "file":

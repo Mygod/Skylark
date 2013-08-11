@@ -14,7 +14,7 @@ namespace Mygod.Skylark.Task
             var result = new XElement("result");
             try
             {
-                var root = XHelper.Load(FileHelper.GetDataPath(RouteData.GetRouteString("ID") + +'.' + RouteData.GetRouteString("Type")
+                var root = XHelper.Load(FileHelper.GetDataPath(RouteData.GetRouteString("ID") + '.' + RouteData.GetRouteString("Type")
                     + ".task")).Root;
                 if (root.AttributeCaseInsensitive("pid") != null)
                     root.SetAttributeValue("running", !TaskHelper.IsBackgroundRunnerKilled(root.GetAttributeValue<int>("pid")));
