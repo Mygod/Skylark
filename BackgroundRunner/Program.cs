@@ -4,9 +4,16 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Xml.Linq;
+using MonoTorrent.Client;
+using MonoTorrent.Client.Encryption;
+using MonoTorrent.Common;
+using MonoTorrent.Dht;
+using MonoTorrent.Dht.Listeners;
 using Mygod.Xml.Linq;
 using SevenZip;
 
@@ -41,6 +48,9 @@ namespace Mygod.Skylark.BackgroundRunner
                     case "cross-app-copy":
                         CrossAppCopy(Console.ReadLine());
                         break;
+                    case "bit-torrent":
+                        BitTorrent(Console.ReadLine());
+                        break;
                     default:
                         Console.WriteLine("无法识别。");
                         break;
@@ -55,10 +65,14 @@ namespace Mygod.Skylark.BackgroundRunner
 
         private static string GetFilePath(string path)
         {
+            if (path.Contains("%", StringComparison.InvariantCultureIgnoreCase)
+                || path.Contains("#", StringComparison.InvariantCultureIgnoreCase)) throw new FormatException();
             return Path.Combine("Files", path);
         }
         private static string GetDataPath(string path)
         {
+            if (path.Contains("%", StringComparison.InvariantCultureIgnoreCase)
+                || path.Contains("#", StringComparison.InvariantCultureIgnoreCase)) throw new FormatException();
             return Path.Combine("Data", path);
         }
         private static string GetDataFilePath(string path)
@@ -332,6 +346,67 @@ namespace Mygod.Skylark.BackgroundRunner
             catch (Exception exc)
             {
                 root.SetAttributeValue("message", exc.GetMessage());
+                doc.Save(xmlPath);
+            }
+        }
+
+        private static void BitTorrent(string id)
+        {
+            var xmlPath = GetDataPath(id + ".bitTorrent.task");
+            if (!File.Exists(xmlPath)) return;
+            var doc = XHelper.Load(xmlPath);
+            var root = doc.Root;
+            try
+            {
+                root.SetAttributeValue("pid", Pid);
+                root.SetAttributeValue("downloaded", 0);
+                string torrentPath = root.GetAttributeValue("torrent"), directory = root.GetAttributeValue("directory").Replace('/', '\\'),
+                       filePath = GetFilePath(directory);
+                var torrent = Torrent.Load(GetFilePath(torrentPath));
+                long length = 0;
+                foreach (var file in torrent.Files)
+                {
+                    length += file.Length;
+                    FileHelper.WriteAllText(GetDataFilePath(FileHelper.Combine(directory, file.Path)),
+                                            string.Format("<file state=\"downloading-bit-torrent\" id=\"{0}\" pid=\"{1}\" />", id, Pid));
+                }
+                root.SetAttributeValue("length", length);
+                doc.Save(xmlPath);
+
+                var listenedPorts =
+                    new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Select(endPoint => endPoint.Port));
+                var port = 10000;
+                while (listenedPorts.Contains(port)) port++;
+                var engine = new ClientEngine(
+                    new EngineSettings(filePath, port) { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
+                engine.ChangeListenEndpoint(new IPEndPoint(IPAddress.Any, port));
+                var listener = new DhtListener(new IPEndPoint(IPAddress.Any, port));
+                engine.RegisterDht(new DhtEngine(listener));
+                listener.Start();
+                engine.DhtEngine.Start();
+                if (!Directory.Exists(engine.Settings.SavePath)) Directory.CreateDirectory(engine.Settings.SavePath);
+                var manager = new TorrentManager(torrent, filePath, new TorrentSettings(4, 150, 0, 0));
+                engine.Register(manager);
+                manager.PieceHashed += (sender, e) =>
+                {
+                    root.SetAttributeValue("downloaded", (long) (e.TorrentManager.Progress * length / 100));
+                    try
+                    {
+                        doc.Save(xmlPath);
+                    }
+                    catch (IOException) { }
+                };
+                manager.Start();
+                while (!manager.Complete) Thread.Sleep(1000);
+                foreach (var file in torrent.Files) FileHelper.WriteAllText(GetDataFilePath(FileHelper.Combine(directory, file.Path)),
+                    string.Format("<file mime=\"{0}\" state=\"ready\" />", Helper.GetMimeType(file.Path)));
+                root.SetAttributeValue("downloaded", length);
+                root.SetAttributeValue("finished", DateTime.UtcNow.Ticks);
+                doc.Save(xmlPath);
+            }
+            catch (Exception exc)
+            {
+                root.SetAttributeValue("message", exc.Message);
                 doc.Save(xmlPath);
             }
         }

@@ -63,6 +63,9 @@ namespace Mygod.Skylark
                         Views.SetActiveView(FileDownloadingView);
                         RefreshDownloading();
                         break;
+                    case "downloading-bit-torrent":
+                        Views.SetActiveView(FileDownloadingBitTorrentView);
+                        break;
                     case "decompressing":
                         Views.SetActiveView(FileDecompressingView);
                         break;
@@ -228,6 +231,11 @@ namespace Mygod.Skylark
         protected void Decompress(object sender, EventArgs e)
         {
             Response.Redirect("/Task/Decompress/" + TaskHelper.CreateDecompress(RelativePath, Hidden.Value.UrlDecode()));
+        }
+
+        protected void BitTorrentDownload(object sender, EventArgs e)
+        {
+            Response.Redirect("/Task/BitTorrent/" + TaskHelper.CreateBitTorrent(RelativePath, Hidden.Value.UrlDecode()));
         }
 
         protected void Convert(object sender, EventArgs e)

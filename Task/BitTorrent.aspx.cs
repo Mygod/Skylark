@@ -1,25 +1,27 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Web.UI;
 using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark.Task
 {
-    public partial class Decompress : Page
+    public partial class BitTorrent : Page
     {
-        protected string Archive, Status, TargetDirectory, CurrentFile, StartTime, SpentTime, RemainingTime, EndingTime, Percentage;
+        protected string Torrent, Status, TargetDirectory, StartTime, SpentTime, RemainingTime, EndingTime,
+                         FileSize, DownloadedFileSize, AverageDownloadSpeed, Percentage;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            Archive = Status = TargetDirectory = SpentTime = RemainingTime = EndingTime = "未知";
-            CurrentFile = "无";
+            Torrent = FileSize = DownloadedFileSize = AverageDownloadSpeed = Status = TargetDirectory
+                = SpentTime = RemainingTime = EndingTime = "未知";
             Percentage = "0";
-            string id = RouteData.GetRouteString("ID"), xmlPath = FileHelper.GetDataPath(id + ".decompress.task");
+            string id = RouteData.GetRouteString("ID"), xmlPath = FileHelper.GetDataPath(id + ".bitTorrent.task");
             var startTime = Helper.Deshorten(id);
             StartTime = startTime.ToChineseString();
             if (!File.Exists(xmlPath)) return;
             var root = XHelper.Load(xmlPath).Root;
-            Archive = root.GetAttributeValue("archive");
+            Torrent = root.GetAttributeValue("torrent");
             var targetDirectory = root.GetAttributeValue("directory");
             TargetDirectory = string.Format("<a href=\"/Browse/{0}\">{0}</a>", targetDirectory);
             var attr = root.GetAttributeValue("message");
@@ -29,29 +31,35 @@ namespace Mygod.Skylark.Task
                 Never();
                 return;
             }
-            attr = root.GetAttributeValue("progress");
+            attr = root.GetAttributeValue("length");
             if (attr == null)
             {
                 Status = "正在开始";
                 return;
             }
-            var percentage = byte.Parse(Percentage = attr);
-            attr = root.GetAttributeValue("current");
-            if (!string.IsNullOrEmpty(attr))
-                CurrentFile = string.Format("<a href=\"/Browse/{0}\">{1}</a>", FileHelper.Combine(targetDirectory, attr), attr);
+            attr = root.GetAttributeValue("length");
+            if (attr == null) return;
+            var fileSize = long.Parse(attr);
+            FileSize = Helper.GetSize(fileSize);
+            var downloadedFileSize = root.GetAttributeValue<long>("downloaded");
+            DownloadedFileSize = string.Format("{0} ({1}%)", Helper.GetSize(downloadedFileSize),
+                                    Percentage = (100.0 * downloadedFileSize / fileSize).ToString(CultureInfo.InvariantCulture));
             attr = root.GetAttributeValue("finished");
             if (string.IsNullOrEmpty(attr))
             {
                 var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(root.GetAttributeValueWithDefault<int>("pid"));
-                Status = impossibleEnds ? "已被咔嚓（请重新开始任务）" : "正在解压";
+                Status = impossibleEnds ? "已被咔嚓（请删除后重新开始任务）" : "正在下载";
                 if (impossibleEnds) Never();
                 else
                 {
                     var spentTime = DateTime.UtcNow - startTime;
                     SpentTime = spentTime.ToString("g");
-                    if (percentage > 0)
+                    var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
+                    AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);
+                    if (downloadedFileSize > 0)
                     {
-                        var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
+                        var remainingTime =
+                            new TimeSpan((long) (spentTime.Ticks * (fileSize - downloadedFileSize) / (double) downloadedFileSize));
                         RemainingTime = remainingTime.ToString("g");
                         EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
                     }
@@ -59,12 +67,13 @@ namespace Mygod.Skylark.Task
             }
             else
             {
-                Status = "解压完毕";
+                Status = "下载完毕";
                 RemainingTime = new TimeSpan(0).ToString("g");
                 var endingTime = new DateTime(long.Parse(attr), DateTimeKind.Utc);
                 EndingTime = endingTime.ToChineseString();
                 var spentTime = endingTime - startTime;
                 SpentTime = spentTime.ToString("g");
+                AverageDownloadSpeed = Helper.GetSize(fileSize / spentTime.TotalSeconds);
             }
         }
 

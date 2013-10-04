@@ -44,7 +44,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -154,8 +153,12 @@
     <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
     <Content Include="plugins\fineuploader\loading.gif" />
     <Content Include="plugins\fineuploader\processing.gif" />
+    <Content Include="plugins\MonoTorrent.Dht.dll" />
+    <Content Include="plugins\MonoTorrent.Dht.pdb" />
+    <Content Include="plugins\MonoTorrent.dll" />
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\SevenZipSharp.dll" />
+    <Content Include="Task\BitTorrent.aspx" />
     <Content Include="Task\Default.aspx" />
     <Content Include="Task\Create.aspx" />
     <Content Include="Task\CrossAppCopy.aspx" />
@@ -255,6 +258,13 @@
     </Compile>
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
+    </Compile>
+    <Compile Include="Task\BitTorrent.aspx.cs">
+      <DependentUpon>BitTorrent.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Task\BitTorrent.aspx.designer.cs">
+      <DependentUpon>BitTorrent.aspx</DependentUpon>
     </Compile>
     <Compile Include="Task\Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>

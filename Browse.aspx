@@ -78,8 +78,7 @@
                 }
                 var appParser = /^http:\/\/(.*?)\/Browse\/(.*?)$/;
                 function pickApp() {
-                    var result = prompt("请输入目标云雀：（请使用“http://……/Browse/……”的格式）",
-                                                 "http://skylark.apphb.com/Browse/");
+                    var result = prompt("请输入目标云雀：（请使用“http://……/Browse/……”的格式）", "http://skylark.apphb.com/Browse/");
                     if (appParser.test(result)) {
                         $("#Hidden").val(result);
                         return true;
@@ -211,6 +210,8 @@
                 <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
                 <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore(true);" />
                 <a href="javascript:showConvert();">[转换媒体文件格式]</a>
+                <asp:LinkButton runat="server" Text="[离线下载此种子]" OnClick="BitTorrentDownload"
+                                OnClientClick="return pickFolderCore(true);" />
             </div>
             <div id="convert-form" style="display: none;">
                 <div>输出路径：（重名将被忽略）</div>
@@ -268,6 +269,12 @@
             <div>
                 正在解压缩……
                 <a href="/Task/Decompress/<%=FileHelper.GetFileValue(FileHelper.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
+            </div>
+        </asp:View>
+        <asp:View runat="server" ID="FileDownloadingBitTorrentView">
+            <div>
+                正在离线下载……
+                <a href="/Task/BitTorrent/<%=FileHelper.GetFileValue(FileHelper.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
             </div>
         </asp:View>
         <asp:View runat="server" ID="FileCompressingView">

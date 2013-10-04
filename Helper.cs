@@ -101,10 +101,14 @@ namespace Mygod.Skylark
 
         public static string GetFilePath(string path)
         {
+            if (path.Contains("%", StringComparison.InvariantCultureIgnoreCase)
+                || path.Contains("#", StringComparison.InvariantCultureIgnoreCase)) throw new FormatException();
             return HttpContext.Current.Server.MapPath("~/Files/" + path);
         }
         public static string GetDataPath(string path)
         {
+            if (path.Contains("%", StringComparison.InvariantCultureIgnoreCase)
+                || path.Contains("#", StringComparison.InvariantCultureIgnoreCase)) throw new FormatException();
             return HttpContext.Current.Server.MapPath("~/Data/" + path);
         }
         public static string GetDataFilePath(string path)
@@ -260,9 +264,11 @@ namespace Mygod.Skylark
 
         private static void StartRunner(string args)
         {
-            var info = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
-                { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false };
-            var process = new Process { StartInfo = info };
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
+                    { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false }
+            };
             process.Start();
             process.StandardInput.WriteLine(args);
             process.StandardInput.Close();
@@ -281,7 +287,7 @@ namespace Mygod.Skylark
         public static void CreateCompress(string archiveFilePath, IEnumerable<string> files, string baseFolder = null, 
                                           string compressionLevel = null)
         {
-            baseFolder = baseFolder ?? String.Empty;
+            baseFolder = baseFolder ?? string.Empty;
             var root = new XElement("file", new XAttribute("state", "compressing"), new XAttribute("startTime", DateTime.UtcNow.Ticks),
                                     new XAttribute("baseFolder", baseFolder), new XAttribute("mime", Helper.GetMimeType(archiveFilePath)),
                                     new XAttribute("level", compressionLevel ?? "Ultra"));
@@ -321,6 +327,15 @@ namespace Mygod.Skylark
                                        new XAttribute("mime", Helper.GetMimeType(target))))
                 .Save(FileHelper.GetDataFilePath(target));
             StartRunner("convert\n" + target);
+        }
+
+        public static string CreateBitTorrent(string path, string target)
+        {
+            var id = DateTime.UtcNow.Shorten();
+            new XDocument(new XElement("bitTorrent", new XAttribute("torrent", path), new XAttribute("directory", target)))
+                .Save(FileHelper.GetDataPath(id + ".bitTorrent.task"));
+            StartRunner("bit-torrent\n" + id);
+            return id;
         }
 
         public static string CreateCrossAppCopy(string domain, string path, string target)

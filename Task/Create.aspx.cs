@@ -34,6 +34,9 @@ namespace Mygod.Skylark.Task
                     case "decompress":
                         result.SetAttributeValue("id", TaskHelper.CreateDecompress(path, Request.QueryString["Target"].UrlDecode()));
                         break;
+                    case "bittorrent":
+                        result.SetAttributeValue("id", TaskHelper.CreateBitTorrent(path, Request.QueryString["Target"].UrlDecode()));
+                        break;
                     case "convert":
                         TaskHelper.CreateConvert(path, Request.QueryString["Target"].UrlDecode(), Request.QueryString["Size"].UrlDecode(), 
                             Request.QueryString["VCodec"].UrlDecode(), Request.QueryString["ACodec"].UrlDecode(), 
