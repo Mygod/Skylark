@@ -98,6 +98,7 @@ namespace Mygod.Skylark.BackgroundRunner
             try
             {
                 var request = WebRequest.Create(url);
+                request.Timeout = Timeout.Infinite;
                 var response = request.GetResponse();
                 var stream = response.GetResponseStream();
                 var disposition = response.Headers["Content-Disposition"] ?? string.Empty;
@@ -188,6 +189,7 @@ namespace Mygod.Skylark.BackgroundRunner
                     }
                     foreach (var dir in Directory.EnumerateDirectories(itemFile)) queue.Enqueue(Path.Combine(item, Path.GetFileName(dir)));
                     var request = (FtpWebRequest)WebRequest.Create(Path.Combine(target, item));
+                    request.Timeout = Timeout.Infinite;
                     request.UseBinary = true;
                     request.UsePassive = true;
                     request.KeepAlive = true;
@@ -203,6 +205,7 @@ namespace Mygod.Skylark.BackgroundRunner
                     root.SetAttributeValue("current", file);
                     doc.Save(xmlPath);
                     var request = (FtpWebRequest)WebRequest.Create(Path.Combine(target, file));
+                    request.Timeout = Timeout.Infinite;
                     request.UseBinary = true;
                     request.UsePassive = true;
                     request.KeepAlive = true;
