@@ -6,15 +6,15 @@ using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark
 {
     public partial class Browse : Page
     {
-        protected string RelativePath, Status, FileSize, StartTime, SpentTime, RemainingTime, EndingTime, Percentage;
+        protected string RelativePath;
         protected DirectoryInfo InfoDirectory;
         protected FileInfo InfoFile;
+        protected CloudTask Task;
 
         protected void Page_PreInit(object sender, EventArgs e)
         {
@@ -51,32 +51,20 @@ namespace Mygod.Skylark
             else if (InfoFile.Exists)
             {
                 string dataPath = FileHelper.GetDataFilePath(RelativePath), state = FileHelper.GetFileValue(dataPath, "state");
-                switch (state)
-                {
-                    case "ready":
-                        if (Request.IsAjaxRequest()) Response.Redirect(Request.RawUrl, true);   // processing is finished
+                Task = GenerateFileTask.Create(RelativePath);
+                if (Task == null)
+                    if (state == TaskType.NoTask)
+                    {
+                        if (Request.IsAjaxRequest()) Response.Redirect(Request.RawUrl, true); // processing is finished
                         Views.SetActiveView(FileView);
                         Mime = FileHelper.GetDefaultMime(dataPath);
                         RefreshFile();
-                        break;
-                    case "downloading":
-                        Views.SetActiveView(FileDownloadingView);
-                        RefreshDownloading();
-                        break;
-                    case "downloading-bit-torrent":
-                        Views.SetActiveView(FileDownloadingBitTorrentView);
-                        break;
-                    case "decompressing":
-                        Views.SetActiveView(FileDecompressingView);
-                        break;
-                    case "compressing":
-                        Views.SetActiveView(FileCompressingView);
-                        RefreshCompressing();
-                        break;
-                    case "converting":
-                        Views.SetActiveView(FileConvertingView);
-                        RefreshConverting();
-                        break;
+                    }
+                    else Views.SetActiveView(GeneralTaskProcessingView);
+                else
+                {
+                    Viewer.SetTask(Task);
+                    Views.SetActiveView(FileProcessingView);
                 }
             }
             else
@@ -84,31 +72,6 @@ namespace Mygod.Skylark
                 Views.SetActiveView(GoneView);
                 Response.StatusCode = 404;
             }
-        }
-
-        private void Update(DateTime startTime, double percentage, int pid)
-        {
-            StartTime = startTime.ToChineseString();
-            var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(pid);
-            Status = impossibleEnds ? "已被咔嚓（请重新开始任务）" : "正在进行";
-            if (impossibleEnds) Never();
-            else
-            {
-                var spentTime = DateTime.UtcNow - startTime;
-                SpentTime = spentTime.ToString("g");
-                if (percentage > 0)
-                {
-                    var remainingTime = new TimeSpan((long)(spentTime.Ticks * (100.0 / percentage - 1)));
-                    RemainingTime = remainingTime.ToString("g");
-                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
-                }
-            }
-        }
-
-        private void Never()
-        {
-            RemainingTime = "永远";
-            EndingTime = "地球毁灭时";
         }
 
         #region Directory
@@ -168,8 +131,8 @@ namespace Mygod.Skylark
 
         protected void Compress(object sender, EventArgs e)
         {
-            TaskHelper.CreateCompress(ArchiveFilePath.Text, DirectoryList.Items.GetSelectedFiles()
-                .Union(FileList.Items.GetSelectedFiles()), RelativePath, CompressionLevelList.SelectedValue);
+            new CompressTask(ArchiveFilePath.Text, DirectoryList.Items.GetSelectedFiles()
+                .Union(FileList.Items.GetSelectedFiles()), RelativePath, CompressionLevelList.SelectedValue).Start();
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
         }
 
@@ -178,19 +141,21 @@ namespace Mygod.Skylark
         {
             var match = AppParser.Match(Hidden.Value);
             if (!match.Success) return;
-            Response.Redirect("/Task/CrossAppCopy/" +
-                TaskHelper.CreateCrossAppCopy(match.Groups[1].Value, match.Groups[2].Value.UrlDecode(), RelativePath));
+            var task = new CrossAppCopyTask(match.Groups[1].Value, match.Groups[2].Value.UrlDecode(), RelativePath);
+            task.Start();
+            Response.Redirect("/Task/Details/" + task.ID);
         }
 
         protected void FtpUpload(object sender, EventArgs e)
         {
-            Response.Redirect("/Task/FtpUpload/" + TaskHelper.CreateFtpUpload(RelativePath,
-                DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles()), Hidden.Value));
+            Response.Redirect("/Task/Details/" + new FtpUploadTask(RelativePath,
+                DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
+                    .Select(file => FileHelper.Combine(Hidden.Value ?? string.Empty, file)), Hidden.Value));
         }
 
         #endregion
 
-        #region File - ready
+        #region File
 
         protected string Mime, FFmpegResult;
 
@@ -230,151 +195,24 @@ namespace Mygod.Skylark
 
         protected void Decompress(object sender, EventArgs e)
         {
-            Response.Redirect("/Task/Decompress/" + TaskHelper.CreateDecompress(RelativePath, Hidden.Value.UrlDecode()));
+            var task = new DecompressTask(RelativePath, Hidden.Value.UrlDecode());
+            task.Start();
+            Response.Redirect("/Task/Details/" + task.ID);
         }
 
         protected void BitTorrentDownload(object sender, EventArgs e)
         {
-            Response.Redirect("/Task/BitTorrent/" + TaskHelper.CreateBitTorrent(RelativePath, Hidden.Value.UrlDecode()));
+            var task = new BitTorrentTask(RelativePath, Hidden.Value.UrlDecode());
+            task.Start();
+            Response.Redirect("/Task/Details/" + task.ID);
         }
 
         protected void Convert(object sender, EventArgs e)
         {
-            TaskHelper.CreateConvert(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text, ConvertVideoCodecBox.SelectedValue, 
-                                 ConvertAudioCodecBox.SelectedValue, ConvertSubtitleCodecBox.SelectedValue, 
-                                 ConvertStartBox.Text, ConvertEndBox.Text);
+            ConvertTask.Create(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text, ConvertVideoCodecBox.SelectedValue, 
+                               ConvertAudioCodecBox.SelectedValue, ConvertSubtitleCodecBox.SelectedValue, 
+                               ConvertStartBox.Text, ConvertEndBox.Text);
             Response.Redirect("/Browse/" + ConvertPathBox.Text.ToCorrectUrl());
-        }
-
-        #endregion
-
-        #region File - downloading
-
-        protected string Url, DownloadedFileSize, AverageDownloadSpeed;
-
-        private void RefreshDownloading()
-        {
-            Url = FileSize = DownloadedFileSize = AverageDownloadSpeed = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
-            Percentage = "0";
-            string path = FileHelper.GetFilePath(RelativePath), xmlPath = FileHelper.GetDataFilePath(RelativePath);
-            var file = FileHelper.GetElement(xmlPath);
-            Url = string.Format("<a href=\"{0}\">{0}</a>", file.GetAttributeValue("url"));
-            var startTime = new DateTime(file.GetAttributeValue<long>("startTime"), DateTimeKind.Utc);
-            StartTime = startTime.ToChineseString();
-            var attr = file.GetAttributeValue("message");
-            if (attr != null)
-            {
-                Status = "发生错误，具体信息：" + attr;
-                Never();
-                return;
-            }
-            attr = file.GetAttributeValue("size");
-            if (attr == null) return;
-            var fileSize = long.Parse(attr);
-            FileSize = Helper.GetSize(fileSize);
-            var downloadedFileSize = File.Exists(path) ? new FileInfo(path).Length : 0;
-            DownloadedFileSize = string.Format("{0} ({1}%)", Helper.GetSize(downloadedFileSize),
-                                    Percentage = (100.0 * downloadedFileSize / fileSize).ToString(CultureInfo.InvariantCulture));
-            var impossibleEnds = TaskHelper.IsBackgroundRunnerKilled(file.GetAttributeValueWithDefault<int>("pid"));
-            Status = impossibleEnds ? "已被咔嚓（请删除后重新开始任务）" : "正在下载";
-            if (impossibleEnds) Never();
-            else
-            {
-                var spentTime = DateTime.UtcNow - startTime;
-                SpentTime = spentTime.ToString("g");
-                var averageDownloadSpeed = downloadedFileSize / spentTime.TotalSeconds;
-                AverageDownloadSpeed = Helper.GetSize(averageDownloadSpeed);
-                if (downloadedFileSize > 0)
-                {
-                    var remainingTime =
-                        new TimeSpan((long)(spentTime.Ticks * (fileSize - downloadedFileSize) / (double)downloadedFileSize));
-                    RemainingTime = remainingTime.ToString("g");
-                    EndingTime = (startTime + spentTime + remainingTime).ToChineseString();
-                }
-            }
-        }
-
-        #endregion
-
-        #region File - compressing
-
-        protected string CurrentFile;
-
-        private void RefreshCompressing()
-        {
-            Status = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
-            CurrentFile = "无";
-            Percentage = "0";
-            var xmlPath = FileHelper.GetDataFilePath(RelativePath);
-            if (!File.Exists(xmlPath)) return;
-            var root = XHelper.Load(xmlPath).Root;
-            var attr = root.GetAttributeValue("progress");
-            var pid = root.GetAttributeValueWithDefault<int>("pid");
-            if (attr == null)
-            {
-                Status = pid == 0 ? "正在开始" : "正在初始化";
-                attr = root.GetAttributeValue("message");
-                if (attr != null)
-                {
-                    Status = "发生错误，具体信息：" + attr;
-                    Never();
-                }
-                return;
-            }
-            var percentage = byte.Parse(Percentage = attr);
-            attr = root.GetAttributeValue("current");
-            if (!string.IsNullOrEmpty(attr)) CurrentFile = string.Format("<a href=\"/Browse/{0}\">{1}</a>", 
-                FileHelper.Combine(root.GetAttributeValue("baseFolder"), attr), attr);
-            attr = root.GetAttributeValue("message");
-            if (attr != null)
-            {
-                Status = "发生错误，具体信息：" + attr;
-                Never();
-                return;
-            }
-            Update(new DateTime(root.GetAttributeValueWithDefault<long>("startTime"), DateTimeKind.Utc), percentage, pid);
-        }
-
-        #endregion
-
-        #region File - converting
-
-        protected string CurrentTime, Duration;
-
-        private void RefreshConverting()
-        {
-            Status = CurrentTime = Duration = StartTime = SpentTime = RemainingTime = EndingTime = "未知";
-            Percentage = "0";
-            var xmlPath = FileHelper.GetDataFilePath(RelativePath);
-            if (!File.Exists(xmlPath)) return;
-            var root = XHelper.Load(xmlPath).Root;
-            var attr = root.GetAttributeValue("time");
-            var pid = root.GetAttributeValueWithDefault<int>("pid");
-            if (attr == null)
-            {
-                Status = pid == 0 ? "正在开始" : "正在初始化";
-                attr = root.GetAttributeValue("message");
-                if (attr != null)
-                {
-                    Status = "发生错误，具体信息：" + attr;
-                    Never();
-                }
-                return;
-            }
-            TimeSpan time = new TimeSpan(long.Parse(attr)), duration = new TimeSpan(root.GetAttributeValue<long>("duration"));
-            CurrentTime = time.ToString("g");
-            Duration = duration.ToString("g");
-            var percentage = 100.0 * time.Ticks / duration.Ticks;
-            Percentage = percentage.ToString(CultureInfo.InvariantCulture);
-            FileSize = Helper.GetSize(root.GetAttributeValue<long>("size"));
-            attr = root.GetAttributeValue("message");
-            if (attr != null)
-            {
-                Status = "发生错误，具体信息：" + attr;
-                Never();
-                return;
-            }
-            Update(new DateTime(root.GetAttributeValueWithDefault<long>("startTime"), DateTimeKind.Utc), percentage, pid);
         }
 
         #endregion

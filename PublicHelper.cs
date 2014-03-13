@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Xml.Linq;
@@ -57,6 +60,16 @@ namespace Mygod.Skylark
             {
                 return contentType;
             }
+        }
+
+        public static string Shorten(this DateTime value)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value.Ticks.ToString(CultureInfo.InvariantCulture)));
+        }
+
+        public static DateTime Deshorten(string value)
+        {
+            return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))), DateTimeKind.Utc);
         }
     }
 
@@ -117,9 +130,13 @@ namespace Mygod.Skylark
             doc.Save(path);
         }
 
+        public static string GetState(string dataPath)
+        {
+            return GetFileValue(dataPath, "state");
+        }
         public static bool IsReady(string dataPath)
         {
-            return GetFileValue(dataPath, "state") == "ready";
+            return GetState(dataPath) == TaskType.NoTask;
         }
         public static void WaitForReady(string dataPath, int timeoutSeconds = -1)
         {
@@ -128,6 +145,19 @@ namespace Mygod.Skylark
                 if (timeoutSeconds-- == 0) throw new TimeoutException();
                 Thread.Sleep(1000);
             }
+        }
+
+        public static bool? IsFileExtended(string path)
+        {
+            if (File.Exists(path)) return true;
+            if (Directory.Exists(path)) return false;
+            return null;
+        }
+        public static bool IsFile(string path)
+        {
+            var result = IsFileExtended(path);
+            if (result.HasValue) return result.Value;
+            throw new FileNotFoundException();
         }
 
         public static void SetDefaultMime(string path, string value)

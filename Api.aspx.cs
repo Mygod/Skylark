@@ -80,16 +80,15 @@ namespace Mygod.Skylark
             Response.Flush();
             var url = Rbase64.Decode(Request.QueryString["Url"].UrlDecode());
             if (string.IsNullOrWhiteSpace(url)) return;
-            var client = new WebClient();
-            foreach (var video in Net.YouTube.Video.GetVideoFromLink(client, url))
+            foreach (var video in Net.YouTube.Video.GetVideoFromLink(url))
             {
-                var element = new XElement("video", new XAttribute("title", video.Title), new XAttribute("url", video.Url));
+                var element = new XElement("video", new XAttribute("title", video.Title),
+                                           new XAttribute("url", video.Url));
                 foreach (var link in video.FmtStreamMap)
-                {
-                    element.Add(new XElement("download", new XAttribute("type", link.ToString()), new XAttribute("link",
-                        string.Format("{0}://{1}/Task/Create/Offline/{2}?Url={3}", Request.Url.Scheme, Request.Url.Host, path,
-                                      Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
-                }
+                    element.Add(new XElement("download", new XAttribute("type", link.ToString()),
+                        new XAttribute("link", string.Format("{0}://{1}/Task/Create/Offline/{2}?Url={3}",
+                                                             Request.Url.Scheme, Request.Url.Host, path,
+                                                             Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
                 result.Add(element);
                 Response.Write('.');    // prevent the thread from getting killed
                 Response.Flush();
@@ -101,7 +100,7 @@ namespace Mygod.Skylark
         {
             var element = FileHelper.GetElement(FileHelper.GetDataFilePath(path));
             var info = new FileInfo(FileHelper.GetFilePath(path));
-            if (element.GetAttributeValue("state") == "ready" || element.GetAttributeValue("size") == null)
+            if (element.GetAttributeValue("state") == TaskType.NoTask || element.GetAttributeValue("size") == null)
                 element.SetAttributeValue("size", info.Length);
             element.SetAttributeValue("lastWriteTimeUtc", info.LastWriteTimeUtc);
             element.Add(new XElement("ffmpeg", FFmpeg.Analyze(info.FullName)));

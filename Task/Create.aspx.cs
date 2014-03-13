@@ -15,37 +15,44 @@ namespace Mygod.Skylark.Task
             var path = RouteData.GetRelativePath();
             try
             {
-                switch (RouteData.GetRouteString("Type").ToLower())
+                GeneralTask task;
+                switch (RouteData.GetRouteString("Type").ToLowerInvariant())
                 {
                     case "offline":
-                        TaskHelper.CreateOffline(Rbase64.Decode(Request.QueryString["Url"]), path);
+                        OfflineDownloadTask.Create(Rbase64.Decode(Request.QueryString["Url"]), path);
                         break;
                     case "offline-mediafire":
-                        TaskHelper.CreateOfflineMediaFire(Request.QueryString["ID"], path);
+                        OfflineDownloadTask.CreateMediaFire(Request.QueryString["ID"], path);
                         break;
                     case "ftpupload":
-                        result.SetAttributeValue("id", TaskHelper.CreateFtpUpload(path, Request.QueryString["Files"].Split('|')
-                            .Select(file => file.UrlDecode()), Request.QueryString["Target"].UrlDecode()));
+                        result.SetAttributeValue("id", (task = new FtpUploadTask(path, Request.QueryString["Files"].Split('|')
+                            .Select(file => file.UrlDecode()), Request.QueryString["Target"].UrlDecode())));
+                        task.Start();
                         break;
                     case "compress":
-                        TaskHelper.CreateCompress(path, Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()), 
-                                                  Request.QueryString["BaseFolder"].UrlDecode(), Request.QueryString["CompressionLevel"]);
+                        new CompressTask(path, Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()), 
+                                         Request.QueryString["BaseFolder"].UrlDecode(), Request.QueryString["CompressionLevel"])
+                            .Start();
                         break;
                     case "decompress":
-                        result.SetAttributeValue("id", TaskHelper.CreateDecompress(path, Request.QueryString["Target"].UrlDecode()));
+                        result.SetAttributeValue("id", 
+                                                 (task = new DecompressTask(path, Request.QueryString["Target"].UrlDecode())).ID);
+                        task.Start();
                         break;
                     case "bittorrent":
-                        result.SetAttributeValue("id", TaskHelper.CreateBitTorrent(path, Request.QueryString["Target"].UrlDecode()));
+                        result.SetAttributeValue("id", (task = new BitTorrentTask(path, Request.QueryString["Target"].UrlDecode())));
+                        task.Start();
                         break;
                     case "convert":
-                        TaskHelper.CreateConvert(path, Request.QueryString["Target"].UrlDecode(), Request.QueryString["Size"].UrlDecode(), 
+                        ConvertTask.Create(path, Request.QueryString["Target"].UrlDecode(), Request.QueryString["Size"].UrlDecode(), 
                             Request.QueryString["VCodec"].UrlDecode(), Request.QueryString["ACodec"].UrlDecode(), 
                             Request.QueryString["SCodec"].UrlDecode(), Request.QueryString["Start"].UrlDecode(), 
                             Request.QueryString["End"].UrlDecode());
                         break;
                     case "crossappcopy":
-                        result.SetAttributeValue("id", TaskHelper.CreateCrossAppCopy(Request.QueryString["Domain"].UrlDecode(), 
-                                                                                     Request.QueryString["Path"].UrlDecode(), path));
+                        result.SetAttributeValue("id", (task = new CrossAppCopyTask(Request.QueryString["Domain"].UrlDecode(), 
+                                                                                    Request.QueryString["Path"].UrlDecode(), path)));
+                        task.Start();
                         break;
                     default:
                         throw new FormatException("无法识别的 Type！");

@@ -1,6 +1,8 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/FileSystem.Master" AutoEventWireup="true" CodeBehind="Browse.aspx.cs" Inherits="Mygod.Skylark.Browse" %>
+<%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
 <%@ Import Namespace="System.IO" %>
 <%@ Import Namespace="Mygod.Skylark" %>
+<%@ Import Namespace="Mygod.Xml.Linq" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <link href="/plugins/fineuploader/fineuploader-3.5.0.css" rel="stylesheet" />
     <style type="text/css">
@@ -32,29 +34,38 @@
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
             <div id="manual-fine-uploader"></div>
-            <div>该目录下有&nbsp;<%=DirectoryCount %>&nbsp;个目录，<%=FileCount %>&nbsp;个文件。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
+            <div>该目录下有&nbsp;<%=DirectoryCount %>&nbsp;个目录，<%=FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
             <script src="/plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
             <script type="text/javascript">
+                function updateSelectedCount() {
+                    $('#selected-count').text($("#file-list >>>> input:checkbox:checked").length);
+                }
+                $(function() {
+                    $('#file-list >>>> input:checkbox').change(updateSelectedCount);
+                });
                 function newFolder() {
                     return pickCore("请输入文件夹名：", "");
                 }
                 function deleteConfirm() {
-                    return $("input:checked").length > 0 && confirm("确定要删除吗？此操作没有后悔药吃。");
+                    return $("#file-list >>>> input:checkbox:checked").length > 0
+                        && confirm("确定要删除吗？此操作没有后悔药吃。");
                 }
                 var selectAll = false;
                 function doSelectAll() {
-                    $('input:checkbox').prop('checked', selectAll = !selectAll);
+                    $('#file-list >>>> input:checkbox').prop('checked', selectAll = !selectAll);
+                    updateSelectedCount();
                 }
                 function invertSelection() {
-                    var checked = $("input:checkbox:checked");
-                    $("input:checkbox:not(:checked)").prop("checked", true);
+                    var checked = $("#file-list >>>> input:checkbox:checked");
+                    $("#file-list >>>> input:checkbox:not(:checked)").prop("checked", true);
                     checked.prop("checked", false);
+                    updateSelectedCount();
                 }
                 function showCompressConfig() {
                     $("#compress-config").show();
                 }
                 function getDownloadLink() {
-                    var array = $("input:checkbox:checked").parent().parent().find("input:hidden");
+                    var array = $("#file-list >>>> input:checkbox:checked").parent().parent().find("input:hidden");
                     var result = "";
                     uriParser.exec(location.href);
                     var prefix = (RegExp.$1 + "/Download/" + RegExp.$3).replace("\\", "/");
@@ -87,7 +98,7 @@
                 }
                 function pickFtp() {
                     return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，你的用户名和密码不会被保留，" +
-                                    "也不会在上传进度上显示）", "");
+                        "也不会在上传进度上显示）", "");
                 }
                 var manualuploader = new qq.FineUploader({
                     element: $('#manual-fine-uploader')[0],
@@ -133,7 +144,7 @@
                  <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
                  <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
             </div>
-            <table>
+            <table id="file-list">
                 <asp:Repeater runat="server" ID="DirectoryList" OnItemCommand="DirectoryCommand">
                     <ItemTemplate>
                         <tr>
@@ -202,7 +213,7 @@
                     OnClientClick="return modifyMime();" />
             </div>
             <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
-            <div>自定义MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
+            <div>自定义 MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
             <div>
                 <a href="/Edit/<%=RelativePath %>" target="_blank">[以纯文本格式编辑]</a>
                 <a href="/View/<%=RelativePath %>" target="_blank">[使用默认类型查看]</a>
@@ -221,19 +232,19 @@
                 <div>视频编码：</div>
                 <div>
                     <asp:DropDownList ID="ConvertVideoCodecBox" runat="server">
-                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                        <asp:ListItem Selected="True" Text="默认编码" Value="" />
                     </asp:DropDownList>
                 </div>
                 <div>音频编码：</div>
                 <div>
                     <asp:DropDownList ID="ConvertAudioCodecBox" runat="server">
-                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                        <asp:ListItem Selected="True" Text="默认编码" Value="" />
                     </asp:DropDownList>
                 </div>
                 <div>字幕编码：</div>
                 <div>
                     <asp:DropDownList ID="ConvertSubtitleCodecBox" runat="server">
-                        <asp:ListItem Selected="True">默认编码</asp:ListItem>
+                        <asp:ListItem Selected="True" Text="默认编码" Value="" />
                     </asp:DropDownList>
                 </div>
                 <div>起始位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示从头开始）</div>
@@ -243,79 +254,15 @@
                 <div class="center"><asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" /></div>
             </div>
         </asp:View>
-        <asp:View runat="server" ID="FileDownloadingView">
-            <div>正在离线下载中……</div>
-            <asp:UpdatePanel runat="server">
-                <ContentTemplate>
-                    <asp:Timer runat="server" Interval="1000" />
-                    <div style="word-wrap: break-word;">原文件地址：　<%=Url %></div>
-                    <div>当前状态：　　<%=Status %></div>
-                    <div>文件总大小：　<%=FileSize %></div>
-                    <div>已下载大小：　<%=DownloadedFileSize %></div>
-                    <div>平均下载速度：<%=AverageDownloadSpeed %>&nbsp;每秒</div>
-                    <div>开始时间：　　<%=StartTime %></div>
-                    <div>花费时间：　　<%=SpentTime %></div>
-                    <div>预计剩余时间：<%=RemainingTime %></div>
-                    <div>预计结束时间：<%=EndingTime %></div>
-                    <div class="progress-bar">
-                        <%-- ReSharper disable UnexpectedValue --%>
-                        <div class="bar" style="width: <%=Percentage %>%;"></div>
-                        <%-- ReSharper restore UnexpectedValue --%>
-                    </div>
-                </ContentTemplate>
-            </asp:UpdatePanel>
+        <asp:View runat="server" ID="FileProcessingView">
+            <skylark:TaskViewer runat="server" ID="Viewer" />
         </asp:View>
-        <asp:View runat="server" ID="FileDecompressingView">
+        <asp:View runat="server" ID="GeneralTaskProcessingView">
             <div>
-                正在解压缩……
-                <a href="/Task/Decompress/<%=FileHelper.GetFileValue(FileHelper.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
+                <% var root = FileHelper.GetElement(FileHelper.GetDataFilePath(RelativePath)); %>
+                正在<%=TaskHelper.GetName(root.GetAttributeValue("state")) %>……
+                <a href="/Task/Details/<%=root.GetAttributeValue("id") %>">现在去看看吧！</a>
             </div>
-        </asp:View>
-        <asp:View runat="server" ID="FileDownloadingBitTorrentView">
-            <div>
-                正在离线下载……
-                <a href="/Task/BitTorrent/<%=FileHelper.GetFileValue(FileHelper.GetDataFilePath(RelativePath), "id") %>">现在去看看吧！</a>
-            </div>
-        </asp:View>
-        <asp:View runat="server" ID="FileCompressingView">
-            <div>正在压缩中……</div>
-            <asp:UpdatePanel runat="server">
-                <ContentTemplate>
-                    <asp:Timer runat="server" Interval="1000" />
-                    <div>当前状态：　　<%=Status %></div>
-                    <div>当前文件：　　<%=CurrentFile %></div>
-                    <div>开始时间：　　<%=StartTime %></div>
-                    <div>花费时间：　　<%=SpentTime %></div>
-                    <div>预计剩余时间：<%=RemainingTime %></div>
-                    <div>预计结束时间：<%=EndingTime %></div>
-                    <div class="progress-bar">
-                        <%-- ReSharper disable UnexpectedValue --%>
-                        <div class="bar" style="width: <%=Percentage %>%;"></div>
-                        <%-- ReSharper restore UnexpectedValue --%>
-                    </div>
-                </ContentTemplate>
-            </asp:UpdatePanel>
-        </asp:View>
-        <asp:View runat="server" ID="FileConvertingView">
-            <div>正在转换格式中……</div>
-            <asp:UpdatePanel runat="server">
-                <ContentTemplate>
-                    <asp:Timer runat="server" Interval="1000" />
-                    <div>当前状态：　　<%=Status %></div>
-                    <div>当前大小：　　<%=FileSize %></div>
-                    <div>当前时刻：　　<%=CurrentTime %></div>
-                    <div>总时长：　　　<%=Duration %></div>
-                    <div>开始时间：　　<%=StartTime %></div>
-                    <div>花费时间：　　<%=SpentTime %></div>
-                    <div>预计剩余时间：<%=RemainingTime %></div>
-                    <div>预计结束时间：<%=EndingTime %></div>
-                    <div class="progress-bar">
-                        <%-- ReSharper disable UnexpectedValue --%>
-                        <div class="bar" style="width: <%=Percentage %>%;"></div>
-                        <%-- ReSharper restore UnexpectedValue --%>
-                    </div>
-                </ContentTemplate>
-            </asp:UpdatePanel>
         </asp:View>
         <asp:View runat="server" ID="GoneView">
             <div>您要查找的东西已消失！</div>

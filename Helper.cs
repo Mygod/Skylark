@@ -5,7 +5,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
@@ -20,7 +19,7 @@ namespace Mygod.Skylark
 {
     public static partial class Helper
     {
-        private static readonly string[] Units = new[] { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
+        private static readonly string[] Units = { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         public static string GetSize(long size)
         {
             double byt = size;
@@ -30,8 +29,8 @@ namespace Mygod.Skylark
                 byt /= 1024;
                 i++;
             }
-            var bytesstring = size.ToString("N");
-            return byt.ToString("N") + " " + Units[i] + " (" + bytesstring.Remove(bytesstring.Length - 3) + " 字节)";
+            if (i == 0) return size.ToString("N0") + " 字节";
+            return byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N0") + " 字节)";
         }
         public static string GetSize(double size)
         {
@@ -42,8 +41,8 @@ namespace Mygod.Skylark
                 byt /= 1024;
                 i++;
             }
-            var bytesstring = size.ToString("N");
-            return byt.ToString("N") + " " + Units[i] + " (" + bytesstring.Remove(bytesstring.Length - 3) + " 字节)";
+            if (i == 0) return byt.ToString("N") + " 字节";
+            return byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N") + " 字节)";
         }
 
         public static string GetRouteString(this RouteData data, string valueName)
@@ -69,21 +68,15 @@ namespace Mygod.Skylark
             if (offset) value = value.AddHours(8);
             return value.ToString("yyyy.M.d H:mm:ss.fff");
         }
+        public static string ToChineseString(this DateTime? value, bool offset = true)
+        {
+            return value.HasValue ? value.Value.ToChineseString(offset) : "未知";
+        }
 
         public static bool IsAjaxRequest(this HttpRequest request)
         {
             var header = request.Headers["X-Requested-With"];
             return header != null && header == "XMLHttpRequest";
-        }
-
-        public static string Shorten(this DateTime value)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(value.Ticks.ToString(CultureInfo.InvariantCulture)));
-        }
-
-        public static DateTime Deshorten(string value)
-        {
-            return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))), DateTimeKind.Utc);
         }
     }
 
@@ -119,11 +112,15 @@ namespace Mygod.Skylark
         {
             return Path.Combine(GetDataPath(path), "Settings.directory");
         }
+        public static string GetTaskPath(string id)
+        {
+            return GetDataPath(id + ".task");
+        }
 
         public static long GetFileSize(string path)
         {
             var root = GetElement(GetDataFilePath(path));
-            if (root != null && root.GetAttributeValue("state") != "ready")
+            if (root != null && root.GetAttributeValue("state") != TaskType.NoTask)
             {
                 long result;
                 if (long.TryParse(root.GetAttributeValue("size"), out result)) return result;
@@ -141,18 +138,6 @@ namespace Mygod.Skylark
             if (!File.Exists(path) && !Directory.Exists(path)) return true;
             if (overwrite.HasValue) return overwrite.Value; 
             throw new IOException("文件/目录已存在！");
-        }
-        private static bool? IsFileExtended(string path)
-        {
-            if (File.Exists(path)) return true;
-            if (Directory.Exists(path)) return false;
-            return null;
-        }
-        public static bool IsFile(string path)
-        {
-            var result = IsFileExtended(path);
-            if (result.HasValue) return result.Value;
-            throw new FileNotFoundException();
         }
         private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs = true)
         {
@@ -194,10 +179,10 @@ namespace Mygod.Skylark
             {
                 if (!dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture)) return;    // ignore non-data files
                 var element = GetElement(dataPath);
-                if (element.GetAttributeValue("state") != "ready")
+                if (element.GetAttributeValue("state") != TaskType.NoTask)
                 {
                     var pid = element.GetAttributeValueWithDefault<int>("pid");
-                    if (pid != 0) TaskHelper.KillProcess(pid);
+                    if (pid != 0) CloudTask.KillProcess(pid);
                 }
             }
             else if (Directory.Exists(dataPath))
@@ -257,105 +242,90 @@ namespace Mygod.Skylark
         }
     }
 
-    public static class TaskHelper
+    public abstract partial class CloudTask
     {
-        private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled),
-                                      MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
-
-        private static void StartRunner(string args)
+        public static void StartRunner(string args)
         {
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
-                    { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, UseShellExecute = false }
+                                { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, 
+                                  UseShellExecute = false }
             };
             process.Start();
             process.StandardInput.WriteLine(args);
             process.StandardInput.Close();
         }
 
-        public static void CreateOffline(string url, string relativePath)
+        public void Start()
         {
-            StartRunner(String.Format("offline-download\n{0}\n{1}", LinkConverter.Decode(url), relativePath));
+            Save();
+            StartCore();
         }
-        public static void CreateOfflineMediaFire(string id, string relativePath)
+        protected abstract void StartCore();
+    }
+    public abstract partial class GenerateFileTask
+    {
+        protected override void StartCore()
         {
-            CreateOffline(MediaFireDirectLinkExtractor.Match(new WebClient().DownloadString("http://www.mediafire.com/?" + id))
-                .Groups[1].Value, relativePath);
+            StartRunner(Type + '\n' + RelativePath);
+        }
+    }
+    public abstract partial class GeneralTask
+    {
+        protected override void StartCore()
+        {
+            StartRunner(Type + '\n' + ID);
+        }
+    }
+    
+    public sealed partial class OfflineDownloadTask
+    {
+        private static readonly Regex MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
+        public static void Create(string url, string relativePath)
+        {
+            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath, TaskType.OfflineDownloadTask));
+        }
+        public static void CreateMediaFire(string id, string relativePath)
+        {
+            Create(MediaFireDirectLinkExtractor.Match(new WebClient().DownloadString("http://www.mediafire.com/?" + id))
+                                               .Groups[1].Value, relativePath);
         }
 
-        public static void CreateCompress(string archiveFilePath, IEnumerable<string> files, string baseFolder = null, 
-                                          string compressionLevel = null)
+        protected override void StartCore()
         {
-            baseFolder = baseFolder ?? string.Empty;
-            var root = new XElement("file", new XAttribute("state", "compressing"), new XAttribute("startTime", DateTime.UtcNow.Ticks),
-                                    new XAttribute("baseFolder", baseFolder), new XAttribute("mime", Helper.GetMimeType(archiveFilePath)),
-                                    new XAttribute("level", compressionLevel ?? "Ultra"));
-            foreach (var file in files) root.Add(new XElement(
-                FileHelper.IsFile(FileHelper.GetFilePath(FileHelper.Combine(baseFolder, file))) ? "file" : "directory", file));
-            new XDocument(root).Save(FileHelper.GetDataFilePath(archiveFilePath));
-            File.WriteAllText(FileHelper.GetFilePath(archiveFilePath), String.Empty);   // temp
-            StartRunner("compress\n" + archiveFilePath);
+            throw new NotSupportedException();
         }
-        public static string CreateDecompress(string path, string target)
-        {
-            var id = DateTime.UtcNow.Shorten();
-            new XDocument(new XElement("decompress", new XAttribute("archive", path), new XAttribute("directory", target)))
-                .Save(FileHelper.GetDataPath(id + ".decompress.task"));
-            StartRunner("decompress\n" + id);
-            return id;
-        }
+    }
+    public sealed partial class ConvertTask
+    {
+        private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
 
-        public static void CreateConvert(string source, string target, string size = null, string vcodec = null, string acodec = null, 
-                                         string scodec = null, string startPoint = null, string endPoint = null)
+        public static void Create(string source, string target, string size = null, string vcodec = null, string acodec = null,
+                                  string scodec = null, string startPoint = null, string endPoint = null)
         {
-            var filePath = FileHelper.GetFilePath(target);
-            if (File.Exists(filePath)) return;
-            File.WriteAllText(filePath, String.Empty);
-            var arguments = String.Empty;
-            if (!String.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
-            if (!String.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
-            if (!String.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
-            if (!String.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
+            var arguments = string.Empty;
+            if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
+            if (!string.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
+            if (!string.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
+            if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
             TimeSpan duration = TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
                      start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
             if (start <= TimeSpan.Zero) start = TimeSpan.Zero; else arguments += " -ss " + startPoint;
             if (end >= duration) end = duration; else arguments += " -to " + endPoint;
-            new XDocument(new XElement("file", new XAttribute("state", "converting"), new XAttribute("input", source),
-                                       new XAttribute("startTime", DateTime.UtcNow.Ticks), new XAttribute("arguments", arguments),
-                                       new XAttribute("duration", (end - start).Ticks),
-                                       new XAttribute("mime", Helper.GetMimeType(target))))
-                .Save(FileHelper.GetDataFilePath(target));
-            StartRunner("convert\n" + target);
+            new ConvertTask(source, target, end - start, arguments).Start();
         }
+    }
 
-        public static string CreateBitTorrent(string path, string target)
+    public static class TaskHelper
+    {
+        private static readonly Dictionary<string, string> Mappings = new Dictionary<string, string>
+            { { TaskType.OfflineDownloadTask, "离线下载" }, { TaskType.CompressTask, "压缩" },
+              { TaskType.BitTorrentTask, "离线下载 BT 种子" },  { TaskType.ConvertTask, "转换媒体格式" },
+              { TaskType.CrossAppCopyTask, "跨云雀复制" }, { TaskType.DecompressTask, "解压" }, { TaskType.FtpUploadTask, "FTP 上传" } };
+        public static string GetName(string id)
         {
-            var id = DateTime.UtcNow.Shorten();
-            new XDocument(new XElement("bitTorrent", new XAttribute("torrent", path), new XAttribute("directory", target)))
-                .Save(FileHelper.GetDataPath(id + ".bitTorrent.task"));
-            StartRunner("bit-torrent\n" + id);
-            return id;
-        }
-
-        public static string CreateCrossAppCopy(string domain, string path, string target)
-        {
-            var id = DateTime.UtcNow.Shorten();
-            new XDocument(new XElement("crossAppCopy", new XAttribute("domain", domain), new XAttribute("path", path.ToCorrectUrl()), 
-                new XAttribute("target", target))).Save(FileHelper.GetDataPath(id + ".crossAppCopy.task"));
-            StartRunner("cross-app-copy\n" + id);
-            return id;
-        }
-
-        public static string CreateFtpUpload(string source, IEnumerable<string> files, string target)
-        {
-            var id = DateTime.UtcNow.Shorten();
-            var root = new XElement("ftpUpload", new XAttribute("source", source), new XAttribute("target", target));
-            foreach (var file in files) root.Add(new XElement(
-                FileHelper.IsFile(FileHelper.GetFilePath(FileHelper.Combine(source, file))) ? "file" : "directory", file));
-            new XDocument(root).Save(FileHelper.GetDataPath(id + ".ftpUpload.task"));
-            StartRunner("ftp-upload\n" + id);
-            return id;
+            return Mappings.ContainsKey(id) ? Mappings[id] : "处理";
         }
 
         public static void CleanUp()
@@ -363,28 +333,8 @@ namespace Mygod.Skylark
             foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(String.Empty), "*.task"))
             {
                 var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
-                if (pid != 0) KillProcess(pid);
+                if (pid != 0) CloudTask.KillProcess(pid);
                 FileHelper.DeleteWithRetries(path);
-            }
-        }
-
-        public static void KillProcess(int pid)
-        {
-            try
-            {
-                Process.GetProcessById(pid).Kill();
-            }
-            catch { }
-        }
-        public static bool IsBackgroundRunnerKilled(int pid)
-        {
-            try
-            {
-                return Process.GetProcessById(pid).ProcessName != "BackgroundRunner";
-            }
-            catch
-            {
-                return true;
             }
         }
 
@@ -406,7 +356,7 @@ namespace Mygod.Skylark
 
     public static partial class FFmpeg
     {
-        public sealed class Codec
+        public struct Codec
         {
             public Codec(string input)
             {
@@ -423,6 +373,9 @@ namespace Mygod.Skylark
                     case 'S':
                         Type = CodecType.Subtitle;
                         break;
+                    default:
+                        Type = CodecType.Unknown;
+                        break;
                 }
                 IntraFrameOnlyCodec = input[4] == 'I';
                 LossyCompression = input[5] == 'L';
@@ -431,9 +384,9 @@ namespace Mygod.Skylark
                 Description = input.Substring(29);
             }
 
-            public bool DecodingSupported, EncodingSupported, IntraFrameOnlyCodec, LossyCompression, LosslessCompression;
-            public CodecType Type;
-            public string Name, Description;
+            public readonly bool DecodingSupported, EncodingSupported, IntraFrameOnlyCodec, LossyCompression, LosslessCompression;
+            public readonly CodecType Type;
+            public readonly string Name, Description;
 
             public override string ToString()
             {
@@ -471,9 +424,8 @@ namespace Mygod.Skylark
                 if (Root != null) return;
                 Root = HttpContext.Current.Server.MapPath("~/");
                 var dirPath = Path.Combine(Root, "plugins/ffmpeg");
-                Ffmpeg = Path.Combine(dirPath, "ffmpeg.exe");
                 Ffprobe = Path.Combine(dirPath, "ffprobe.exe");
-                var process = CreateProcess(Ffmpeg, "-codecs");
+                var process = CreateProcess(Path.Combine(dirPath, "ffmpeg.exe"), "-codecs");
                 while (!process.StandardOutput.ReadLine().Contains("-------", StringComparison.Ordinal))
                 {
                 }
@@ -481,7 +433,7 @@ namespace Mygod.Skylark
             }
         }
 
-        private static readonly string Root, Ffmpeg, Ffprobe;
+        private static readonly string Root, Ffprobe;
         public static readonly List<Codec> Codecs = new List<Codec>();
 
         private static Process CreateProcess(string path, string arguments)

@@ -20,10 +20,7 @@ namespace Mygod.Skylark
             RouteTable.Routes.MapPageRoute("Api", "Api/{Action}/{*Path}", "~/Api.aspx", false);
 
             RouteTable.Routes.MapPageRoute("TaskCreate", "Task/Create/{Type}/{*Path}", "~/Task/Create.aspx", false);
-            RouteTable.Routes.MapPageRoute("TaskBitTorrent", "Task/BitTorrent/{ID}", "~/Task/BitTorrent.aspx", false);
-            RouteTable.Routes.MapPageRoute("TaskCrossAppCopy", "Task/CrossAppCopy/{ID}", "~/Task/CrossAppCopy.aspx", false);
-            RouteTable.Routes.MapPageRoute("TaskDecompress", "Task/Decompress/{ID}", "~/Task/Decompress.aspx", false);
-            RouteTable.Routes.MapPageRoute("TaskFtpUpload", "Task/FtpUpload/{ID}", "~/Task/FtpUpload.aspx", false);
+            RouteTable.Routes.MapPageRoute("TaskDetails", "Task/Details/{ID}", "~/Task/Details.aspx", false);
             RouteTable.Routes.MapPageRoute("TaskLog", "Task/Log/", "~/Task/Log.aspx", false);
             RouteTable.Routes.MapPageRoute("TaskQuery", "Task/Query/{Type}/{ID}", "~/Task/Query.aspx", false);
 

@@ -10,6 +10,6 @@
 namespace Mygod.Skylark {
     
     
-    public partial class Upload {
+    public partial class TaskViewer {
     }
 }

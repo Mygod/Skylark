@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
     <link href="/css/modern.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+    <script type="text/javascript" src="/plugins/jquery/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>
     <script type="text/javascript" src="/javascript/generic.js"></script>
@@ -25,16 +25,19 @@
         </div>
         <div class="page-region">
             <div class="page-region-content" style="padding-left: 20px;">
-                <div><a href="http://mygodstudio.tk/skylark/">云雀™</a>，您的云存储伴侣。</div>
                 <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture)); %>
-                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)", Helper.GetSize(currentDrive.AvailableFreeSpace), 
-                                                    Helper.GetSize(currentDrive.TotalSize), 
-                                                    100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
+                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)",
+                                        Helper.GetSize(currentDrive.AvailableFreeSpace), 
+                                        Helper.GetSize(currentDrive.TotalSize), 
+                                        100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
                 <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
                 <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
                 </asp:ContentPlaceHolder>
-                <div class="center">Powered by <a href="http://mygodstudio.tk/">Mygod 工作室™</a></div>
-                <div class="center">Copyright &copy; 2013 云雀™ V<%=CurrentAssembly.GetName().Version %> RC2</div>
+                <% var version = CurrentAssembly.GetName().Version; %>
+                <div class="center">
+                    Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
+                    <%=version.ToString(2) %> Albatross Pre-RTM (V<%=version %>)
+                </div>
             </div>
         </div>
     </div>

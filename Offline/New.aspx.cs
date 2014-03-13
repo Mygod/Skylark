@@ -16,13 +16,13 @@ namespace Mygod.Skylark.Offline
         protected void Submit(object sender, EventArgs e)
         {
             foreach (var link in LinkBox.Text.Split(new[] { '\r', '\n' }).Where(link => !string.IsNullOrWhiteSpace(link)))
-                TaskHelper.CreateOffline(link, Path);
+                OfflineDownloadTask.Create(link, Path);
             Response.Redirect("/Browse/" + Path + '/');
         }
 
         protected void MediaFire(object sender, EventArgs e)
         {
-            TaskHelper.CreateOfflineMediaFire(MediaFireBox.Text, Path);
+            OfflineDownloadTask.CreateMediaFire(MediaFireBox.Text, Path);
             Response.Redirect("/Browse/" + Path + '/');
         }
     }

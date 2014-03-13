@@ -153,17 +153,16 @@
     <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
     <Content Include="plugins\fineuploader\loading.gif" />
     <Content Include="plugins\fineuploader\processing.gif" />
+    <Content Include="plugins\jquery\jquery-2.0.3.min.js" />
     <Content Include="plugins\MonoTorrent.Dht.dll" />
     <Content Include="plugins\MonoTorrent.Dht.pdb" />
     <Content Include="plugins\MonoTorrent.dll" />
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\SevenZipSharp.dll" />
-    <Content Include="Task\BitTorrent.aspx" />
+    <Content Include="TaskViewer.ascx" />
     <Content Include="Task\Default.aspx" />
     <Content Include="Task\Create.aspx" />
-    <Content Include="Task\CrossAppCopy.aspx" />
-    <Content Include="Task\Decompress.aspx" />
-    <Content Include="Task\FtpUpload.aspx" />
+    <Content Include="Task\Details.aspx" />
     <Content Include="Task\Log.aspx" />
     <Content Include="Task\Query.aspx" />
     <Content Include="Upload.aspx" />
@@ -259,12 +258,13 @@
     <Compile Include="Site.Master.designer.cs">
       <DependentUpon>Site.Master</DependentUpon>
     </Compile>
-    <Compile Include="Task\BitTorrent.aspx.cs">
-      <DependentUpon>BitTorrent.aspx</DependentUpon>
+    <Compile Include="Tasks.cs" />
+    <Compile Include="TaskViewer.ascx.cs">
+      <DependentUpon>TaskViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Task\BitTorrent.aspx.designer.cs">
-      <DependentUpon>BitTorrent.aspx</DependentUpon>
+    <Compile Include="TaskViewer.ascx.designer.cs">
+      <DependentUpon>TaskViewer.ascx</DependentUpon>
     </Compile>
     <Compile Include="Task\Default.aspx.cs">
       <DependentUpon>Default.aspx</DependentUpon>
@@ -280,26 +280,12 @@
     <Compile Include="Task\Create.aspx.designer.cs">
       <DependentUpon>Create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Task\CrossAppCopy.aspx.cs">
-      <DependentUpon>CrossAppCopy.aspx</DependentUpon>
+    <Compile Include="Task\Details.aspx.cs">
+      <DependentUpon>Details.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Task\CrossAppCopy.aspx.designer.cs">
-      <DependentUpon>CrossAppCopy.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Task\Decompress.aspx.cs">
-      <DependentUpon>Decompress.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Task\Decompress.aspx.designer.cs">
-      <DependentUpon>Decompress.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Task\FtpUpload.aspx.cs">
-      <DependentUpon>FtpUpload.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Task\FtpUpload.aspx.designer.cs">
-      <DependentUpon>FtpUpload.aspx</DependentUpon>
+    <Compile Include="Task\Details.aspx.designer.cs">
+      <DependentUpon>Details.aspx</DependentUpon>
     </Compile>
     <Compile Include="Task\Log.aspx.cs">
       <DependentUpon>Log.aspx</DependentUpon>
@@ -341,6 +327,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Banner.png.data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="plugins\jquery\jquery-2.0.3.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
