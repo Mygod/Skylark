@@ -65,7 +65,14 @@ namespace Mygod.Skylark
 
         public static string ToChineseString(this DateTime value, bool offset = true)
         {
-            if (offset) value = value.AddHours(8);
+            if (offset)
+                try
+                {
+                    value = value.AddHours(8);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                }
             return value.ToString("yyyy.M.d H:mm:ss.fff");
         }
         public static string ToChineseString(this DateTime? value, bool offset = true)
@@ -249,8 +256,8 @@ namespace Mygod.Skylark
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
-                                { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, 
-                                  UseShellExecute = false }
+                    { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, 
+                      UseShellExecute = false }
             };
             process.Start();
             process.StandardInput.WriteLine(args);

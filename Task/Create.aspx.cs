@@ -25,33 +25,40 @@ namespace Mygod.Skylark.Task
                         OfflineDownloadTask.CreateMediaFire(Request.QueryString["ID"], path);
                         break;
                     case "ftpupload":
-                        result.SetAttributeValue("id", (task = new FtpUploadTask(path, Request.QueryString["Files"].Split('|')
-                            .Select(file => file.UrlDecode()), Request.QueryString["Target"].UrlDecode())));
+                        result.SetAttributeValue("id", (task = new FtpUploadTask(path,
+                            Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()),
+                            Request.QueryString["Target"].UrlDecode())));
                         task.Start();
                         break;
                     case "compress":
-                        new CompressTask(path, Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()), 
-                                         Request.QueryString["BaseFolder"].UrlDecode(), Request.QueryString["CompressionLevel"])
-                            .Start();
+                        new CompressTask(path,
+                                         Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()), 
+                                         Request.QueryString["BaseFolder"].UrlDecode(),
+                                         Request.QueryString["CompressionLevel"]).Start();
                         break;
                     case "decompress":
-                        result.SetAttributeValue("id", 
-                                                 (task = new DecompressTask(path, Request.QueryString["Target"].UrlDecode())).ID);
+                        result.SetAttributeValue("id", (task = new DecompressTask
+                            (path, Request.QueryString["Target"].UrlDecode())).ID);
                         task.Start();
                         break;
                     case "bittorrent":
-                        result.SetAttributeValue("id", (task = new BitTorrentTask(path, Request.QueryString["Target"].UrlDecode())));
+                        result.SetAttributeValue("id", (task = new BitTorrentTask(Request.QueryString["Files"]
+                            .Split('|').Select(file => file.UrlDecode()), Request.QueryString["Target"].UrlDecode())));
                         task.Start();
                         break;
                     case "convert":
-                        ConvertTask.Create(path, Request.QueryString["Target"].UrlDecode(), Request.QueryString["Size"].UrlDecode(), 
-                            Request.QueryString["VCodec"].UrlDecode(), Request.QueryString["ACodec"].UrlDecode(), 
-                            Request.QueryString["SCodec"].UrlDecode(), Request.QueryString["Start"].UrlDecode(), 
-                            Request.QueryString["End"].UrlDecode());
+                        ConvertTask.Create(path, Request.QueryString["Target"].UrlDecode(),
+                                           Request.QueryString["Size"].UrlDecode(),
+                                           Request.QueryString["VCodec"].UrlDecode(),
+                                           Request.QueryString["ACodec"].UrlDecode(),
+                                           Request.QueryString["SCodec"].UrlDecode(),
+                                           Request.QueryString["Start"].UrlDecode(),
+                                           Request.QueryString["End"].UrlDecode());
                         break;
                     case "crossappcopy":
-                        result.SetAttributeValue("id", (task = new CrossAppCopyTask(Request.QueryString["Domain"].UrlDecode(), 
-                                                                                    Request.QueryString["Path"].UrlDecode(), path)));
+                        result.SetAttributeValue("id", (task = new CrossAppCopyTask(
+                            Request.QueryString["Domain"].UrlDecode(), Request.QueryString["Path"].UrlDecode(),
+                            path)));
                         task.Start();
                         break;
                     default:

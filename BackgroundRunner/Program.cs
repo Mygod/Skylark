@@ -148,7 +148,6 @@ namespace Mygod.Skylark
                 var files = this.GetAllSources().ToList();
                 foreach (var file in files) FileHelper.WaitForReady(FileHelper.GetDataFilePath(file));
                 long nextLength = 0, nextFile = 0;
-                SourceCount = files.Count;
                 FileLength = files.Sum(file => new FileInfo(FileHelper.GetFilePath(file)).Length);
                 compressor = new SevenZipCompressor
                 {
@@ -263,14 +262,18 @@ namespace Mygod.Skylark
         protected override void ExecuteCore()
         {
             var filePath = FileHelper.GetFilePath(Target);
-            var torrent = Torrent.Load(FileHelper.GetFilePath(Source));
             long length = 0;
-            foreach (var file in torrent.Files)
+            var torrents = this.GetAllSources().Select(source => Torrent.Load(FileHelper.GetFilePath(source)))
+                                               .ToList();
+            foreach (var torrent in torrents)
             {
-                length += file.Length;
-                StartFile(FileHelper.Combine(Target, file.Path));
+                FileCount += torrent.Files.Length;
+                foreach (var file in torrent.Files)
+                {
+                    length += file.Length;
+                    StartFile(FileHelper.Combine(Target, file.Path));
+                }
             }
-            FileCount = torrent.Files.Length;
             FileLength = length;
             Save();
 
@@ -286,16 +289,36 @@ namespace Mygod.Skylark
             listener.Start();
             engine.DhtEngine.Start();
             if (!Directory.Exists(engine.Settings.SavePath)) Directory.CreateDirectory(engine.Settings.SavePath);
-            var manager = new TorrentManager(torrent, filePath, new TorrentSettings(4, 150, 0, 0));
-            engine.Register(manager);
-            manager.PieceHashed += (sender, e) =>
+            var managers = new LinkedList<TorrentManager>();
+            foreach (var manager in
+                torrents.Select(torrent => new TorrentManager(torrent, filePath, new TorrentSettings(1, 150, 0, 0))))
             {
-                ProcessedFileLength = (long) (e.TorrentManager.Progress * length / 100);
-                Save();
-            };
-            manager.Start();
-            while (!manager.Complete) Thread.Sleep(1000);
-            foreach (var file in torrent.Files) FinishFile(FileHelper.Combine(Target, file.Path));
+                engine.Register(manager);
+                manager.PieceHashed += (sender, e) =>
+                {
+                    ProcessedFileLength = (long)(e.TorrentManager.Progress * length / 100);
+                    Save();
+                };
+                manager.Start();
+                managers.AddLast(manager);
+            }
+            while (managers.Count > 0)
+            {
+                Thread.Sleep(1000);
+                var i = managers.First;
+                while (i != null)
+                    if (i.Value.Complete)
+                    {
+                        var temp = i;
+                        i = i.Next;
+                        managers.Remove(temp);
+                        ProcessedSourceCount++;
+                        Save();
+                    }
+                    else i = i.Next;
+            }
+            foreach (var file in torrents.SelectMany(torrent => torrent.Files))
+                FinishFile(FileHelper.Combine(Target, file.Path));
             ProcessedFileLength = length;
             Finish();
         }

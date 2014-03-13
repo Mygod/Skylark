@@ -17,6 +17,6 @@
             location.href = "?Url=" + $.base64reversed.encode($("#link-box").val());
         });
     </script>
-    <div>想要直接下载你管视频？试试<a href="http://mygodstudio.tk/product/hide-ear/">掩耳</a>！</div>
+    <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/">掩耳</a>！</div>
     <% GetEmAll(); %>
 </asp:Content>

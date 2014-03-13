@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -77,6 +78,14 @@ namespace Mygod.Skylark
         #region Directory
 
         protected string DirectoryCount, FileCount;
+        private IEnumerable<string> SelectedPaths
+        {
+            get
+            {
+                return DirectoryList.Items.GetSelectedFiles()
+                    .Union(FileList.Items.GetSelectedFiles()).Select(name => FileHelper.Combine(RelativePath, name));
+            }
+        }
 
         protected void DirectoryCommand(object source, RepeaterCommandEventArgs e)
         {
@@ -131,8 +140,8 @@ namespace Mygod.Skylark
 
         protected void Compress(object sender, EventArgs e)
         {
-            new CompressTask(ArchiveFilePath.Text, DirectoryList.Items.GetSelectedFiles()
-                .Union(FileList.Items.GetSelectedFiles()), RelativePath, CompressionLevelList.SelectedValue).Start();
+            new CompressTask(ArchiveFilePath.Text, SelectedPaths, RelativePath,
+                             CompressionLevelList.SelectedValue).Start();
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
         }
 
@@ -151,6 +160,13 @@ namespace Mygod.Skylark
             Response.Redirect("/Task/Details/" + new FtpUploadTask(RelativePath,
                 DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
                     .Select(file => FileHelper.Combine(Hidden.Value ?? string.Empty, file)), Hidden.Value));
+        }
+
+        protected void BitTorrentDownload(object sender, EventArgs e)
+        {
+            var task = new BitTorrentTask(SelectedPaths, Hidden.Value.UrlDecode());
+            task.Start();
+            Response.Redirect("/Task/Details/" + task.ID);
         }
 
         #endregion
@@ -196,13 +212,6 @@ namespace Mygod.Skylark
         protected void Decompress(object sender, EventArgs e)
         {
             var task = new DecompressTask(RelativePath, Hidden.Value.UrlDecode());
-            task.Start();
-            Response.Redirect("/Task/Details/" + task.ID);
-        }
-
-        protected void BitTorrentDownload(object sender, EventArgs e)
-        {
-            var task = new BitTorrentTask(RelativePath, Hidden.Value.UrlDecode());
             task.Start();
             Response.Redirect("/Task/Details/" + task.ID);
         }

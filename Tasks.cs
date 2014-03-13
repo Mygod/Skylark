@@ -150,7 +150,17 @@ namespace Mygod.Skylark
         }
         public DateTime? PredictedEndTime
         {
-            get { return EndTime.HasValue ? EndTime.Value : StartTime + PredictedRemainingTime; }
+            get
+            {
+                try
+                {
+                    return EndTime.HasValue ? EndTime.Value : StartTime + PredictedRemainingTime;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return DateTime.MaxValue;
+                }
+            }
         }
 
         public string GetStatus(string action, Action never)
@@ -192,9 +202,7 @@ namespace Mygod.Skylark
     }
     public interface IMultipleSources
     {
-        string BaseFolder { get; }
         string CurrentSource { get; }
-        long? SourceCount { get; }
         long ProcessedSourceCount { get; }
         IEnumerable<string> Sources { get; }
     }
@@ -281,17 +289,10 @@ namespace Mygod.Skylark
         protected MultipleToOneFileTask(string relativePath) : base(relativePath)
         {
         }
-        protected MultipleToOneFileTask(IEnumerable<string> sources, string relativePath, string baseFolder,
-                                        string state) : base(relativePath, state)
+        protected MultipleToOneFileTask(IEnumerable<string> sources, string relativePath, string state)
+            : base(relativePath, state)
         {
-            BaseFolder = baseFolder ?? string.Empty;
             Sources = sources;
-        }
-
-        public string BaseFolder
-        {
-            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("baseFolder"); }
-            set { TaskXml.SetAttributeValue("baseFolder", value); }
         }
 
         public string CurrentSource
@@ -300,15 +301,6 @@ namespace Mygod.Skylark
             set { TaskXml.SetAttributeValue("currentFile", value); }
         }
 
-        public long? SourceCount
-        {
-            get { return TaskXml == null ? null : TaskXml.GetAttributeValue<long?>("sourceCount"); }
-            set
-            {
-                if (value.HasValue) TaskXml.SetAttributeValue("sourceCount", value.Value);
-                else TaskXml.SetAttributeValue("sourceCount", null);
-            }
-        }
         public long ProcessedSourceCount
         {
             get { return TaskXml == null ? 0 : TaskXml.GetAttributeValueWithDefault<long>("sourceProcessed"); }
@@ -354,11 +346,16 @@ namespace Mygod.Skylark
         {
         }
         public CompressTask(string archiveFilePath, IEnumerable<string> files, string baseFolder = null,
-                            string compressionLevel = null) 
-            : base(files.Select(file => FileHelper.Combine(baseFolder ?? string.Empty, file)),
-                   archiveFilePath, baseFolder, TaskType.CompressTask)
+                            string compressionLevel = null) : base(files, archiveFilePath, TaskType.CompressTask)
         {
             TaskXml.SetAttributeValue("compressionLevel", compressionLevel ?? "Ultra");
+            BaseFolder = baseFolder ?? string.Empty;
+        }
+
+        public string BaseFolder
+        {
+            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("baseFolder"); }
+            set { TaskXml.SetAttributeValue("baseFolder", value); }
         }
     }
     public sealed partial class ConvertTask : OneToOneFileTask
@@ -484,6 +481,39 @@ namespace Mygod.Skylark
             set { TaskXml.SetAttributeValue("source", value); }
         }
     }
+    public abstract partial class MultipleToMultipleFilesTask : MultipleFilesTask, IMultipleSources
+    {
+        protected MultipleToMultipleFilesTask(string id) : base(id)
+        {
+        }
+        protected MultipleToMultipleFilesTask(string type, IEnumerable<string> sources, string target)
+            : base(type, target)
+        {
+            Sources = sources;
+        }
+
+        public string CurrentSource
+        {
+            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("currentFile"); }
+            set { TaskXml.SetAttributeValue("currentFile", value); }
+        }
+
+        public long ProcessedSourceCount
+        {
+            get { return TaskXml == null ? 0 : TaskXml.GetAttributeValueWithDefault<long>("sourceProcessed"); }
+            set { TaskXml.SetAttributeValue("sourceProcessed", value); }
+        }
+
+        public IEnumerable<string> Sources
+        {
+            get { return TaskXml.ElementsCaseInsensitive("source").Select(file => file.Value); }
+            set
+            {
+                TaskXml.ElementsCaseInsensitive("source").Remove();
+                foreach (var file in value) TaskXml.Add(new XElement("source", file));
+            }
+        }
+    }
 
     public sealed partial class FtpUploadTask : GeneralTask, IRemoteTask, IMultipleSources
     {
@@ -576,12 +606,13 @@ namespace Mygod.Skylark
         {
         }
     }
-    public sealed partial class BitTorrentTask : OneToMultipleFilesTask
+    public sealed partial class BitTorrentTask : MultipleToMultipleFilesTask
     {
         public BitTorrentTask(string id) : base(id)
         {
         }
-        public BitTorrentTask(string source, string target) : base(TaskType.BitTorrentTask, source, target)
+        public BitTorrentTask(IEnumerable<string> sources, string target)
+            : base(TaskType.BitTorrentTask, sources, target)
         {
         }
 

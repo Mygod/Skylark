@@ -120,9 +120,14 @@
                 <a href="javascript:getDownloadLink();">[生成下载链接]</a>
                 <asp:LinkButton runat="server" Text="[移动到]" OnClick="Move" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[复制到]" OnClick="Copy" OnClientClick="return pickFolder();" />
-                <asp:LinkButton runat="server" Text="[删除]" OnClick="Delete" OnClientClick="return deleteConfirm();" />
-                <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy" OnClientClick="return pickApp();" />
-                <asp:LinkButton runat="server" Text="[上传到 FTP]" OnClick="FtpUpload" OnClientClick="return pickFtp();" />
+                <asp:LinkButton runat="server" Text="[删除]" OnClick="Delete"
+                                OnClientClick="return deleteConfirm();" />
+                <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy"
+                                OnClientClick="return pickApp();" />
+                <asp:LinkButton runat="server" Text="[上传到 FTP]" OnClick="FtpUpload"
+                                OnClientClick="return pickFtp();" />
+                <asp:LinkButton runat="server" Text="[离线下载选中种子]" OnClick="BitTorrentDownload"
+                                OnClientClick="return pickFolderCore(true);" />
             </div>
             <div id="running-result" style="display: none;">
                 <a href="javascript:hideParent();">[隐藏]</a><br />
@@ -221,8 +226,6 @@
                 <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
                 <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore(true);" />
                 <a href="javascript:showConvert();">[转换媒体文件格式]</a>
-                <asp:LinkButton runat="server" Text="[离线下载此种子]" OnClick="BitTorrentDownload"
-                                OnClientClick="return pickFolderCore(true);" />
             </div>
             <div id="convert-form" style="display: none;">
                 <div>输出路径：（重名将被忽略）</div>

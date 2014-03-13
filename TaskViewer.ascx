@@ -25,12 +25,9 @@
             {
         %>
         <div>
-            目标目录：　　<a href="/Browse/<%=multipleSources.BaseFolder %>">/<%=multipleSources.BaseFolder %></a>
-        </div>
-        <div>
             当前文件：　　<a href="/Browse/<%=multipleSources.CurrentSource %>">/<%=multipleSources.CurrentSource %></a>
         </div>
-        <div>源文件数量：　<%=multipleSources.SourceCount %></div>
+        <div>源文件数量：　<%=multipleSources.Sources == null ? 0 : multipleSources.Sources.LongCount() %></div>
         <div>已处理数量：　<%=multipleSources.ProcessedSourceCount %></div>
         <%
             }
@@ -54,7 +51,7 @@
             if (multipleFilesTask != null)
             {
         %>
-        <div>目标目录：　　<a href="<%=multipleFilesTask.Target %>"><%=multipleFilesTask.Target %></a></div>
+        <div>目标目录：　　<a href="/Browse/<%=multipleFilesTask.Target %>">/<%=multipleFilesTask.Target %></a></div>
         <div>当前文件：　　<%=multipleFilesTask.CurrentFile == null ? "无"
             : string.Format("<a href=\"/Browse/{0}\">{0}</a>", multipleFilesTask.CurrentFile) %></div>
         <div>文件数量：　　<%=multipleFilesTask.FileCount.HasValue
