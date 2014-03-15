@@ -52,11 +52,11 @@
     <Content Include="Admin.aspx" />
     <Content Include="Api.aspx" />
     <Content Include="css\site.css" />
-    <None Include="Data\Banner.png.data" />
-    <None Include="Data\readme.htm.data" />
+    <Content Include="Data\Banner.png.data" />
+    <Content Include="Data\readme.htm.data" />
     <Content Include="Edit.aspx" />
-    <None Include="Data\Site.config" />
-    <None Include="Files\Banner.png" />
+    <Content Include="Data\Site.config" />
+    <Content Include="Files\Banner.png" />
     <Content Include="Forbidden.aspx" />
     <Content Include="plugins\7z.dll" />
     <Content Include="plugins\BackgroundRunner.exe" />
@@ -66,7 +66,7 @@
     <Content Include="Default.aspx" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
-    <None Include="Files\readme.htm" />
+    <Content Include="Files\readme.htm" />
     <Content Include="Global.asax" />
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
@@ -276,7 +276,7 @@
     <Content Include="plugins\jquery\jquery-2.0.3.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Data\Site.privileges" />
+    <Content Include="Data\Site.privileges" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
