@@ -21,7 +21,7 @@
         <li>升级过程中会产生一定的临时文件，你需要在升级完成后点击下面的“清理升级文件”来删除它们。</li>
     </ul>
     <div class="center">
-        <asp:Button ID="UpdateButton" runat="server" Text="下载并部署最新版" OnClick="Update" />
+        <asp:Button ID="UpdateButton" runat="server" Text="云端下载并部署最新版" OnClick="Update" />
         <asp:Button ID="CleanupButton" runat="server" Text="清理升级文件" OnClick="Cleanup" />
     </div>
 </asp:Content>
