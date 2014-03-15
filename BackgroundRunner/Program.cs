@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -53,7 +52,7 @@ namespace Mygod.Skylark
                 var path = GetFilePath(file);
                 if (IsFile(path)) yield return file;
                 else foreach (var sub in Directory.EnumerateFiles(path, "*.*", SearchOption.AllDirectories))
-                    yield return sub.Substring(6);
+                        yield return sub.Substring(6);
             }
         }
     }
@@ -129,7 +128,8 @@ namespace Mygod.Skylark
 
     public sealed partial class OfflineDownloadTask
     {
-        public OfflineDownloadTask(string url, string relativePath) : base(relativePath, TaskType.OfflineDownloadTask)
+        public OfflineDownloadTask(string url, string relativePath)
+            : base(relativePath, TaskType.OfflineDownloadTask)
         {
             Url = url;
         }
@@ -200,8 +200,7 @@ namespace Mygod.Skylark
             {
                 StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
                     string.Format("-i \"{0}\"{2} \"{1}\" -y", FileHelper.GetFilePath(Source),
-                                  FileHelper.GetFilePath(RelativePath), Arguments ?? string.Empty))
-                        { UseShellExecute = false, RedirectStandardError = true }
+                                  FileHelper.GetFilePath(RelativePath), Arguments ?? string.Empty)) { UseShellExecute = false, RedirectStandardError = true }
             };
             process.Start();
             while (!process.StandardError.EndOfStream)
@@ -282,8 +281,7 @@ namespace Mygod.Skylark
                 .GetActiveTcpListeners().Select(endPoint => endPoint.Port));
             var port = 10000;
             while (listenedPorts.Contains(port)) port++;
-            var engine = new ClientEngine(new EngineSettings(filePath, port)
-                { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
+            var engine = new ClientEngine(new EngineSettings(filePath, port) { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
             engine.ChangeListenEndpoint(new IPEndPoint(IPAddress.Any, port));
             var listener = new DhtListener(new IPEndPoint(IPAddress.Any, port));
             engine.RegisterDht(new DhtEngine(listener));
@@ -389,7 +387,7 @@ namespace Mygod.Skylark
                 Save();
             }
         }
-        
+
         protected override void ExecuteCore()
         {
             ErrorMessage = string.Empty;
@@ -486,9 +484,6 @@ namespace Mygod.Skylark.BackgroundRunner
                     case TaskType.BitTorrentTask:
                         new BitTorrentTask(Console.ReadLine()).Execute();
                         break;
-                    case "update":
-                        Update(Console.ReadLine());
-                        break;
                     default:
                         Console.WriteLine("无法识别。");
                         break;
@@ -498,60 +493,6 @@ namespace Mygod.Skylark.BackgroundRunner
             {
                 File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
                                                                     exc.GetMessage(), Environment.NewLine));
-            }
-        }
-
-        private static void Update(string id)
-        {
-            using (var log = new StreamWriter(@"Update\" + id + ".log", true) { AutoFlush = true })
-            try
-            {
-                log.WriteLine("[{0}] 更新开始。下载更新包中……", DateTime.UtcNow);
-                var zipPath = @"Update\" + id + ".zip";
-                new WebClient().DownloadFile("https://github.com/Mygod/Skylark/archive/master.zip", zipPath);
-                log.WriteLine("[{0}] 下载完成。解压中……", DateTime.UtcNow);
-                var extractor = new SevenZipExtractor(zipPath, InArchiveFormat.Zip);
-                var i = 0;
-                foreach (var file in from file in extractor.ArchiveFileData
-                                     where file.FileName != null && file.FileName.Length > 15
-                                     let path = file.FileName.Substring(15)
-                                     where !file.IsDirectory && !string.IsNullOrWhiteSpace(path)
-                                        && !path.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
-                                        && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture)
-                                     select path)
-                {
-                    var dir = Path.GetDirectoryName(file);
-                    if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
-                    var retries = 5;
-                    while (true)
-                        try
-                        {
-                            using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write,
-                                                               FileShare.Read)) extractor.ExtractFile(i, stream);
-                            break;
-                        }
-                        catch (Exception exc)
-                        {
-                            log.WriteLine("[{0}] 解压文件失败：{1}{2}错误详细信息：{3}", DateTime.UtcNow,
-                                          file, Environment.NewLine, exc.GetMessage());
-                            if (retries-- > 0)
-                            {
-                                log.WriteLine("[{0}] 将于 5 秒后重试。", DateTime.UtcNow);
-                                Thread.Sleep(5000);
-                            }
-                            else
-                            {
-                                log.WriteLine("[{0}] 失败次数过多，果断弃坑。", DateTime.UtcNow);
-                                break;
-                            }
-                        }
-                    i++;
-                }
-                log.WriteLine("[{0}] 更新完成。", DateTime.UtcNow);
-            }
-            catch (Exception exc)
-            {
-                log.WriteLine("[{0}] 更新失败，出现错误：{1}", DateTime.UtcNow, exc.GetMessage());
             }
         }
 
@@ -604,8 +545,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
                     fileName += extension;
 
-                task = new OfflineDownloadTask(url, path = Path.Combine(path, fileName))
-                    { PID = Process.GetCurrentProcess().Id };
+                task = new OfflineDownloadTask(url, path = Path.Combine(path, fileName)) { PID = Process.GetCurrentProcess().Id };
                 if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;
                 if (fileLength != null) task.FileLength = fileLength;
                 task.Save();
