@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -312,13 +313,12 @@ namespace Mygod.Skylark
                         var temp = i;
                         i = i.Next;
                         managers.Remove(temp);
+                        foreach (var file in i.Value.Torrent.Files) FinishFile(FileHelper.Combine(Target, file.Path));
                         ProcessedSourceCount++;
                         Save();
                     }
                     else i = i.Next;
             }
-            foreach (var file in torrents.SelectMany(torrent => torrent.Files))
-                FinishFile(FileHelper.Combine(Target, file.Path));
             ProcessedFileLength = length;
             Finish();
         }
@@ -486,6 +486,9 @@ namespace Mygod.Skylark.BackgroundRunner
                     case TaskType.BitTorrentTask:
                         new BitTorrentTask(Console.ReadLine()).Execute();
                         break;
+                    case "update":
+                        Update(Console.ReadLine());
+                        break;
                     default:
                         Console.WriteLine("无法识别。");
                         break;
@@ -495,6 +498,28 @@ namespace Mygod.Skylark.BackgroundRunner
             {
                 File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
                                                                     exc.GetMessage(), Environment.NewLine));
+            }
+        }
+
+        private static void Update(string id)
+        {
+            using (var log = new StreamWriter(@"Update\" + id + ".log", true) { AutoFlush = true })
+            try
+            {
+                log.WriteLine("[{0}] 更新开始。下载更新包中……", DateTime.UtcNow);
+                var zipPath = @"Update\" + id + ".zip";
+                new WebClient().DownloadFile("https://github.com/Mygod/Skylark/archive/master.zip", zipPath);
+                log.WriteLine("[{0}] 下载完成。解压中……", DateTime.UtcNow);
+                var extractor = new SevenZipExtractor(zipPath, InArchiveFormat.Zip);
+                extractor.ExtractFiles(Environment.CurrentDirectory, (extractor.ArchiveFileNames.Where(fileName =>
+                    !fileName.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
+                    && !fileName.StartsWith("Data\\", true, CultureInfo.InvariantCulture)).Select((i, j) => j))
+                    .ToArray());
+                log.WriteLine("[{0}] 更新完成。", DateTime.UtcNow);
+            }
+            catch (Exception exc)
+            {
+                log.WriteLine("[{0}] 更新失败，出现错误：{1}", DateTime.UtcNow, exc.GetMessage());
             }
         }
 
