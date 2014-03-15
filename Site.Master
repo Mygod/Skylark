@@ -31,7 +31,7 @@
                                         Helper.GetSize(currentDrive.AvailableFreeSpace), 
                                         Helper.GetSize(currentDrive.TotalSize), 
                                         100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
-                <div>当前工作义工：<a href="/Task/">[后台]</a> <%=TaskHelper.CurrentWorkers %></div>
+                <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
                 <div>
                     您的当前身份：<a href="javascript:login();">[修改]</a>
                     <%=string.Format(User.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", User.Comment) %>
