@@ -3,13 +3,14 @@
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <h2 class="center">升级</h2>
-    <% if (Mygod.Net.WebsiteManager.UpdateAvailable)
+    <% if (string.IsNullOrWhiteSpace(new WebClient()
+           .DownloadString("http://mygod.tk/product/update/" + CurrentAssembly.GetName().Version.Revision + '/')))
        { %>
-    <div>新版 云雀™ 现在已可用。</div>
+    <div>恭喜您，您的 云雀™ 是最新版！如果你想，你还是可以再次部署一次最新版。</div>
     <% }
        else
        { %>
-    <div>恭喜您，您的 云雀™ 是最新版！如果你想，你还是可以再次部署一次最新版。</div>
+    <div>新版 云雀™ 现在已可用。</div>
     <% } %>
     <h3>升级须知</h3>
     <ul>

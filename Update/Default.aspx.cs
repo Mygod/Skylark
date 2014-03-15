@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Web.UI;
 
 namespace Mygod.Skylark.Update
@@ -28,5 +29,7 @@ namespace Mygod.Skylark.Update
                             || file.EndsWith(".log", true, CultureInfo.InvariantCulture)))
                 FileHelper.DeleteWithRetries(file);
         }
+
+        protected static readonly Assembly CurrentAssembly = Assembly.GetExecutingAssembly();
     }
 }
