@@ -19,11 +19,11 @@ namespace Mygod.Skylark.Update
 
         protected void Update(object sender, EventArgs e)
         {
-            string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/Update/" + id + ".exe");
-            new WebClient().DownloadFile("http://mygod.tk/misc/SkylarkUpdater.exe", path);
+            string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/plugins/SkylarkUpdater.exe");
+            new WebClient().DownloadFile("http://mygod.tk/skylark/SkylarkUpdater.exe", path);
             File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
                               "处理已开始，刷新此页面查看进度。" + Environment.NewLine, Encoding.UTF8);
-            Process.Start(new ProcessStartInfo(path) { WorkingDirectory = Server.MapPath("~/") });
+            Process.Start(new ProcessStartInfo(path, id) { WorkingDirectory = Server.MapPath("~/") });
             Response.Redirect(id + ".log");
         }
 
