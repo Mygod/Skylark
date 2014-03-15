@@ -511,10 +511,38 @@ namespace Mygod.Skylark.BackgroundRunner
                 new WebClient().DownloadFile("https://github.com/Mygod/Skylark/archive/master.zip", zipPath);
                 log.WriteLine("[{0}] 下载完成。解压中……", DateTime.UtcNow);
                 var extractor = new SevenZipExtractor(zipPath, InArchiveFormat.Zip);
-                extractor.ExtractFiles(Environment.CurrentDirectory, (extractor.ArchiveFileNames.Where(fileName =>
-                    !fileName.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
-                    && !fileName.StartsWith("Data\\", true, CultureInfo.InvariantCulture)).Select((i, j) => j))
-                    .ToArray());
+                var i = 0;
+                foreach (var file in from file in extractor.ArchiveFileNames
+                                     let path = file.Substring(14)
+                                     where !path.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
+                                        && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture)
+                                     select path)
+                {
+                    var retries = 5;
+                    while (true)
+                        try
+                        {
+                            using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write,
+                                                               FileShare.Read)) extractor.ExtractFile(i, stream);
+                            break;
+                        }
+                        catch (Exception exc)
+                        {
+                            log.WriteLine("[{0}] 解压文件失败：{1}{2}错误详细信息：{3}", DateTime.UtcNow,
+                                          file, Environment.NewLine, exc.GetMessage());
+                            if (retries-- > 0)
+                            {
+                                log.WriteLine("[{0}] 将于 5 秒后重试。", DateTime.UtcNow);
+                                Thread.Sleep(5000);
+                            }
+                            else
+                            {
+                                log.WriteLine("[{0}] 失败次数过多，果断弃坑。", DateTime.UtcNow);
+                                break;
+                            }
+                        }
+                    i++;
+                }
                 log.WriteLine("[{0}] 更新完成。", DateTime.UtcNow);
             }
             catch (Exception exc)
