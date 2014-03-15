@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web.UI;
 
 namespace Mygod.Skylark.Update
@@ -17,8 +18,9 @@ namespace Mygod.Skylark.Update
         protected void Update(object sender, EventArgs e)
         {
             var id = DateTime.UtcNow.Shorten();
-            File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"), "处理已开始，刷新此页面查看进度。");
-            CloudTask.StartRunner("update\n" + id);
+            File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
+                              "处理已开始，刷新此页面查看进度。" + Environment.NewLine, Encoding.UTF8);
+            //CloudTask.StartRunner("update\n" + id);
             Response.Redirect(id + ".log");
         }
 
