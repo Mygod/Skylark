@@ -512,7 +512,9 @@ namespace Mygod.Skylark.BackgroundRunner
                 log.WriteLine("[{0}] 下载完成。解压中……", DateTime.UtcNow);
                 var extractor = new SevenZipExtractor(zipPath, InArchiveFormat.Zip);
                 var i = 0;
-                foreach (var file in from file in extractor.ArchiveFileData let path = file.FileName.Substring(15)
+                foreach (var file in from file in extractor.ArchiveFileData
+                                     where file.FileName != null && file.FileName.Length > 15
+                                     let path = file.FileName.Substring(15)
                                      where !file.IsDirectory && !string.IsNullOrWhiteSpace(path)
                                         && !path.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
                                         && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture)
