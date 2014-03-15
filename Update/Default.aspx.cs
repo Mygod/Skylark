@@ -20,7 +20,7 @@ namespace Mygod.Skylark.Update
             var id = DateTime.UtcNow.Shorten();
             File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
                               "处理已开始，刷新此页面查看进度。" + Environment.NewLine, Encoding.UTF8);
-            //CloudTask.StartRunner("update\n" + id);
+            CloudTask.StartRunner("update\n" + id);
             Response.Redirect(id + ".log");
         }
 
