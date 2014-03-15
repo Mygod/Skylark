@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 
 namespace Mygod.Skylark.Task
 {
-    public partial class Log : System.Web.UI.Page
+    public partial class Log : Page
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            if (!Request.GetUser().Browse) Response.StatusCode = 401;
         }
     }
 }

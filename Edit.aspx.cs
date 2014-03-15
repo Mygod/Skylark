@@ -11,6 +11,11 @@ namespace Mygod.Skylark
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             relativePath = RouteData.GetRelativePath();
             Title = ("编辑 " + relativePath).TrimEnd();
             absolutePath = FileHelper.GetFilePath(relativePath);

@@ -9,6 +9,11 @@ namespace Mygod.Skylark.Task
 
         protected void Page_Init(object sender, EventArgs e)
         {
+            if (!Request.GetUser().Browse)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             try
             {
                 Task = GeneralTask.Create(ID = RouteData.GetRouteString("ID"));

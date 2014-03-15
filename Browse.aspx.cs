@@ -33,8 +33,15 @@ namespace Mygod.Skylark
                 else Response.Redirect(url[0].TrimEnd('/'), true);
         }
 
+        protected User CurrentUser;
+
         protected void Page_Init(object sender, EventArgs e)
         {
+            if (!(CurrentUser = Request.GetUser()).Browse)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             if (InfoDirectory.Exists)
             {
                 Views.SetActiveView(DirectoryView);
@@ -82,17 +89,23 @@ namespace Mygod.Skylark
         {
             get
             {
-                return DirectoryList.Items.GetSelectedFiles()
-                    .Union(FileList.Items.GetSelectedFiles()).Select(name => FileHelper.Combine(RelativePath, name));
+                return DirectoryList.Items.GetSelectedItemsID()
+                    .Union(FileList.Items.GetSelectedItemsID()).Select(name => FileHelper.Combine(RelativePath, name));
             }
         }
 
         protected void DirectoryCommand(object source, RepeaterCommandEventArgs e)
         {
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             switch (e.CommandName)
             {
                 case "Rename":
-                    FileHelper.Move(FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value), 
+                    FileHelper.Move(FileHelper.Combine(RelativePath,
+                                                       ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value), 
                                     FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
                     Response.Redirect(Request.RawUrl);
                     break;
@@ -101,10 +114,16 @@ namespace Mygod.Skylark
 
         protected void FileCommand(object source, RepeaterCommandEventArgs e)
         {
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             switch (e.CommandName)
             {
                 case "Rename":
-                    FileHelper.Move(FileHelper.Combine(RelativePath, ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value),
+                    FileHelper.Move(FileHelper.Combine(RelativePath,
+                                                       ((HtmlInputHidden)e.Item.FindControl("Hidden")).Value),
                                     FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
                     Response.Redirect(Request.RawUrl);
                     break;
@@ -113,33 +132,55 @@ namespace Mygod.Skylark
 
         protected void NewFolder(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             FileHelper.CreateDirectory(FileHelper.Combine(RelativePath, Hidden.Value.UrlDecode()));
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Move(object sender, EventArgs e)
         {
-            foreach (var source in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
-                .Select(fileName => FileHelper.Combine(RelativePath, fileName)))
-                FileHelper.Move(source, FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
+            foreach (var source in SelectedPaths) FileHelper.Move(source,
+                FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
             Response.Redirect(Request.RawUrl);
         }
         protected void Copy(object sender, EventArgs e)
         {
-            foreach (var source in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
-                .Select(fileName => FileHelper.Combine(RelativePath, fileName)))
-                FileHelper.Copy(source, FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
+            foreach (var source in SelectedPaths) FileHelper.Copy(source,
+                FileHelper.Combine(Hidden.Value.UrlDecode(), Path.GetFileName(source)), false);
             Response.Redirect(Request.RawUrl);
         }
         protected void Delete(object sender, EventArgs e)
         {
-            foreach (var path in DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
-                .Select(fileName => FileHelper.Combine(RelativePath, fileName))) FileHelper.Delete(path);
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
+            foreach (var path in SelectedPaths) FileHelper.Delete(path);
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Compress(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             new CompressTask(ArchiveFilePath.Text, SelectedPaths, RelativePath,
                              CompressionLevelList.SelectedValue).Start();
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
@@ -148,6 +189,11 @@ namespace Mygod.Skylark
         private static readonly Regex AppParser = new Regex(@"^http:\/\/(.*?)\/Browse\/(.*?)$", RegexOptions.Compiled);
         protected void CrossAppCopy(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             var match = AppParser.Match(Hidden.Value);
             if (!match.Success) return;
             var task = new CrossAppCopyTask(match.Groups[1].Value, match.Groups[2].Value.UrlDecode(), RelativePath);
@@ -157,13 +203,21 @@ namespace Mygod.Skylark
 
         protected void FtpUpload(object sender, EventArgs e)
         {
-            Response.Redirect("/Task/Details/" + new FtpUploadTask(RelativePath,
-                DirectoryList.Items.GetSelectedFiles().Union(FileList.Items.GetSelectedFiles())
-                    .Select(file => FileHelper.Combine(Hidden.Value ?? string.Empty, file)), Hidden.Value));
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
+            Response.Redirect("/Task/Details/" + new FtpUploadTask(RelativePath, SelectedPaths, Hidden.Value));
         }
 
         protected void BitTorrentDownload(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             var task = new BitTorrentTask(SelectedPaths, Hidden.Value.UrlDecode());
             task.Start();
             Response.Redirect("/Task/Details/" + task.ID);
@@ -205,12 +259,22 @@ namespace Mygod.Skylark
 
         protected void ModifyMime(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             FileHelper.SetDefaultMime(FileHelper.GetDataFilePath(RelativePath), Hidden.Value.UrlDecode());
             Response.Redirect(Request.RawUrl);
         }
 
         protected void Decompress(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             var task = new DecompressTask(RelativePath, Hidden.Value.UrlDecode());
             task.Start();
             Response.Redirect("/Task/Details/" + task.ID);
@@ -218,6 +282,11 @@ namespace Mygod.Skylark
 
         protected void Convert(object sender, EventArgs e)
         {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             ConvertTask.Create(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text, ConvertVideoCodecBox.SelectedValue, 
                                ConvertAudioCodecBox.SelectedValue, ConvertSubtitleCodecBox.SelectedValue, 
                                ConvertStartBox.Text, ConvertEndBox.Text);

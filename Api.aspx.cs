@@ -20,21 +20,51 @@ namespace Mygod.Skylark
                 switch (RouteData.GetRouteString("Action").ToLower())
                 {
                     case "list":
+                        if (!Request.GetUser().Browse)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         List(path, result);
                         break;
                     case "createdirectory":
+                        if (!Request.GetUser().OperateFiles)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         FileHelper.CreateDirectory(path);
                         break;
                     case "copy":
+                        if (!Request.GetUser().OperateFiles)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         FileHelper.Copy(path, Request.QueryString["Target"].UrlDecode());
                         break;
                     case "move":
+                        if (!Request.GetUser().OperateFiles)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         FileHelper.Move(path, Request.QueryString["Target"].UrlDecode());
                         break;
                     case "delete":
+                        if (!Request.GetUser().OperateFiles)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         FileHelper.Delete(path);
                         break;
                     case "details":
+                        if (!Request.GetUser().Browse)
+                        {
+                            Response.StatusCode = 401;
+                            return;
+                        }
                         Details(path, result);
                         break;
                     case "niguan":
@@ -90,7 +120,7 @@ namespace Mygod.Skylark
                                                              Request.Url.Scheme, Request.Url.Host, path,
                                                              Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
                 result.Add(element);
-                Response.Write('.');    // prevent the thread from getting killed
+                Response.Write('.');    // prevent the thread from getting killed, how evil I am MUAHAHA
                 Response.Flush();
             }
             Response.Write(" -->" + Environment.NewLine);

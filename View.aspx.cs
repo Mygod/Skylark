@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Mygod.Skylark
 {
@@ -6,6 +7,11 @@ namespace Mygod.Skylark
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().Download)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             string path = RouteData.GetRelativePath(), dataPath = FileHelper.GetDataFilePath(path), 
                    mime = Request.QueryString["Mime"];
             if (string.IsNullOrWhiteSpace(mime)) mime = FileHelper.GetDefaultMime(dataPath);
@@ -16,10 +22,8 @@ namespace Mygod.Skylark
                 FileHelper.WaitForReady(dataPath, timeout);
                 TransmitFile(FileHelper.GetFilePath(path), mime: mime);
             }
-            catch
+            catch (ThreadAbortException)
             {
-                Response.StatusCode = 503;
-                Response.StatusDescription = "File is not ready yet";
             }
         }
     }

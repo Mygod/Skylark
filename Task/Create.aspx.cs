@@ -9,6 +9,11 @@ namespace Mygod.Skylark.Task
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             Response.Clear();
             Response.ContentType = "application/xml";
             var result = new XElement("result");

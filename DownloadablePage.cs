@@ -16,29 +16,35 @@ namespace Mygod.Skylark
         {
             var fileInfo = new FileInfo(filePath);
             long responseLength = fileInfo.Exists ? fileInfo.Length : 0, startIndex = 0;
-            var etag = '"' + HttpUtility.UrlEncode(filePath, Encoding.UTF8) + File.GetLastWriteTimeUtc(filePath).ToString("r") + '"';
+            var etag = '"' + HttpUtility.UrlEncode(filePath, Encoding.UTF8)
+                           + File.GetLastWriteTimeUtc(filePath).ToString("r") + '"';
 
             // if the "If-Match" exists and is different to etag (or is equal to any "*" with no resource)
             if (Request.Headers["If-Match"] == "*" && !fileInfo.Exists ||
-                Request.Headers["If-Match"] != null && Request.Headers["If-Match"] != "*" && Request.Headers["If-Match"] != etag)
+                Request.Headers["If-Match"] != null && Request.Headers["If-Match"] != "*"
+                                                    && Request.Headers["If-Match"] != etag)
             {
                 Response.StatusCode = (int)HttpStatusCode.PreconditionFailed;
                 Response.End();
+                return;
             }
 
             if (!fileInfo.Exists)
             {
                 Response.StatusCode = (int)HttpStatusCode.NotFound;
                 Response.End();
+                return;
             }
 
             if (Request.Headers["If-None-Match"] == etag)
             {
                 Response.StatusCode = (int)HttpStatusCode.NotModified;
                 Response.End();
+                return;
             }
 
-            if (Request.Headers["Range"] != null && (Request.Headers["If-Range"] == null || Request.Headers["If-Range"] == etag))
+            if (Request.Headers["Range"] != null
+                && (Request.Headers["If-Range"] == null || Request.Headers["If-Range"] == etag))
             {
                 var match = Regex.Match(Request.Headers["Range"], @"bytes=(\d*)-(\d*)");
                 startIndex = Parse<long>(match.Groups[1].Value);
@@ -61,8 +67,8 @@ namespace Mygod.Skylark
         private static T Parse<T>(object value)
         {
             //convert value to string to allow conversion from types like float to int
-            //converter.IsValid only works since .NET4 but still returns invalid values for a few cases like NULL for uint
-            //and not respecting locale for date validation
+            //converter.IsValid only works since .NET4 but still returns invalid values for a few cases like NULL
+            //for uint and not respecting locale for date validation
             try
             {
                 return (T)TypeDescriptor.GetConverter(typeof(T)).ConvertFrom(value.ToString());

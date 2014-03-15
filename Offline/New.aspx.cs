@@ -10,6 +10,11 @@ namespace Mygod.Skylark.Offline
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             Path = RouteData.GetRelativePath();
         }
 

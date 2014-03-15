@@ -1,0 +1,86 @@
+.left {
+    text-align: left;
+}
+
+.center, .screenshots {
+    text-align: center;
+}
+
+.right {
+    text-align: right;
+}
+
+img {
+    max-width: 100%;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.screenshots img {
+    max-height: 100px;
+}
+
+.archived {
+    background-color: #eee;
+    display: none;
+}
+
+.nightly {
+    background-color: #adff2f;
+    display: none;
+}
+
+.image-button {
+    display: inline-block;
+    width: 392px !important;
+    padding: 10px !important;
+    height: auto !important;
+    color: white !important;
+    box-shadow: inset 0px 0px 1px #FFFFCC;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.image-button:hover {
+    outline: 3px #9f9f9f solid;
+}
+.image-button img {
+    display: inline-block !important;
+    position: relative !important;
+    width: 70px !important;
+    height: 60px !important;
+    right: auto !important;
+    border: 0 !important;
+    padding: 0 10px 0 0 !important;
+    float: left !important;
+}
+.image-button > div {
+    display: inline-block !important;
+    width: 300px !important;
+}
+.image-button small {
+  color: #dddddd !important;
+}
+
+.ellipsis {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.product-container {
+    text-align: left;
+    display: inline-block;
+}
+
+#player {
+    height: 0;
+    left: -5000px;
+    position: absolute;
+    top: -5000px;
+    width: 0;
+}

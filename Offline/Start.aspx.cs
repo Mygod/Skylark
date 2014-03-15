@@ -7,6 +7,11 @@ namespace Mygod.Skylark.Offline
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             var url = Rbase64.Decode(Request.QueryString["Url"].UrlDecode());
             var relativePath = RouteData.GetRelativePath();
             if (!string.IsNullOrWhiteSpace(url)) OfflineDownloadTask.Create(url, relativePath);

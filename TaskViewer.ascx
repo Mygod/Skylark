@@ -1,6 +1,4 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TaskViewer.ascx.cs" Inherits="Mygod.Skylark.TaskViewer" %>
-<%@ Import Namespace="Mygod.Skylark" %>
-<%@ Import Namespace="System.Globalization" %>
 <asp:UpdatePanel runat="server">
     <ContentTemplate>
         <asp:Timer runat="server" Interval="1000" />
@@ -56,24 +54,24 @@
             : string.Format("<a href=\"/Browse/{0}\">{0}</a>", multipleFilesTask.CurrentFile) %></div>
         <div>文件数量：　　<%=multipleFilesTask.FileCount.HasValue
                                 ? multipleFilesTask.FileCount.Value.ToString(CultureInfo.InvariantCulture)
-                                : Unknown %></div>
+                                : Helper.Unknown %></div>
         <div>已处理文件数：<%=multipleFilesTask.ProcessedFileCount %></div>
         <%
             }
         %>
         <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
-                                ? Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
-        <div>已处理大小：　<%=Task == null ? Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
+                                ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
+        <div>已处理大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
         <div>平均处理速度：<%=Task == null || !Task.SpeedFileLength.HasValue
-                            ? Unknown : Helper.GetSize(Task.SpeedFileLength.Value) %>&nbsp;每秒</div>
+                            ? Helper.Unknown : Helper.GetSize(Task.SpeedFileLength.Value) %>&nbsp;每秒</div>
         <div>开始时间：　　<%=Task == null || !Task.StartTime.HasValue
-                                ? Unknown : Task.StartTime.Value.ToChineseString() %></div>
+                                ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
         <div>花费时间：　　<%=Task == null || !Task.SpentTime.HasValue
-                                ? Unknown : Task.SpentTime.Value.ToString("G") %></div>
+                                ? Helper.Unknown : Task.SpentTime.Value.ToString("G") %></div>
         <div>预计剩余时间：<%=NeverEnds ? "永远" : Task == null || !Task.PredictedRemainingTime.HasValue
-                                ? Unknown : Task.PredictedRemainingTime.Value.ToString("G") %></div>
+                                ? Helper.Unknown : Task.PredictedRemainingTime.Value.ToString("G") %></div>
         <div>预计结束时间：<%=NeverEnds ? "地球毁灭时" : Task == null || !Task.PredictedEndTime.HasValue
-                                ? Unknown : Task.PredictedEndTime.Value.ToChineseString() %></div>
+                                ? Helper.Unknown : Task.PredictedEndTime.Value.ToChineseString() %></div>
         <div class="progress-bar">
             <%-- ReSharper disable UnexpectedValue --%>
             <div class="bar" style="width: <%=Task == null || !Task.Percentage.HasValue

@@ -6,7 +6,6 @@ namespace Mygod.Skylark
     {
         protected CloudTask Task;
         protected bool NeverEnds;
-        protected const string Unknown = "未知";
 
         public void SetTask(CloudTask task)
         {

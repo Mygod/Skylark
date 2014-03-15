@@ -33,6 +33,17 @@ $.base64reversed = {
     }
 };
 
+function hideParent() {
+    $(event.target).parent().hide();
+}
+
+if (typeof String.prototype.startsWith != 'function') {
+    // see below for better implementation!
+    String.prototype.startsWith = function (str) {
+        return this.indexOf(str) == 0;
+    };
+}
+
 var uriParser = /^(.*)\/(Browse|Download|Offline\/New|Offline\/NiGuan|Offline\/Start|Upload|View)\/(.*)(\?.*)?$/i;
 
 function changePath() {
@@ -41,6 +52,9 @@ function changePath() {
     if (result) location.href = RegExp.$1 + "/" + RegExp.$2 + "/" + result + RegExp.$4;
 }
 
-function hideParent() {
-    $(event.target).parent().hide();
+function login() {
+    var psw = prompt('请输入您的密码：', '');
+    if (!psw) return;
+    $.cookie('Password', CryptoJS.SHA512(psw));
+    location.reload();
 }

@@ -1,8 +1,5 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/FileSystem.Master" AutoEventWireup="true" CodeBehind="Browse.aspx.cs" Inherits="Mygod.Skylark.Browse" %>
 <%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
-<%@ Import Namespace="System.IO" %>
-<%@ Import Namespace="Mygod.Skylark" %>
-<%@ Import Namespace="Mygod.Xml.Linq" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <link href="/plugins/fineuploader/fineuploader-3.5.0.css" rel="stylesheet" />
     <style type="text/css">
@@ -11,6 +8,11 @@
         }
     </style>
     <script type="text/javascript">
+        function pickCore(text, defaultText) {
+            var result = prompt(text, defaultText);
+            if (result) $("#Hidden").val(result);
+            return !!result;
+        }
         function pickFolderCore(stripExtension) {
             uriParser.exec(location.href);
             var target = unescape(RegExp.$3);
@@ -21,11 +23,6 @@
             if ($("input:checked").length == 0) return true;
             return pickFolderCore();
         }
-        function pickCore(text, defaultText) {
-            var result = prompt(text, defaultText);
-            if (result) $("#Hidden").val(result);
-            return !!result;
-        }
     </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
@@ -34,7 +31,13 @@
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
             <div id="manual-fine-uploader"></div>
-            <div>该目录下有&nbsp;<%=DirectoryCount %>&nbsp;个目录，<%=FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）</div>
+            <div>
+                该目录下有
+                <%= DirectoryCount %>
+                个目录，<%= FileCount %>&nbsp;个文件，当前选中
+                <span id="selected-count">0</span>
+                个项目。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）
+            </div>
             <script src="/plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
             <script type="text/javascript">
                 function updateSelectedCount() {
@@ -89,7 +92,8 @@
                 }
                 var appParser = /^http:\/\/(.*?)\/Browse\/(.*?)$/;
                 function pickApp() {
-                    var result = prompt("请输入目标云雀：（请使用“http://……/Browse/……”的格式）", "http://skylark.apphb.com/Browse/");
+                    var result = prompt("请输入目标云雀：（请使用“http://……/Browse/……”的格式）",
+                                        "http://skylark.apphb.com/Browse/");
                     if (appParser.test(result)) {
                         $("#Hidden").val(result);
                         return true;
@@ -97,13 +101,13 @@
                     return false;
                 }
                 function pickFtp() {
-                    return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，你的用户名和密码不会被保留，" +
-                        "也不会在上传进度上显示）", "");
+                    return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，" +
+                                    "你的用户名和密码不会被保留，也不会在上传进度上显示）", "");
                 }
                 var manualuploader = new qq.FineUploader({
                     element: $('#manual-fine-uploader')[0],
                     request: {
-                        endpoint: '/Upload/<%=RelativePath.Replace("'", @"\'") %>'
+                        endpoint: '/Upload/<%= RelativePath.Replace("'", @"\'") %>'
                     },
                     autoUpload: true,
                     text: {
@@ -112,22 +116,32 @@
                 });
             </script>
             <div>
-                <asp:LinkButton runat="server" Text="[新建文件夹]" OnClick="NewFolder" OnClientClick="return newFolder();" />
-                <a href="/Offline/New/<%=RelativePath %>">[新建离线下载任务]</a>
                 <a href="javascript:doSelectAll();">[全选]</a>
                 <a href="javascript:invertSelection();">[反选]</a>
-                <a href="javascript:showCompressConfig();">[压缩选中项]</a>
+                <% if (CurrentUser.Download)
+                   { %>
                 <a href="javascript:getDownloadLink();">[生成下载链接]</a>
+                <% }
+                   if (CurrentUser.OperateFiles)
+                   { %>
+                <asp:LinkButton runat="server" Text="[新建文件夹]" OnClick="NewFolder"
+                                OnClientClick="return newFolder();" />
                 <asp:LinkButton runat="server" Text="[移动到]" OnClick="Move" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[复制到]" OnClick="Copy" OnClientClick="return pickFolder();" />
                 <asp:LinkButton runat="server" Text="[删除]" OnClick="Delete"
                                 OnClientClick="return deleteConfirm();" />
+                <%     if (CurrentUser.OperateTasks)
+                       { %>
+                <a href="/Offline/New/<%= RelativePath %>">[新建离线下载任务]</a>
+                <a href="javascript:showCompressConfig();">[压缩选中项]</a>
                 <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy"
                                 OnClientClick="return pickApp();" />
                 <asp:LinkButton runat="server" Text="[上传到 FTP]" OnClick="FtpUpload"
                                 OnClientClick="return pickFtp();" />
                 <asp:LinkButton runat="server" Text="[离线下载选中种子]" OnClick="BitTorrentDownload"
                                 OnClientClick="return pickFolderCore(true);" />
+                <%     }
+                   } %>
             </div>
             <div id="running-result" style="display: none;">
                 <a href="javascript:hideParent();">[隐藏]</a><br />
@@ -154,16 +168,23 @@
                     <ItemTemplate>
                         <tr>
                             <td class="nowrap">
-                                <asp:CheckBox ID="Check" runat="server" Text=' <img src="/Image/Directory.png" alt="目录" />' />
+                                <asp:CheckBox ID="Check" runat="server"
+                                              Text=' <img src="/Image/Directory.png" alt="目录" />' />
                             </td>
                             <td><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
                             <td class="nowrap">&lt;DIR&gt;</td>
-                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(
-                                               FileHelper.Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %></td>
+                            <td class="nowrap">
+                                <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
+                                    .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
+                            </td>
                             <td class="nowrap">
                                 <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
+                                <%  if (CurrentUser.OperateFiles)
+                                    { %>
                                 <asp:LinkButton ID="LinkButton4" runat="server" Text="[重命名]" CommandName="Rename"
-                                                OnClientClick='<%#string.Format("return rename(\"{0}\");", Eval("Name"))%>' />
+                                                OnClientClick='<%#string.Format("return rename(\"{0}\");",
+                                                                                Eval("Name"))%>' />
+                                <%  } %>
                             </td>
                         </tr>
                     </ItemTemplate>
@@ -172,21 +193,29 @@
                     <ItemTemplate>
                         <tr>
                             <td class="nowrap">
-                                <asp:CheckBox ID="Check" runat="server" Text='<%#FileHelper.IsReady(
-                                    FileHelper.GetDataFilePath(FileHelper.Combine(RelativePath, Eval("Name").ToString())))
+                                <asp:CheckBox ID="Check" runat="server" Text='<%#
+                                    FileHelper.IsReady(FileHelper.GetDataFilePath(FileHelper.Combine(RelativePath,
+                                        Eval("Name").ToString())))
                                         ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
                                         : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>' />
                             </td>
                             <td><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
-                            <td class="nowrap"><%#Helper.GetSize(FileHelper.GetFileSize(
-                                               FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %></td>
-                            <td class="nowrap"><%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(
-                                               FileHelper.Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %></td>
+                            <td class="nowrap">
+                                <%#Helper.GetSize(FileHelper.GetFileSize(
+                                                  FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %>
+                            </td>
+                            <td class="nowrap">
+                                <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
+                                    .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
+                            </td>
                             <td class="nowrap">
                                 <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
+                                <% if (CurrentUser.OperateFiles)
+                                   { %>
                                 <asp:LinkButton ID="LinkButton5" runat="server" Text="[重命名]" CommandName="Rename"
-                                                OnClientClick='<%#string.Format("return rename(\"{0}\");", Eval("Name"))%>' />
-
+                                                OnClientClick='<%#string.Format("return rename(\"{0}\");",
+                                                                                Eval("Name"))%>' />
+                                <% } %>
                             </td>
                         </tr>
                     </ItemTemplate>
@@ -214,18 +243,30 @@
             <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
             <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
             <div>
-                默认类型：<%=GetMimeType(Mime) %><asp:LinkButton runat="server" Text="[修改]" OnClick="ModifyMime"
-                    OnClientClick="return modifyMime();" />
+                默认类型：<%=GetMimeType(Mime) %><% if (CurrentUser.OperateFiles)
+                   { %><asp:LinkButton runat="server" Text="[修改]" OnClick="ModifyMime"
+                                OnClientClick="return modifyMime();" />
+                <% } %>
             </div>
             <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
             <div>自定义 MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
             <div>
-                <a href="/Edit/<%=RelativePath %>" target="_blank">[以纯文本格式编辑]</a>
-                <a href="/View/<%=RelativePath %>" target="_blank">[使用默认类型查看]</a>
-                <a href="/Download/<%=RelativePath %>" target="_blank">[下载链接]</a>
+                <% if (CurrentUser.Download)
+                   { %>
+                <a href="/View/<%= RelativePath %>" target="_blank">[使用默认类型查看]</a>
+                <a href="/Download/<%= RelativePath %>" target="_blank">[下载链接]</a>
                 <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
-                <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress" OnClientClick="return pickFolderCore(true);" />
+                <% } %>
+                <% if (CurrentUser.OperateFiles)
+                   { %>
+                <a href="/Edit/<%= RelativePath %>" target="_blank">[以纯文本格式编辑]</a>
+                <%     if (CurrentUser.OperateTasks)
+                       { %>
+                <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress"
+                                OnClientClick="return pickFolderCore(true);" />
                 <a href="javascript:showConvert();">[转换媒体文件格式]</a>
+                <%     }
+                   } %>
             </div>
             <div id="convert-form" style="display: none;">
                 <div>输出路径：（重名将被忽略）</div>
@@ -254,7 +295,9 @@
                 <div><asp:TextBox ID="ConvertStartBox" runat="server"></asp:TextBox></div>
                 <div>结束位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示到视频结束为止）</div>
                 <div><asp:TextBox ID="ConvertEndBox" runat="server"></asp:TextBox></div>
-                <div class="center"><asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" /></div>
+                <div class="center">
+                    <asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" />
+                </div>
             </div>
         </asp:View>
         <asp:View runat="server" ID="FileProcessingView">

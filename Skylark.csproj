@@ -42,25 +42,31 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Admin.aspx" />
     <Content Include="Api.aspx" />
+    <Content Include="css\site.css" />
+    <None Include="Data\Banner.png.data" />
+    <None Include="Data\readme.htm.data" />
     <Content Include="Edit.aspx" />
-    <Content Include="Files\Banner.png" />
+    <None Include="Data\Site.config" />
+    <None Include="Files\Banner.png" />
     <Content Include="Forbidden.aspx" />
     <Content Include="plugins\7z.dll" />
     <Content Include="plugins\BackgroundRunner.exe" />
     <Content Include="Browse.aspx" />
     <Content Include="css\modern-responsive.css" />
     <Content Include="css\modern.css" />
-    <Content Include="css\theme-dark.css" />
     <Content Include="Default.aspx" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
-    <Content Include="Files\readme.txt" />
+    <None Include="Files\readme.htm" />
     <Content Include="Global.asax" />
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
@@ -69,72 +75,10 @@
     <Content Include="Offline\New.aspx" />
     <Content Include="Offline\Start.aspx" />
     <Content Include="Offline\YouTube.aspx" />
-    <Content Include="plugins\CryptoJS\aes-min.js" />
-    <Content Include="plugins\CryptoJS\aes.js" />
-    <Content Include="plugins\CryptoJS\cipher-core-min.js" />
-    <Content Include="plugins\CryptoJS\cipher-core.js" />
     <Content Include="plugins\CryptoJS\core-min.js" />
-    <Content Include="plugins\CryptoJS\core.js" />
     <Content Include="plugins\CryptoJS\enc-base64-min.js" />
-    <Content Include="plugins\CryptoJS\enc-base64.js" />
-    <Content Include="plugins\CryptoJS\enc-utf16-min.js" />
-    <Content Include="plugins\CryptoJS\enc-utf16.js" />
-    <Content Include="plugins\CryptoJS\evpkdf-min.js" />
-    <Content Include="plugins\CryptoJS\evpkdf.js" />
-    <Content Include="plugins\CryptoJS\format-hex-min.js" />
-    <Content Include="plugins\CryptoJS\format-hex.js" />
-    <Content Include="plugins\CryptoJS\hmac-min.js" />
-    <Content Include="plugins\CryptoJS\hmac.js" />
-    <Content Include="plugins\CryptoJS\lib-typedarrays-min.js" />
-    <Content Include="plugins\CryptoJS\lib-typedarrays.js" />
-    <Content Include="plugins\CryptoJS\md5-min.js" />
-    <Content Include="plugins\CryptoJS\md5.js" />
-    <Content Include="plugins\CryptoJS\mode-cfb-min.js" />
-    <Content Include="plugins\CryptoJS\mode-cfb.js" />
-    <Content Include="plugins\CryptoJS\mode-ctr-gladman-min.js" />
-    <Content Include="plugins\CryptoJS\mode-ctr-gladman.js" />
-    <Content Include="plugins\CryptoJS\mode-ctr-min.js" />
-    <Content Include="plugins\CryptoJS\mode-ctr.js" />
-    <Content Include="plugins\CryptoJS\mode-ecb-min.js" />
-    <Content Include="plugins\CryptoJS\mode-ecb.js" />
-    <Content Include="plugins\CryptoJS\mode-ofb-min.js" />
-    <Content Include="plugins\CryptoJS\mode-ofb.js" />
-    <Content Include="plugins\CryptoJS\pad-ansix923-min.js" />
-    <Content Include="plugins\CryptoJS\pad-ansix923.js" />
-    <Content Include="plugins\CryptoJS\pad-iso10126-min.js" />
-    <Content Include="plugins\CryptoJS\pad-iso10126.js" />
-    <Content Include="plugins\CryptoJS\pad-iso97971-min.js" />
-    <Content Include="plugins\CryptoJS\pad-iso97971.js" />
-    <Content Include="plugins\CryptoJS\pad-nopadding-min.js" />
-    <Content Include="plugins\CryptoJS\pad-nopadding.js" />
-    <Content Include="plugins\CryptoJS\pad-zeropadding-min.js" />
-    <Content Include="plugins\CryptoJS\pad-zeropadding.js" />
-    <Content Include="plugins\CryptoJS\pbkdf2-min.js" />
-    <Content Include="plugins\CryptoJS\pbkdf2.js" />
-    <Content Include="plugins\CryptoJS\rabbit-legacy-min.js" />
-    <Content Include="plugins\CryptoJS\rabbit-legacy.js" />
-    <Content Include="plugins\CryptoJS\rabbit-min.js" />
-    <Content Include="plugins\CryptoJS\rabbit.js" />
-    <Content Include="plugins\CryptoJS\rc4-min.js" />
-    <Content Include="plugins\CryptoJS\rc4.js" />
-    <Content Include="plugins\CryptoJS\ripemd160-min.js" />
-    <Content Include="plugins\CryptoJS\ripemd160.js" />
-    <Content Include="plugins\CryptoJS\sha1-min.js" />
-    <Content Include="plugins\CryptoJS\sha1.js" />
-    <Content Include="plugins\CryptoJS\sha224-min.js" />
-    <Content Include="plugins\CryptoJS\sha224.js" />
-    <Content Include="plugins\CryptoJS\sha256-min.js" />
-    <Content Include="plugins\CryptoJS\sha256.js" />
-    <Content Include="plugins\CryptoJS\sha3-min.js" />
-    <Content Include="plugins\CryptoJS\sha3.js" />
-    <Content Include="plugins\CryptoJS\sha384-min.js" />
-    <Content Include="plugins\CryptoJS\sha384.js" />
     <Content Include="plugins\CryptoJS\sha512-min.js" />
-    <Content Include="plugins\CryptoJS\sha512.js" />
-    <Content Include="plugins\CryptoJS\tripledes-min.js" />
-    <Content Include="plugins\CryptoJS\tripledes.js" />
     <Content Include="plugins\CryptoJS\x64-core-min.js" />
-    <Content Include="plugins\CryptoJS\x64-core.js" />
     <Content Include="plugins\ffmpeg\avcodec-55.dll" />
     <Content Include="plugins\ffmpeg\avdevice-55.dll" />
     <Content Include="plugins\ffmpeg\avfilter-3.dll" />
@@ -152,6 +96,7 @@
     <Content Include="plugins\fineuploader\loading.gif" />
     <Content Include="plugins\fineuploader\processing.gif" />
     <Content Include="plugins\jquery\jquery-2.0.3.min.js" />
+    <Content Include="plugins\jquery\jquery.cookie.js" />
     <Content Include="plugins\MonoTorrent.Dht.dll" />
     <Content Include="plugins\MonoTorrent.Dht.pdb" />
     <Content Include="plugins\MonoTorrent.dll" />
@@ -170,6 +115,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin.aspx.cs">
+      <DependentUpon>Admin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Admin.aspx.designer.cs">
+      <DependentUpon>Admin.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Api.aspx.cs">
       <DependentUpon>Api.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -321,13 +273,10 @@
     <Content Include="FileSystem.master" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Data\readme.txt.data" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Data\Banner.png.data" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="plugins\jquery\jquery-2.0.3.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Data\Site.privileges" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

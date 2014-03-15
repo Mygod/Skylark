@@ -9,6 +9,11 @@ namespace Mygod.Skylark
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().OperateFiles)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             try
             {
                 foreach (var file in Request.Files.AllKeys.Select(key => Request.Files[key]))

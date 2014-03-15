@@ -30,8 +30,6 @@ audio,
 canvas,
 video {
   display: inline-block;
-  *display: inline;
-  *zoom: 1;
 }
 /*
  * Prevents modern browsers from displaying 'audio' without controls
@@ -76,7 +74,7 @@ button,
 input,
 select,
 textarea {
-  font-family: 微软雅黑, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", sans-serif;
 }
 /*
  * Addresses margins handled incorrectly in IE6/7
@@ -177,7 +175,6 @@ code,
 kbd,
 samp {
   font-family: monospace, serif;
-  _font-family: 'courier new', monospace;
   font-size: 1em;
 }
 /*
@@ -313,10 +310,6 @@ legend {
   padding: 0;
   white-space: normal;
   /* 2 */
-
-  *margin-left: -7px;
-  /* 3 */
-
 }
 /*
  * 1. Corrects font size not being inherited in all browsers
@@ -335,10 +328,6 @@ textarea {
 
   vertical-align: baseline;
   /* 3 */
-
-  *vertical-align: middle;
-  /* 3 */
-
 }
 /*
  * Addresses FF3/4 setting line-height on 'input' using !important in the UA stylesheet
@@ -364,10 +353,6 @@ input[type="submit"] {
 
   -webkit-appearance: button;
   /* 2 */
-
-  *overflow: visible;
-  /* 3 */
-
 }
 /*
  * Re-set default cursor for disabled elements
@@ -389,13 +374,6 @@ input[type="radio"] {
 
   padding: 0;
   /* 2 */
-
-  *height: 13px;
-  /* 3 */
-
-  *width: 13px;
-  /* 3 */
-
 }
 /*
  * 1. Addresses appearance set to searchfield in S5, Chrome
@@ -532,9 +510,6 @@ table {
 .nrm {
   margin-right: 0 !important;
 }
-.clearfix {
-  *zoom: 1;
-}
 .clearfix:before,
 .clearfix:after {
   display: table;
@@ -584,7 +559,7 @@ table {
   content: "\e08a";
   color: #fff;
   right: 4px;
-  font-family: 微软雅黑, iconFont;
+  font-family: "微软雅黑 Light", "微软雅黑", iconFont;
   z-index: 1002;
 }
 .border {
@@ -603,7 +578,7 @@ Icon Set:	IcoMoon - Free -- http://keyamoon.com/icomoon/
 License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
 */
 @font-face {
-  font-family: 微软雅黑, 'iconFont';
+  font-family: 'iconFont';
   src: url('../fonts/iconFont.eot');
   src: url('../fonts/iconFont.eot?#iefix') format('embedded-opentype'), url('../fonts/iconFont.svg#iconFont') format('svg'), url('../fonts/iconFont.woff') format('woff'), url('../fonts/iconFont.ttf') format('truetype');
   font-weight: normal;
@@ -611,7 +586,7 @@ License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
 }
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
 [data-icon]:before {
-  font-family: 微软雅黑, 'iconFont';
+  font-family: 'iconFont';
   content: attr(data-icon);
   speak: none;
   font-weight: normal;
@@ -624,7 +599,7 @@ License:	CC BY-SA 3.0 -- http://creativecommons.org/licenses/by-sa/3.0/
 /* Use the following CSS code if you want to have a class per icon */
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  font-family: 微软雅黑, 'iconFont';
+  font-family: 'iconFont';
   font-style: normal;
   speak: none;
   font-weight: normal;
@@ -2065,7 +2040,7 @@ li .icon-large:before {
   color: rgba(0, 0, 0, 0.4);
 }
 #font .header {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 42pt;
   letter-spacing: 0.00em;
@@ -2074,7 +2049,7 @@ li .icon-large:before {
 }
 #font .subheader,
 #font .subheader-secondary {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 20pt;
   letter-spacing: 0.01em;
@@ -2083,7 +2058,7 @@ li .icon-large:before {
 }
 #font .subheader-smaller,
 #font .subheader-secondary-smaller {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   letter-spacing: 0.01em;
   line-height: 24pt;
@@ -2092,7 +2067,7 @@ li .icon-large:before {
 }
 #font .small-subheader,
 #font .small-subheader-secondary {
-  font-family: 微软雅黑, 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 600;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -2100,7 +2075,7 @@ li .icon-large:before {
   font-smooth: always;
 }
 #font .navigation {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -2110,7 +2085,7 @@ li .icon-large:before {
 #font .body,
 #font .body-secondary,
 #font .normal {
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -2118,32 +2093,32 @@ li .icon-large:before {
   font-smooth: always;
 }
 #font .link {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   font-smooth: always;
 }
 #font .tertiary,
 #font .tertiary-secondary {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
 }
 #font .control {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
 }
 #font .small {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 8pt;
   font-smooth: always;
 }
 #font .long-text {
-  font-family: 微软雅黑, 'PT Serif Caption', sans-serif, serif !important;
+  font-family: "微软雅黑 Light", "微软雅黑", 'PT Serif Caption', sans-serif, serif !important;
   font-weight: 300;
   font-size: 10pt;
   letter-spacing: 0.02em;
@@ -2151,7 +2126,7 @@ li .icon-large:before {
   font-smooth: always;
 }
 #font .long-text-smaller {
-  font-family: 微软雅黑, 'PT Serif Caption', sans-serif, serif !important;
+  font-family: "微软雅黑 Light", "微软雅黑", 'PT Serif Caption', sans-serif, serif !important;
   font-weight: 300;
   font-size: 10pt;
   letter-spacing: 0.02em;
@@ -2160,7 +2135,7 @@ li .icon-large:before {
   font-size: 9pt;
 }
 #font .long-text-lead {
-  font-family: 微软雅黑, 'PT Serif Caption', sans-serif, serif !important;
+  font-family: "微软雅黑 Light", "微软雅黑", 'PT Serif Caption', sans-serif, serif !important;
   font-weight: 300;
   font-size: 10pt;
   letter-spacing: 0.02em;
@@ -2227,7 +2202,7 @@ li .icon-large:before {
 }
 a,
 .link {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-smooth: always;
   color: #2e92cf;
@@ -2261,7 +2236,7 @@ h6 {
   padding: 0;
 }
 h1 {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 42pt;
   letter-spacing: 0.00em;
@@ -2276,7 +2251,7 @@ h1:active {
   color: rgba(0, 0, 0, 0.4);
 }
 h2 {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 20pt;
   letter-spacing: 0.01em;
@@ -2291,7 +2266,7 @@ h2:active {
   color: rgba(0, 0, 0, 0.4);
 }
 h3 {
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 20pt;
   letter-spacing: 0.01em;
@@ -2308,7 +2283,7 @@ h3:active {
   color: rgba(0, 0, 0, 0.4);
 }
 h4 {
-  font-family: 微软雅黑, 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 600;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -2330,7 +2305,7 @@ h4:active {
   color: rgba(0, 0, 0, 0.4);
 }
 h5 {
-  font-family: 微软雅黑, 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 600;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -2346,7 +2321,7 @@ h5:active {
   color: rgba(0, 0, 0, 0.4);
 }
 h6 {
-  font-family: 微软雅黑, 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 600;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -2363,7 +2338,7 @@ h6:active {
 }
 body,
 p {
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -2371,7 +2346,7 @@ p {
   font-smooth: always;
 }
 p.long-text {
-  font-family: 微软雅黑, 'PT Serif Caption', sans-serif, serif !important;
+  font-family: "微软雅黑 Light", "微软雅黑", 'PT Serif Caption', sans-serif, serif !important;
   font-weight: 300;
   font-size: 10pt;
   letter-spacing: 0.02em;
@@ -2390,7 +2365,7 @@ p.indent:first-letter {
 }
 .tertiary-info-text,
 .tertiary-text {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -2406,7 +2381,7 @@ p.indent:first-letter {
 }
 .tertiary-info-secondary-text,
 .tertiary-secondary-text {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -2430,7 +2405,7 @@ abbr[title] {
 address {
   display: block;
   margin-bottom: 20px;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -2650,13 +2625,13 @@ ol.unstyled,
   text-align: right;
 }
 .page .page-header .page-header-content .user-login .name .first-name {
-  font-family: 微软雅黑, "Open Sans", sans-serif, sans;
+  font-family: "微软雅黑 Light", "微软雅黑", "Open Sans", sans-serif, sans;
   font-size: 18pt;
   display: block;
   margin: 0;
 }
 .page .page-header .page-header-content .user-login .name .last-name {
-  font-family: 微软雅黑, "Open Sans", sans-serif, sans;
+  font-family: "微软雅黑 Light", "微软雅黑", "Open Sans", sans-serif, sans;
   font-size: 10pt;
   display: block;
   margin: 0;
@@ -2823,7 +2798,7 @@ ol.unstyled,
 }
 button,
 .button {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -2910,16 +2885,16 @@ button.big,
   height: auto;
   color: #000;
   background-color: #ccc;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
   line-height: 20px;
   font-smooth: always;
 }
-.command-button  > small {
+.command-button  small {
   display: block;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -2928,11 +2903,11 @@ button.big,
   font-size: 10pt;
   color: #505050;
 }
-.command-button.default  > small {
+.command-button.default  small {
   color: #ccc;
 }
 .tool-button {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -3008,7 +2983,7 @@ button.big,
 }
 .toolbar a,
 .toolbar button {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -3138,7 +3113,7 @@ button.big,
 }
 .toolbar-vertical a,
 .toolbar-vertical button {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -3361,7 +3336,7 @@ a.shortcut .label {
   position: relative;
 }
 .pagination  > ul li a {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -3547,7 +3522,7 @@ table thead tr td {
   border-right: 1px #ddd solid;
   border-left: 1px transparent solid;
   border-top: 1px transparent solid;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -3573,7 +3548,7 @@ table tbody tr {
   border: 1px #fff solid;
 }
 table tbody tr td {
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -3900,7 +3875,7 @@ th[class*="span"] {
   left: auto;
 }
 .dropdown-menu a {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -4204,7 +4179,7 @@ th[class*="span"] {
 }
 .side-nav ul .title {
   color: #4f4f4f;
-  font-family: 微软雅黑, Segoe UI, Arial, Verdana, Tahoma, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", Segoe UI, Arial, Verdana, Tahoma, sans-serif;
   font-size: 12pt;
   margin: 0 0 5px 0;
   border-bottom: 1px #ccc solid;
@@ -4243,7 +4218,7 @@ th[class*="span"] {
   margin-left: 7px;
 }
 .page-sidebar a {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -4405,7 +4380,7 @@ th[class*="span"] {
   float: none !important;
   width: 310px;
   height: 150px;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -4455,7 +4430,7 @@ th[class*="span"] {
 .replies  > div .reply .text,
 .replies  > li .reply .text,
 .replies  > span .reply .text {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -4611,7 +4586,7 @@ th[class*="span"] {
 .notices  > a .header {
   position: relative;
   background: transparent;
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 20pt;
   letter-spacing: 0.01em;
@@ -4633,7 +4608,7 @@ th[class*="span"] {
   margin-right: 50px;
   margin-left: 10px;
   color: #fff;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 8pt;
   font-smooth: always;
@@ -4746,15 +4721,15 @@ th[class*="span"] {
   display: block;
   float: left;
   background-color: #525252;
-  width: 150px;
-  height: 150px;
+  width: 120px;
+  height: 120px;
   cursor: pointer;
   box-shadow: inset 0px 0px 1px #FFFFCC;
   text-decoration: none;
   color: #ffffff;
   overflow: hidden;
   position: relative;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -4776,7 +4751,7 @@ th[class*="span"] {
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -4814,7 +4789,7 @@ th[class*="span"] {
   color: #ffffff;
 }
 .tile .tile-content p {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -4838,12 +4813,12 @@ th[class*="span"] {
 }
 .tile.icon  > .tile-content  > img {
   position: absolute;
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   top: 50%;
   left: 50%;
-  margin-left: -32px;
-  margin-top: -32px;
+  margin-left: -36px;
+  margin-top: -45px;
 }
 .tile.icon  > .tile-content  > i {
   position: absolute;
@@ -4886,22 +4861,22 @@ th[class*="span"] {
   height: 100%;
 }
 .tile.double {
-  width: 310px;
+  width: 250px;
 }
 .tile.triple {
-  width: 470px;
+  width: 380px;
 }
 .tile.quadro {
-  width: 630px;
+  width: 510px;
 }
 .tile.double-vertical {
-  height: 310px;
+  height: 250px;
 }
 .tile.triple-vertical {
-  height: 470px;
+  height: 380px;
 }
 .tile.quadro-vertical {
-  height: 630px;
+  height: 510px;
 }
 .tile .brand,
 .tile .tile-status {
@@ -4927,17 +4902,16 @@ th[class*="span"] {
 .tile .brand  > .badge,
 .tile .tile-status  > .badge {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 1px;
   right: 5px;
   margin-bottom: 0;
   color: #ffffff;
-  width: 34px;
-  height: 28px;
+  min-width: 34px;
+  height: 26px;
   text-align: center;
-  font-family: 微软雅黑, 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semibold', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 600;
-  font-size: 11pt;
+  font-size: 10pt;
   letter-spacing: 0.01em;
   line-height: 14pt;
   font-smooth: always;
@@ -4994,7 +4968,7 @@ th[class*="span"] {
   left: 0;
   margin-bottom: 5px;
   margin-left: 15px;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -5035,7 +5009,7 @@ th[class*="span"] {
   left: 8px;
   top: 5px;
   right: 50px;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -5057,7 +5031,7 @@ th[class*="span"] {
   color: #ffffff;
 }
 .tile:hover {
-  outline: 3px #3a3a3a solid;
+  outline: 3px #5b9ee3 solid;
 }
 /*
  * Metro UI CSS
@@ -5106,7 +5080,7 @@ th[class*="span"] {
   margin-top: -6px;
   left: 0;
   margin-left: 4px;
-  font-family: 微软雅黑, iconFont;
+  font-family: "微软雅黑 Light", "微软雅黑", iconFont;
 }
 .input-control.checkbox input[type="checkbox"]:not(:checked) ~ .helper:after {
   display: none;
@@ -5404,7 +5378,7 @@ th[class*="span"] {
 .input-control.password .btn-search:before {
   font-size: 12pt;
   position: absolute;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -5436,21 +5410,21 @@ th[class*="span"] {
   background: #ffffff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAXCAYAAADgKtSgAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzM2OTY1MjIwNkVGMTFFMjhDQkNEODZFQTYyRTI5MDciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzM2OTY1MjMwNkVGMTFFMjhDQkNEODZFQTYyRTI5MDciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDozMzU3NURCRDA2RUYxMUUyOENCQ0Q4NkVBNjJFMjkwNyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDozMzU3NURCRTA2RUYxMUUyOENCQ0Q4NkVBNjJFMjkwNyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PhJl5kAAAAEMSURBVHja7FXtEYIwDKVO0BE6AiPoBDICo7BBR9AVnMARcIOyAWxQk6PlakwC/uC888zdOwpJXl/SD0yMsdrLDtWO9h1yY4wDeEAARIKQfE7InQfY8xJgFnBB10ZgrCUc85N8rAHjB8QZmFNTcpNfoBQkvifl2SbAFXAjlZ8BLRN7Ar4HtmVRnoKo4o6Wy7SvYyqwL21hetxKpMwkLbMGS3sccfqtxMUEnnC4TO5pWSSxAYQiBscN06KRCkTrJdWJWNohjaK+X3ZNgSNJCAp50ITgN+2E2rQeklHf9MYh3YqJfNTuDsg10vFXlYMTlQwK97B6c61ssc0Lunq3KBOoW1EiN/8/0W+RPwUYACoftglrEejbAAAAAElFTkSuQmCC) 50% no-repeat;
 }
 .input-control.text .helper:before {
-  font-family: 微软雅黑, iconFont;
+  font-family: "微软雅黑 Light", "微软雅黑", iconFont;
   font-size: 12px;
   content: "\e089";
   left: 7px;
   top: 3px;
 }
 .input-control.text .btn-search:before {
-  font-family: 微软雅黑, iconFont;
+  font-family: "微软雅黑 Light", "微软雅黑", iconFont;
   font-size: 12px;
   content: "\e041";
   left: 7px;
   top: 3px;
 }
 label {
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -5468,7 +5442,7 @@ fieldset {
 fieldset legend {
   padding-left: 10px;
   padding-right: 10px;
-  font-family: 微软雅黑, 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -5482,7 +5456,7 @@ fieldset legend {
 input[type=button],
 input[type=reset],
 input[type=submit] {
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -5695,13 +5669,13 @@ input[type=submit] {
   margin-bottom: 10px;
   cursor: pointer;
   background: #fff;
-  font-family: 微软雅黑, 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Light', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 200;
   font-size: 20pt;
   letter-spacing: 0.01em;
   line-height: 24pt;
   font-smooth: always;
-  font-family: 微软雅黑, Tahoma, Arial, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", Tahoma, Arial, sans-serif;
   line-height: 18pt;
 }
 .card:hover {
@@ -5840,6 +5814,7 @@ input[type=submit] {
 code,
 pre {
   padding: 0 3px 2px;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI Semilight', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 300;
   font-size: 11pt;
   letter-spacing: 0.02em;
@@ -5850,6 +5825,7 @@ pre {
 }
 code {
   padding: 2px 4px;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 9pt;
   font-smooth: always;
@@ -5947,7 +5923,7 @@ pre code {
   float: left;
   padding: 5px 10px;
   color: #1e1e1e;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -6016,7 +5992,7 @@ pre code {
   background-color: rgba(217, 217, 217, 0.16);
   padding-left: 36px;
   padding-top: 5px;
-  font-family: 微软雅黑, 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
+  font-family: "微软雅黑 Light", "微软雅黑", 'Segoe UI', 'Open Sans', Verdana, Arial, Helvetica, sans-serif;
   font-weight: 400;
   font-size: 11pt;
   letter-spacing: 0.01em;
@@ -6381,7 +6357,7 @@ pre code {
   color: #fff;
   right: 4px;
   top: 0;
-  font-family: 微软雅黑, iconFont;
+  font-family: "微软雅黑 Light", "微软雅黑", iconFont;
   z-index: 1002;
   display: block;
 }
@@ -6516,24 +6492,4 @@ pre code {
 }
 #dialogBox {
     max-width: 800px;
-}
-
-.center, .screenshots {
-    text-align: center;
-}
-
-.right {
-    text-align: right;
-}
-
-img {
-    max-width: 100%;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.nowrap {
-    white-space: nowrap;
 }

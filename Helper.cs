@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
+using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml.Linq;
@@ -19,7 +22,8 @@ namespace Mygod.Skylark
 {
     public static partial class Helper
     {
-        private static readonly string[] Units = { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
+        private static readonly string[]
+            Units = { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
         public static string GetSize(long size)
         {
             double byt = size;
@@ -57,7 +61,7 @@ namespace Mygod.Skylark
             }
         }
 
-        public static IEnumerable<string> GetSelectedFiles(this RepeaterItemCollection collection)
+        public static IEnumerable<string> GetSelectedItemsID(this RepeaterItemCollection collection)
         {
             return from RepeaterItem item in collection where ((CheckBox) item.FindControl("Check")).Checked
                    select ((HtmlInputHidden)item.FindControl("Hidden")).Value;
@@ -77,13 +81,25 @@ namespace Mygod.Skylark
         }
         public static string ToChineseString(this DateTime? value, bool offset = true)
         {
-            return value.HasValue ? value.Value.ToChineseString(offset) : "未知";
+            return value.HasValue ? value.Value.ToChineseString(offset) : Unknown;
+        }
+        public static string ToChineseString(this TimeSpan? value)
+        {
+            return value.HasValue ? value.Value.ToString("G") : Unknown;
         }
 
         public static bool IsAjaxRequest(this HttpRequest request)
         {
             var header = request.Headers["X-Requested-With"];
             return header != null && header == "XMLHttpRequest";
+        }
+
+        public static User GetUser(this HttpRequest request)
+        {
+            var cookie = request.Cookies["Password"];
+            var temp = new Privileges();
+            var psw = cookie != null && temp.Contains(cookie.Value) ? cookie.Value : "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
+            return temp.Contains(psw) ? temp[psw] : null;
         }
     }
 
@@ -182,18 +198,17 @@ namespace Mygod.Skylark
 
         public static void CancelControl(string dataPath)
         {
-            if (File.Exists(dataPath))
+            if (Directory.Exists(dataPath))
             {
-                if (!dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture)) return;    // ignore non-data files
-                var element = GetElement(dataPath);
-                if (element.GetAttributeValue("state") != TaskType.NoTask)
-                {
-                    var pid = element.GetAttributeValueWithDefault<int>("pid");
-                    if (pid != 0) CloudTask.KillProcess(pid);
-                }
-            }
-            else if (Directory.Exists(dataPath))
                 foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath)) CancelControl(stuff);
+                return;
+            }
+            if (!File.Exists(dataPath) || !dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture))
+                return; // ignore non-data files
+            var element = GetElement(dataPath);
+            if (element.GetAttributeValue("state") == TaskType.NoTask) return;
+            var pid = element.GetAttributeValueWithDefault<int>("pid");
+            if (pid != 0) CloudTask.KillProcess(pid);
         }
         public static void CreateDirectory(string path)
         {
@@ -352,12 +367,12 @@ namespace Mygod.Skylark
     {
         public static string Encode(string value)
         {
-            return LinkConverter.Base64Encode(LinkConverter.Reverse(value));
+            return LinkConverter.Base64Encode(LinkConverter.Reverse(value), Encoding.UTF8);
         }
 
         public static string Decode(string value)
         {
-            return LinkConverter.Reverse(LinkConverter.Base64Decode(value));
+            return LinkConverter.Reverse(LinkConverter.Base64Decode(value, Encoding.UTF8));
         }
     }
 
@@ -465,6 +480,115 @@ namespace Mygod.Skylark
             {
                 return "分析失败。";
             }
+        }
+    }
+
+    public sealed class User
+    {
+        private static char Tf(bool tf)
+        {
+            return tf ? 'T' : 'F';
+        }
+
+        public User(XElement user)
+        {
+            user.GetAttributeValue(out Password, "password");
+            user.GetAttributeValue(out Comment, "comment");
+            user.GetAttributeValueWithDefault(out Browse, "browse");
+            user.GetAttributeValueWithDefault(out Download, "download");
+            OperateTasks = (OperateFiles = user.GetAttributeValueWithDefault<bool>("operateFiles"))
+                                && user.GetAttributeValueWithDefault<bool>("operateTasks");
+            user.GetAttributeValueWithDefault(out Admin, "admin");
+        }
+        public User(string value)
+        {
+            var columns = value.Split(',');
+            Password = columns[0];
+            Comment = Rbase64.Decode(columns[1]);
+            Browse = columns[2][0] == 'T';
+            Download = columns[2][1] == 'T';
+            OperateTasks = (OperateFiles = columns[2][2] == 'T') && columns[2][3] == 'T';
+            Admin = columns[2][4] == 'T';
+        }
+
+        public readonly string Password, Comment;
+        public readonly bool Browse, Download, OperateFiles, OperateTasks, Admin;
+
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2}{3}{4}{5}{6}", Password, Rbase64.Encode(Comment),
+                                 Tf(Browse), Tf(Download), Tf(OperateFiles), Tf(OperateTasks), Tf(Admin));
+        }
+        public XElement ToElement()
+        {
+            return new XElement("user", new XAttribute("password", Password), new XAttribute("comment", Comment),
+                                new XAttribute("browse", Browse), new XAttribute("download", Download),
+                                new XAttribute("operateFiles", OperateFiles),
+                                new XAttribute("operateTasks", OperateTasks), new XAttribute("admin", Admin));
+        }
+    }
+    public sealed class Privileges : KeyedCollection<string, User>
+    {
+        private static readonly string Path = HttpContext.Current.Server.MapPath("~/Data/Site.privileges");
+
+        private Privileges()
+        {
+        }
+        public Privileges(XContainer root)
+        {
+            foreach (var user in root.ElementsCaseInsensitive("user")) Add(new User(user));
+        }
+        public Privileges(string path = null) : this(XHelper.Load(path ?? Path).Root)
+        {
+        }
+
+        public static Privileges Parse(string value)
+        {
+            var result = new Privileges();
+            foreach (var line in value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                result.Add(new User(line));
+            return result;
+        }
+
+        protected override string GetKeyForItem(User item)
+        {
+            return item.Password;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(";", this);
+        }
+        public XElement ToElement()
+        {
+            return new XElement("privileges", this.Select(user => user.ToElement()));
+        }
+
+        public void Save(string path = null)
+        {
+            ToElement().Save(path ?? Path);
+        }
+    }
+
+    public sealed class Config
+    {
+        private static readonly string ConfigPath = FileHelper.GetDataPath("Site.config");
+        private readonly XElement element;
+
+        public Config()
+        {
+            element = FileHelper.GetElement(ConfigPath);
+        }
+
+        public string Root
+        {
+            get { return element.GetAttributeValue("root"); }
+            set { element.SetAttributeValue("root", value); }
+        }
+
+        public void Save()
+        {
+            element.Save(ConfigPath);
         }
     }
 }

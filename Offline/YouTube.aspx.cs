@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Web.UI;
 
 namespace Mygod.Skylark.Offline

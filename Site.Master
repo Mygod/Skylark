@@ -1,16 +1,17 @@
 ﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Mygod.Skylark.Site" %>
-<%@ Import Namespace="System.Globalization" %>
-<%@ Import Namespace="System.IO" %>
-<%@ Import Namespace="Mygod.Skylark" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
     <link href="/css/modern.css" rel="stylesheet" type="text/css" />
+    <link href="/css/site.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="/plugins/jquery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery/jquery.cookie.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
+    <script type="text/javascript" src="/plugins/CryptoJS/x64-core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>
+    <script type="text/javascript" src="/plugins/CryptoJS/sha512-min.js"></script>
     <script type="text/javascript" src="/javascript/generic.js"></script>
     <asp:ContentPlaceHolder ID="Head" runat="server">
     </asp:ContentPlaceHolder>
@@ -30,17 +31,22 @@
                                         Helper.GetSize(currentDrive.AvailableFreeSpace), 
                                         Helper.GetSize(currentDrive.TotalSize), 
                                         100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
-                <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
-                <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+                <div>当前工作义工：<a href="/Task/">[后台]</a> <%=TaskHelper.CurrentWorkers %></div>
+                <div>
+                    您的当前身份：<a href="javascript:login();">[修改]</a>
+                    <%=string.Format(User.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", User.Comment) %>
+                </div>
+                <asp:ContentPlaceHolder ID="Body" runat="server">
                 </asp:ContentPlaceHolder>
-                <% var version = CurrentAssembly.GetName().Version; %>
                 <div class="center">
                     Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
-                    <%=version.ToString(2) %> Albatross Pre-RTM (V<%=version %>)
+                    V<%=CurrentAssembly.GetName().Version %> Albatross Pre-RTM 2
                 </div>
             </div>
         </div>
     </div>
     </form>
+    <asp:ContentPlaceHolder ID="OuterForm" runat="server">
+    </asp:ContentPlaceHolder>
 </body>
 </html>

@@ -22,7 +22,7 @@ namespace Mygod.Skylark
     }
     public enum TaskStatus
     {
-        Terminated, Working, Error, Starting, Done
+        Terminated, Error, Starting, Working, Done
     }
     public abstract partial class CloudTask
     {
@@ -163,24 +163,26 @@ namespace Mygod.Skylark
             }
         }
 
-        public string GetStatus(string action, Action never)
+        private static readonly Regex ChineseSpaceTrimmer = new Regex(@"([\u4e00-\u9fa5]) ([\u4e00-\u9fa5])",
+                                                                      RegexOptions.Compiled);
+        public string GetStatus(string type = null, Action never = null)
         {
             switch (Status)
             {
                 case TaskStatus.Terminated:
-                    never();
+                    if (never != null) never();
                     return "已被终止（请删除后重新开始任务）";
                 case TaskStatus.Working:
-                    return "正在 " + action + " 中";
+                    return ChineseSpaceTrimmer.Replace("正在 " + (type ?? "进行") + " 中", "$1$2");
                 case TaskStatus.Error:
-                    never();
+                    if (never != null) never();
                     return "发生错误，具体信息：<br /><pre>" + ErrorMessage + "</pre>";
                 case TaskStatus.Starting:
                     return "正在开始";
                 case TaskStatus.Done:
-                    return action + " 完毕";
+                    return type + " 完毕";
                 default:
-                    return "未知";
+                    return Helper.Unknown;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace Mygod.Skylark
 {
@@ -7,6 +8,11 @@ namespace Mygod.Skylark
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            if (!Request.GetUser().Download)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
             string path = RouteData.GetRelativePath(), filePath = FileHelper.GetFilePath(path), 
                    dataPath = FileHelper.GetDataFilePath(path);
             if (!File.Exists(dataPath))
@@ -21,10 +27,8 @@ namespace Mygod.Skylark
                 FileHelper.WaitForReady(dataPath, timeout);
                 TransmitFile(filePath, Path.GetFileName(filePath));
             }
-            catch
+            catch (ThreadAbortException)
             {
-                Response.StatusCode = 503;
-                Response.StatusDescription = "File is not ready yet";
             }
         }
     }
