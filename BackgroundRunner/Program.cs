@@ -520,7 +520,8 @@ namespace Mygod.Skylark.BackgroundRunner
                                         && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture)
                                      select path)
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    var dir = Path.GetDirectoryName(file);
+                    if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
                     var retries = 5;
                     while (true)
                         try
