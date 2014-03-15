@@ -512,39 +512,42 @@ namespace Mygod.Skylark.BackgroundRunner
                 log.WriteLine("[{0}] 下载完成。解压中……", DateTime.UtcNow);
                 var extractor = new SevenZipExtractor(zipPath, InArchiveFormat.Zip);
                 var i = 0;
-                foreach (var file in from file in extractor.ArchiveFileData
-                                     where file.FileName != null && file.FileName.Length > 15
-                                     let path = file.FileName.Substring(15)
-                                     where !file.IsDirectory && !string.IsNullOrWhiteSpace(path)
-                                        && !path.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
-                                        && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture)
-                                     select path)
+                foreach (var file in extractor.ArchiveFileData)
                 {
-                    var dir = Path.GetDirectoryName(file);
-                    if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
-                    var retries = 5;
-                    while (true)
-                        try
+                    if (!file.IsDirectory && file.FileName != null && file.FileName.Length > 15)
+                    {
+                        var path = file.FileName.Substring(15);
+                        if (!string.IsNullOrWhiteSpace(path)
+                            && !path.StartsWith("Files\\", true, CultureInfo.InvariantCulture)
+                            && !path.StartsWith("Data\\", true, CultureInfo.InvariantCulture))
                         {
-                            using (var stream = new FileStream(file, FileMode.Create, FileAccess.Write,
-                                                               FileShare.Read)) extractor.ExtractFile(i, stream);
-                            break;
+                            var dir = Path.GetDirectoryName(path);
+                            if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
+                            var retries = 5;
+                            while (true)
+                                try
+                                {
+                                    using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write,
+                                        FileShare.Read)) extractor.ExtractFile(i, stream);
+                                    break;
+                                }
+                                catch (Exception exc)
+                                {
+                                    log.WriteLine("[{0}] 解压文件失败：{1}{2}错误详细信息：{3}", DateTime.UtcNow,
+                                                  file, Environment.NewLine, exc.GetMessage());
+                                    if (retries-- > 0)
+                                    {
+                                        log.WriteLine("[{0}] 将于 5 秒后重试。", DateTime.UtcNow);
+                                        Thread.Sleep(5000);
+                                    }
+                                    else
+                                    {
+                                        log.WriteLine("[{0}] 失败次数过多，果断弃坑。", DateTime.UtcNow);
+                                        break;
+                                    }
+                                }
                         }
-                        catch (Exception exc)
-                        {
-                            log.WriteLine("[{0}] 解压文件失败：{1}{2}错误详细信息：{3}", DateTime.UtcNow,
-                                          file, Environment.NewLine, exc.GetMessage());
-                            if (retries-- > 0)
-                            {
-                                log.WriteLine("[{0}] 将于 5 秒后重试。", DateTime.UtcNow);
-                                Thread.Sleep(5000);
-                            }
-                            else
-                            {
-                                log.WriteLine("[{0}] 失败次数过多，果断弃坑。", DateTime.UtcNow);
-                                break;
-                            }
-                        }
+                    }
                     i++;
                 }
                 log.WriteLine("[{0}] 更新完成。", DateTime.UtcNow);

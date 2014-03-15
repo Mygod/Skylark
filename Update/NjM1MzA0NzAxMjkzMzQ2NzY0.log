@@ -1,0 +1,244 @@
+﻿处理已开始，刷新此页面查看进度。
+[2014.3.15 8:48:49] 更新开始。下载更新包中……
+[2014.3.15 8:52:16] 下载完成。解压中……
+[2014.3.15 8:52:17] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:17] 将于 5 秒后重试。
+[2014.3.15 8:52:22] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:22] 将于 5 秒后重试。
+[2014.3.15 8:52:27] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:27] 将于 5 秒后重试。
+[2014.3.15 8:52:32] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:32] 将于 5 秒后重试。
+[2014.3.15 8:52:37] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:37] 将于 5 秒后重试。
+[2014.3.15 8:52:42] 解压文件失败：plugins\7z.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\7z.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:42] 失败次数过多，果断弃坑。
+[2014.3.15 8:52:42] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:42] 将于 5 秒后重试。
+[2014.3.15 8:52:47] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:47] 将于 5 秒后重试。
+[2014.3.15 8:52:52] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:52] 将于 5 秒后重试。
+[2014.3.15 8:52:57] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:52:57] 将于 5 秒后重试。
+[2014.3.15 8:53:02] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:02] 将于 5 秒后重试。
+[2014.3.15 8:53:07] 解压文件失败：plugins\BackgroundRunner.exe
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.exe”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:07] 失败次数过多，果断弃坑。
+[2014.3.15 8:53:07] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:07] 将于 5 秒后重试。
+[2014.3.15 8:53:12] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:12] 将于 5 秒后重试。
+[2014.3.15 8:53:17] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:17] 将于 5 秒后重试。
+[2014.3.15 8:53:22] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:22] 将于 5 秒后重试。
+[2014.3.15 8:53:27] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:27] 将于 5 秒后重试。
+[2014.3.15 8:53:32] 解压文件失败：plugins\BackgroundRunner.pdb
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\BackgroundRunner.pdb”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:32] 失败次数过多，果断弃坑。
+[2014.3.15 8:53:32] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:32] 将于 5 秒后重试。
+[2014.3.15 8:53:37] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:37] 将于 5 秒后重试。
+[2014.3.15 8:53:42] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:42] 将于 5 秒后重试。
+[2014.3.15 8:53:47] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:47] 将于 5 秒后重试。
+[2014.3.15 8:53:52] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:52] 将于 5 秒后重试。
+[2014.3.15 8:53:57] 解压文件失败：plugins\MygodLibrary.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\MygodLibrary.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:57] 失败次数过多，果断弃坑。
+[2014.3.15 8:53:57] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:53:57] 将于 5 秒后重试。
+[2014.3.15 8:54:02] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:54:02] 将于 5 秒后重试。
+[2014.3.15 8:54:07] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:54:07] 将于 5 秒后重试。
+[2014.3.15 8:54:12] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:54:12] 将于 5 秒后重试。
+[2014.3.15 8:54:17] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:54:17] 将于 5 秒后重试。
+[2014.3.15 8:54:22] 解压文件失败：plugins\SevenZipSharp.dll
+错误详细信息：(System.IO.IOException) 文件“M:\Products\VSProjects\GitHub\Skylark\plugins\SevenZipSharp.dll”正由另一进程使用，因此该进程无法访问此文件。
+   在 System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   在 System.IO.FileStream.Init(String path, FileMode mode, FileAccess access, Int32 rights, Boolean useRights, FileShare share, Int32 bufferSize, FileOptions options, SECURITY_ATTRIBUTES secAttrs, String msgPath, Boolean bFromProxy, Boolean useLongPath, Boolean checkHost)
+   在 System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   在 Mygod.Skylark.BackgroundRunner.Program.Update(String id) 位置 m:\Products\VSProjects\GitHub\Skylark\BackgroundRunner\Program.cs:行号 529
+
+[2014.3.15 8:54:22] 失败次数过多，果断弃坑。
+[2014.3.15 8:54:23] 更新完成。
