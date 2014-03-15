@@ -20,7 +20,7 @@ namespace Mygod.Skylark.Update
         protected void Update(object sender, EventArgs e)
         {
             string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/Update/SkylarkUpdater.exe");
-            foreach (var file in "7z.dll,SevenZipSharp.dll")
+            foreach (var file in "7z.dll,SevenZipSharp.dll".Split(','))
                 File.Copy(Path.Combine(Server.MapPath("~/plugins/" + file)), Server.MapPath("~/Update/" + file), true);
             new WebClient().DownloadFile("http://mygod.tk/skylark/SkylarkUpdater.exe", path);
             File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
