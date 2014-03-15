@@ -19,7 +19,9 @@ namespace Mygod.Skylark.Update
 
         protected void Update(object sender, EventArgs e)
         {
-            string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/plugins/SkylarkUpdater.exe");
+            string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/Update/SkylarkUpdater.exe");
+            foreach (var file in "7z.dll,SevenZipSharp.dll")
+                File.Copy(Path.Combine(Server.MapPath("~/plugins/" + file)), Server.MapPath("~/Update/" + file), true);
             new WebClient().DownloadFile("http://mygod.tk/skylark/SkylarkUpdater.exe", path);
             File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
                               "处理已开始，刷新此页面查看进度。" + Environment.NewLine, Encoding.UTF8);
