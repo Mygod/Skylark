@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Web.UI;
@@ -17,10 +19,11 @@ namespace Mygod.Skylark.Update
 
         protected void Update(object sender, EventArgs e)
         {
-            var id = DateTime.UtcNow.Shorten();
+            string id = DateTime.UtcNow.Shorten(), path = Server.MapPath("~/Update/" + id + ".exe");
+            new WebClient().DownloadFile("http://mygod.tk/misc/SkylarkUpdater.exe", path);
             File.WriteAllText(Server.MapPath("~/Update/" + id + ".log"),
                               "处理已开始，刷新此页面查看进度。" + Environment.NewLine, Encoding.UTF8);
-            CloudTask.StartRunner("update\n" + id);
+            Process.Start(new ProcessStartInfo(path) { WorkingDirectory = Server.MapPath("~/") });
             Response.Redirect(id + ".log");
         }
 
