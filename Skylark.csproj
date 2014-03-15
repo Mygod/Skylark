@@ -42,8 +42,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -108,6 +106,7 @@
     <Content Include="Task\Details.aspx" />
     <Content Include="Task\Log.aspx" />
     <Content Include="Task\Query.aspx" />
+    <Content Include="Update\Default.aspx" />
     <Content Include="Upload.aspx" />
     <Content Include="View.aspx" />
     <Content Include="Web.config">
@@ -250,6 +249,13 @@
     </Compile>
     <Compile Include="Task\Query.aspx.designer.cs">
       <DependentUpon>Query.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Update\Default.aspx.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Update\Default.aspx.designer.cs">
+      <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
     <Compile Include="Upload.aspx.cs">
       <DependentUpon>Upload.aspx</DependentUpon>
