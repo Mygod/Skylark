@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
     <link href="/css/modern.css" rel="stylesheet" type="text/css" />
     <link href="/css/site.css" rel="stylesheet" type="text/css" />
@@ -40,7 +40,7 @@
                 </asp:ContentPlaceHolder>
                 <div class="center">
                     Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
-                    V<%=CurrentAssembly.GetName().Version %> Albatross Pre-RTM 2
+                    <a href="/Update/">V<%=CurrentAssembly.GetName().Version %> Albatross</a>
                 </div>
             </div>
         </div>
