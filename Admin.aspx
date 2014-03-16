@@ -4,6 +4,9 @@
         input.comment, input.password {
             width: 100% !important;
         }
+        td {
+            text-align: center;
+        }
     </style>
     <script type="text/javascript">
         function insert(line) {
@@ -64,12 +67,12 @@
             <tr>
                 <th>密码</th>
                 <th>备注</th>
-                <th>查看目录列表/文件/任务详细信息</th>
-                <th>上传/查看/下载文件</th>
-                <th>操作文件系统</th>
-                <th>操作离线任务</th>
-                <th>访问董事会</th>
-                <th><a href="javascript:insert();">[添加]</a></th>
+                <th class="center">查看目录列表/文件/任务详细信息</th>
+                <th class="center">查看/下载文件</th>
+                <th class="center">操作文件系统</th>
+                <th class="center">操作离线任务</th>
+                <th class="center">访问董事会</th>
+                <th class="center"><a href="javascript:insert();">[添加]</a></th>
             </tr>
         </thead>
         <tbody></tbody>

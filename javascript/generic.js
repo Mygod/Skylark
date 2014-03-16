@@ -52,9 +52,16 @@ function changePath() {
     if (result) location.href = RegExp.$1 + "/" + RegExp.$2 + "/" + result + RegExp.$4;
 }
 
+function showLoginPanel() {
+    $('#login-panel').toggle();
+}
+
 function login() {
-    var psw = prompt('请输入您的密码：', '');
+    var box = $('#password-box');
+    var psw = box.val();
     if (!psw) return;
+    box.val(null);
+    showLoginPanel();
     $.cookie('Password', CryptoJS.SHA512(psw));
     location.reload();
 }
