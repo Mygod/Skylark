@@ -285,7 +285,7 @@
     <Content Include="Data\Site.privileges" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="PrecompiledApp.config" />
+    <Content Include="PrecompiledApp1.config" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
