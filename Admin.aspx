@@ -18,7 +18,7 @@
                 + tf(columns[2][0]) + ' /></td><td><input type="checkbox" class="download"' + tf(columns[2][1])
                 + ' /></td><td><input type="checkbox" class="operateFiles"' + tf(columns[2][2])
                 + ' /></td><td><input type="checkbox" class="operateTasks"' + tf(columns[2][3])
-                + ' /></td><td><input type="checkbox" class="editPrivileges"' + tf(columns[2][4]) + ' /></td><td>'
+                + ' /></td><td><input type="checkbox" class="admin"' + tf(columns[2][4]) + ' /></td><td>'
                 + '<a href="#" class="delete" onclick="this.parentNode.parentNode.remove();">[删除]</a></td></tr>');
         }
         $(function () {
@@ -26,7 +26,7 @@
         });
         function submitForm() {
             function tf(i) {
-                return i.attr('checked') ? 'T' : 'F';
+                return i.prop('checked') ? 'T' : 'F';
             }
             var result = '';
             $('#password-list > tbody > tr').each(function () {
@@ -37,7 +37,7 @@
                 result += $.base64reversed.encode($this.find('input.comment').val()) + ','
                        + tf($this.find('input.browse')) + tf($this.find('input.download'))
                        + tf($this.find('input.operateFiles')) + tf($this.find('input.operateTasks'))
-                       + tf($this.find('input.editPrivileges')) + ';';
+                       + tf($this.find('input.admin')) + ';';
             });
             $('#hidden').val(result);
             $('#data').submit();
@@ -64,8 +64,8 @@
             <tr>
                 <th>密码</th>
                 <th>备注</th>
-                <th>上传文件/查看目录列表/文件/任务详细信息</th>
-                <th>查看/下载文件</th>
+                <th>查看目录列表/文件/任务详细信息</th>
+                <th>上传/查看/下载文件</th>
                 <th>操作文件系统</th>
                 <th>操作离线任务</th>
                 <th>访问董事会</th>

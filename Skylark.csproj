@@ -284,9 +284,6 @@
   <ItemGroup>
     <Content Include="Data\Site.privileges" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="PrecompiledApp1.config" />
-  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
