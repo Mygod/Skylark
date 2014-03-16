@@ -62,6 +62,6 @@ function login() {
     if (!psw) return;
     box.val(null);
     showLoginPanel();
-    $.cookie('Password', CryptoJS.SHA512(psw));
+    $.cookie('Password', CryptoJS.SHA512(psw), { expires: 365 });
     location.reload();
 }
