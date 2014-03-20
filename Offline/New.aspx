@@ -11,7 +11,7 @@
     <h2 class="center">新建离线下载任务</h2>
     <div>离线下载，即将目标服务器上的文件弄到云雀™上再让你下载的简单伎俩。（当你和服务器之间有厚障壁时这个玩意儿很有用，因此推荐离线下载国外的地址，也可以提升速度）</div>
     <div>要新建任务只需把地址（一个或多个）粘贴到下面那个矩形中，然后按下那个神奇的按钮即可。</div>
-    <div>支持协议：http https thunder flashget qqdl fs2you ftp</div>
+    <div>支持协议：http https thunder flashget qqdl fs2you ftp magnet</div>
     <p><asp:TextBox ID="LinkBox" runat="server" TextMode="MultiLine" CssClass="link-box"></asp:TextBox></p>
     <div class="center"><asp:Button runat="server" Text="神奇的按钮！" OnClick="Submit" /></div>
     <div>点了神奇的按钮后就会回到刚才的目录。如果没有出现你创建的任务，尝试刷新一下。</div>

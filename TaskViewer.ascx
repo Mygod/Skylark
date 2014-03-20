@@ -8,7 +8,7 @@
             if (remoteTask != null)
             {
         %>
-        <div>目标地址：　　<a href="/Browse/<%=remoteTask.Url %>">/<%=remoteTask.Url %></a></div>
+        <div>目标地址：　　<a href="<%=remoteTask.Url %>" style="word-wrap: break-word; word-break: break-all;"><%=remoteTask.Url %></a></div>
         <%
             }
             var singleSource = Task as ISingleSource; 

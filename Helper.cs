@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Routing;
-using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml.Linq;
@@ -98,8 +97,8 @@ namespace Mygod.Skylark
         {
             var cookie = request.Cookies["Password"];
             var temp = new Privileges();
-            var psw = cookie != null && temp.Contains(cookie.Value) ? cookie.Value : "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
-            return temp.Contains(psw) ? temp[psw] : null;
+            var psw = cookie != null && temp.Contains(cookie.Value) ? cookie.Value : User.AnonymousPassword;
+            return temp.Contains(psw) ? temp[psw] : new User();
         }
     }
 
@@ -490,6 +489,11 @@ namespace Mygod.Skylark
             return tf ? 'T' : 'F';
         }
 
+        public User()
+        {
+            Password = AnonymousPassword;
+            Comment = "游客";
+        }
         public User(XElement user)
         {
             user.GetAttributeValue(out Password, "password");
@@ -526,6 +530,14 @@ namespace Mygod.Skylark
                                 new XAttribute("operateFiles", OperateFiles),
                                 new XAttribute("operateTasks", OperateTasks), new XAttribute("admin", Admin));
         }
+
+        public static string AnonymousPassword
+        {
+            get
+            {
+                return "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
+            }
+        }
     }
     public sealed class Privileges : KeyedCollection<string, User>
     {
@@ -536,8 +548,10 @@ namespace Mygod.Skylark
         }
         public Privileges(XContainer root)
         {
-            foreach (var user in root.ElementsCaseInsensitive("user")) Add(new User(user));
+            foreach (var user in root.ElementsCaseInsensitive("user").Select(e => new User(e))
+                                     .Where(user => !Contains(user.Password))) Add(user);
         }
+
         public Privileges(string path = null) : this(XHelper.Load(path ?? Path).Root)
         {
         }
@@ -545,8 +559,8 @@ namespace Mygod.Skylark
         public static Privileges Parse(string value)
         {
             var result = new Privileges();
-            foreach (var line in value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-                result.Add(new User(line));
+            foreach (var user in value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => new User(line)).Where(user => !result.Contains(user.Password))) result.Add(user);
             return result;
         }
 

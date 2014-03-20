@@ -320,7 +320,7 @@ namespace Mygod.Skylark
         }
     }
 
-    public sealed partial class OfflineDownloadTask : GenerateFileTask, IRemoteTask
+    public partial class OfflineDownloadTask : GenerateFileTask, IRemoteTask
     {
         public OfflineDownloadTask(string relativePath) : base(relativePath)
         {
@@ -336,6 +336,7 @@ namespace Mygod.Skylark
         {
             get
             {
+                if (base.ProcessedFileLength > 0) return base.ProcessedFileLength;
                 var file = new FileInfo(FileHelper.GetFilePath(RelativePath));
                 return file.Exists ? file.Length : 0;
             }

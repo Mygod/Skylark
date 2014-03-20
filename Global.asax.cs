@@ -27,7 +27,7 @@ namespace Mygod.Skylark
             RouteTable.Routes.MapPageRoute("TaskQuery", "Task/Query/{ID}", "~/Task/Query.aspx", false);
         }
 
-        protected void Session_Start(object sender, EventArgs e)
+        /*protected void Session_Start(object sender, EventArgs e)
         {
 
         }
@@ -55,6 +55,6 @@ namespace Mygod.Skylark
         protected void Application_End(object sender, EventArgs e)
         {
 
-        }
+        }*/
     }
 }
