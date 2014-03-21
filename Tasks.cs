@@ -18,7 +18,8 @@ namespace Mygod.Skylark
                             DecompressTask = "decompress",
                             FtpUploadTask = "ftp-upload",
                             ConvertTask = "convert",
-                            CrossAppCopyTask = "cross-app-copy";
+                            CrossAppCopyTask = "cross-app-copy",
+                            UploadTask = "upload";
     }
     public enum TaskStatus
     {
@@ -193,6 +194,8 @@ namespace Mygod.Skylark
                 TaskXml.Save(FilePath);
             }
         }
+
+        public abstract void Finish();
     }
     public interface IRemoteTask
     {
@@ -211,21 +214,6 @@ namespace Mygod.Skylark
 
     public abstract partial class GenerateFileTask : CloudTask
     {
-        public static GenerateFileTask Create(string relativePath)
-        {
-            switch (FileHelper.GetState(FileHelper.GetDataFilePath(relativePath)).ToLowerInvariant())
-            {
-                case TaskType.OfflineDownloadTask:
-                    return new OfflineDownloadTask(relativePath);
-                case TaskType.CompressTask:
-                    return new CompressTask(relativePath);
-                case TaskType.ConvertTask:
-                    return new ConvertTask(relativePath);
-                default:
-                    return null;
-            }
-        }
-
         protected GenerateFileTask(string relativePath) : base(FileHelper.GetDataFilePath(relativePath))
         {
             RelativePath = relativePath;
@@ -267,8 +255,14 @@ namespace Mygod.Skylark
             set {  TaskXml.SetAttributeValue("mime", value); }
         }
         public string RelativePath { get; private set; }
+
+        public override void Finish()
+        {
+            State = TaskType.NoTask;
+            Save();
+        }
     }
-    public abstract partial class OneToOneFileTask : GenerateFileTask, ISingleSource
+    public abstract class OneToOneFileTask : GenerateFileTask, ISingleSource
     {
         protected OneToOneFileTask(string relativePath)
             : base(relativePath)
@@ -320,7 +314,7 @@ namespace Mygod.Skylark
         }
     }
 
-    public partial class OfflineDownloadTask : GenerateFileTask, IRemoteTask
+    public sealed partial class OfflineDownloadTask : GenerateFileTask, IRemoteTask
     {
         public OfflineDownloadTask(string relativePath) : base(relativePath)
         {
@@ -394,22 +388,6 @@ namespace Mygod.Skylark
 
     public abstract partial class GeneralTask : CloudTask
     {
-        public static GeneralTask Create(string id)
-        {
-            switch (XHelper.Load(FileHelper.GetTaskPath(id)).Root.Name.LocalName.ToLowerInvariant())
-            {
-                case TaskType.FtpUploadTask:
-                    return new FtpUploadTask(id);
-                case TaskType.CrossAppCopyTask:
-                    return new CrossAppCopyTask(id);
-                case TaskType.DecompressTask:
-                    return new DecompressTask(id);
-                case TaskType.BitTorrentTask:
-                    return new BitTorrentTask(id);
-                default:
-                    return null;
-            }
-        }
         protected GeneralTask(string id) : base(FileHelper.GetDataPath(id + ".task"))
         {
             ID = id;
@@ -430,6 +408,12 @@ namespace Mygod.Skylark
         }
 
         public override sealed string Type { get { return TaskXml.Name.LocalName; } }
+
+        public override void Finish()
+        {
+            EndTime = DateTime.UtcNow;
+            Save();
+        }
     }
     public abstract partial class MultipleFilesTask : GeneralTask
     {
@@ -484,7 +468,7 @@ namespace Mygod.Skylark
             set { TaskXml.SetAttributeValue("source", value); }
         }
     }
-    public abstract partial class MultipleToMultipleFilesTask : MultipleFilesTask, IMultipleSources
+    public abstract class MultipleToMultipleFilesTask : MultipleFilesTask, IMultipleSources
     {
         protected MultipleToMultipleFilesTask(string id) : base(id)
         {

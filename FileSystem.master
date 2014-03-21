@@ -6,6 +6,6 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <div>当前位置：　　<a href="javascript:changePath();">[编辑]</a> <a href="/Browse/">云雀™</a><% WritePath(); %></div>
     <hr />
-    <asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+    <asp:ContentPlaceHolder ID="Body" runat="server">
     </asp:ContentPlaceHolder>
 </asp:Content>

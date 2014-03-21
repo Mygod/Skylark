@@ -76,23 +76,6 @@ namespace Mygod.Skylark
             }
         }
         protected abstract void ExecuteCore();
-        public abstract void Finish();
-    }
-    public abstract partial class GenerateFileTask
-    {
-        public override void Finish()
-        {
-            State = TaskType.NoTask;
-            Save();
-        }
-    }
-    public abstract partial class GeneralTask
-    {
-        public override void Finish()
-        {
-            EndTime = DateTime.UtcNow;
-            Save();
-        }
     }
     public abstract partial class MultipleFilesTask
     {
@@ -127,7 +110,7 @@ namespace Mygod.Skylark
         }
     }
 
-    public partial class OfflineDownloadTask
+    public sealed partial class OfflineDownloadTask
     {
         public OfflineDownloadTask(string url, string relativePath)
             : base(relativePath, TaskType.OfflineDownloadTask)
@@ -138,19 +121,6 @@ namespace Mygod.Skylark
         protected override void ExecuteCore()
         {
             throw new NotSupportedException();
-        }
-    }
-    public sealed class MagnetLinkOfflineDownloadTask : OfflineDownloadTask
-    {
-        public MagnetLinkOfflineDownloadTask(string url, string relativePath)
-            : base(url, relativePath)
-        {
-        }
-
-        public override long ProcessedFileLength
-        {
-            get { return TaskXml == null ? 0 : TaskXml.GetAttributeValueWithDefault<long>("sizeProcessed"); }
-            set { TaskXml.SetAttributeValue("sizeProcessed", value); }
         }
     }
     public sealed partial class CompressTask
@@ -578,7 +548,7 @@ namespace Mygod.Skylark.BackgroundRunner
                     case "magnet":
                         var magnet = new MagnetLink(url);
                         var torrentPath = FileHelper.Combine(path, magnet.Name + ".torrent");
-                        task = new MagnetLinkOfflineDownloadTask(url, torrentPath)
+                        task = new OfflineDownloadTask(url, torrentPath)
                             { PID = Process.GetCurrentProcess().Id, FileLength = magnet.Length };
                         task.Save();
                         var listenedPorts = new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties()

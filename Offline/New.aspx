@@ -7,7 +7,7 @@
         }
     </style>
 </asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+<asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <h2 class="center">新建离线下载任务</h2>
     <div>离线下载，即将目标服务器上的文件弄到云雀™上再让你下载的简单伎俩。（当你和服务器之间有厚障壁时这个玩意儿很有用，因此推荐离线下载国外的地址，也可以提升速度）</div>
     <div>要新建任务只需把地址（一个或多个）粘贴到下面那个矩形中，然后按下那个神奇的按钮即可。</div>

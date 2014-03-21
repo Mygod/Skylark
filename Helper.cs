@@ -287,6 +287,23 @@ namespace Mygod.Skylark
     }
     public abstract partial class GenerateFileTask
     {
+        public static GenerateFileTask Create(string relativePath)
+        {
+            switch (FileHelper.GetState(FileHelper.GetDataFilePath(relativePath)).ToLowerInvariant())
+            {
+                case TaskType.UploadTask:
+                    return new UploadTask(relativePath);
+                case TaskType.OfflineDownloadTask:
+                    return new OfflineDownloadTask(relativePath);
+                case TaskType.CompressTask:
+                    return new CompressTask(relativePath);
+                case TaskType.ConvertTask:
+                    return new ConvertTask(relativePath);
+                default:
+                    return null;
+            }
+        }
+
         protected override void StartCore()
         {
             StartRunner(Type + '\n' + RelativePath);
@@ -294,6 +311,23 @@ namespace Mygod.Skylark
     }
     public abstract partial class GeneralTask
     {
+        public static GeneralTask Create(string id)
+        {
+            switch (XHelper.Load(FileHelper.GetTaskPath(id)).Root.Name.LocalName.ToLowerInvariant())
+            {
+                case TaskType.FtpUploadTask:
+                    return new FtpUploadTask(id);
+                case TaskType.CrossAppCopyTask:
+                    return new CrossAppCopyTask(id);
+                case TaskType.DecompressTask:
+                    return new DecompressTask(id);
+                case TaskType.BitTorrentTask:
+                    return new BitTorrentTask(id);
+                default:
+                    return null;
+            }
+        }
+
         protected override void StartCore()
         {
             StartRunner(Type + '\n' + ID);
@@ -316,6 +350,34 @@ namespace Mygod.Skylark
         protected override void StartCore()
         {
             throw new NotSupportedException();
+        }
+    }
+    public sealed class UploadTask : GenerateFileTask
+    {
+        public UploadTask(string relativePath) : base(relativePath)
+        {
+        }
+
+        public UploadTask(string relativePath, int totalParts, long length) : base(relativePath, TaskType.UploadTask)
+        {
+            TotalParts = totalParts;
+            FileLength = length;
+        }
+
+        public int TotalParts
+        {
+            get { return TaskXml == null ? 0 : TaskXml.GetAttributeValue<int>("totalParts"); }
+            set { TaskXml.SetAttributeValue("totalParts", value); }
+        }
+        public HashSet<int> FinishedParts
+        {
+            get
+            {
+                return TaskXml == null ? null
+                    : new HashSet<int>((TaskXml.GetAttributeValue("finishedParts") ?? string.Empty)
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+            }
+            set { TaskXml.SetAttributeValue("finishedParts", string.Join(",", value)); }
         }
     }
     public sealed partial class ConvertTask
@@ -343,7 +405,8 @@ namespace Mygod.Skylark
         private static readonly Dictionary<string, string> Mappings = new Dictionary<string, string>
             { { TaskType.OfflineDownloadTask, "离线下载" }, { TaskType.CompressTask, "压缩" },
               { TaskType.BitTorrentTask, "离线下载 BT 种子" },  { TaskType.ConvertTask, "转换媒体格式" },
-              { TaskType.CrossAppCopyTask, "跨云雀复制" }, { TaskType.DecompressTask, "解压" }, { TaskType.FtpUploadTask, "FTP 上传" } };
+              { TaskType.CrossAppCopyTask, "跨云雀复制" }, { TaskType.DecompressTask, "解压" },
+              { TaskType.FtpUploadTask, "FTP 上传" }, { TaskType.UploadTask, "上传" } };
         public static string GetName(string id)
         {
             return Mappings.ContainsKey(id) ? Mappings[id] : "处理";

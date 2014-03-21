@@ -84,3 +84,7 @@ img {
     top: -5000px;
     width: 0;
 }
+
+.hidden {
+    display: none;
+}

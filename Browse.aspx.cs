@@ -69,6 +69,7 @@ namespace Mygod.Skylark
                         RefreshFile();
                     }
                     else Views.SetActiveView(GeneralTaskProcessingView);
+                else if (state == TaskType.UploadTask) Views.SetActiveView(FileUploadingView);
                 else
                 {
                     Viewer.SetTask(Task);

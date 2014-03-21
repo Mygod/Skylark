@@ -2,11 +2,6 @@
 <%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <link href="/plugins/fineuploader/fineuploader-3.5.0.css" rel="stylesheet" />
-    <style type="text/css">
-        .hidden {
-            display: none;
-        }
-    </style>
     <script type="text/javascript">
         function pickCore(text, defaultText) {
             var result = prompt(text, defaultText);
@@ -25,7 +20,7 @@
         }
     </script>
 </asp:Content>
-<asp:Content ID="Content2" ContentPlaceHolderID="ContentPlaceHolder1" runat="server">
+<asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <asp:ScriptManager runat="server" />
     <input type="hidden" id="Hidden" runat="server" ClientIDMode="Static" />
     <asp:MultiView runat="server" ID="Views">
@@ -112,8 +107,23 @@
                     autoUpload: true,
                     text: {
                         uploadButton: '上传文件'
+                    },
+                    chunking: {
+                        enabled: true,
+                        partSize: 2097152
+                    },
+                    resume: {
+                        enabled: true,
+                        cookiesExpiresIn: 365,
+                        id: 'uploader'
                     }
                 });
+                var uploadData = manualuploader.getResumableFilesData();
+                if (uploadData.length > 0) {
+                    document.write('<div>友情提醒：您的文件“' + uploadData[0].name + '”');
+                    for (var i = 1; i < uploadData.length; i++) document.write('、“' + uploadData[i].name + '”');
+                    document.write('还没上传完毕，将它拖动进来可以继续上传。</div>');
+                }
             </script>
             <div>
                 <a href="javascript:doSelectAll();">[全选]</a>
@@ -298,6 +308,23 @@
                 <div class="center">
                     <asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" />
                 </div>
+            </div>
+        </asp:View>
+        <asp:View runat="server" ID="FileUploadingView">
+            <% var uploadTask = (UploadTask) Task; %>
+            <div>当前状态：　　正在上传中</div>
+            <div>开始上传时间：<%=Task == null || !Task.StartTime.HasValue
+                                    ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
+            <div>总分块数量：　<%=uploadTask.TotalParts %></div>
+            <div>已上传数量：　<%=uploadTask.FinishedParts.Count %></div>
+            <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
+                                    ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
+            <div>已上传大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
+            <div class="progress-bar">
+                <%-- ReSharper disable UnexpectedValue --%>
+                <div class="bar" style="width: <%=Task == null || !Task.Percentage.HasValue
+                                                    ? 0 : Task.Percentage.Value %>%;"></div>
+                <%-- ReSharper restore UnexpectedValue --%>
             </div>
         </asp:View>
         <asp:View runat="server" ID="FileProcessingView">
