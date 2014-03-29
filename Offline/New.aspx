@@ -21,8 +21,7 @@
     <div>请注意离线下载以下格式的文件方法比较特殊，请按照下面说的进行：（否则可能会失败）</div>
     <ul>
         <li>
-            <a href="/Offline/NiGuan/<%=Path %>/">你管（YouTube）视频</a>：
-            <input type="text" id="link-box" value="http://www.youtube.com/results?search_query=" style="width: 400px;" />
+            你管（YouTube）视频：<input type="text" id="link-box" value="http://www.youtube.com/results?search_query=" style="width: 400px;" />
             <button type="button" id="niguan-button">获取该页上全部视频</button>
             <script type="text/javascript">
                 $("#niguan-button").click(function () {

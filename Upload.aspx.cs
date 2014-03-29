@@ -16,7 +16,7 @@ namespace Mygod.Skylark
             }
             try
             {
-                string fileName = Request.Form["qqfilename"],
+                string fileName = Request.Form["qqfilename"].ToValidPath(),
                        path = FileHelper.Combine(RouteData.GetRelativePath(), fileName),
                        dataPath = FileHelper.GetDataFilePath(path), filePath = FileHelper.GetFilePath(path);
                 UploadTask task;

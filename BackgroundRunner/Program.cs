@@ -522,7 +522,7 @@ namespace Mygod.Skylark.BackgroundRunner
                         if (fileLength < 0) fileLength = null;
 
                         var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode()
-                                                 : GetFileName(url)).UrlDecode();
+                                                 : GetFileName(url)).UrlDecode().ToValidPath();
                         string mime, extension;
                         try
                         {
