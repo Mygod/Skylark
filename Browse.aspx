@@ -69,7 +69,7 @@
                     var prefix = (RegExp.$1 + "/Download/" + RegExp.$3).replace("\\", "/");
                     while (prefix[prefix.length - 1] == "/") prefix = prefix.substr(0, prefix.length - 1);
                     prefix = prefix + "/";
-                    for (var i = 0; i < array.length; i++) result += prefix + array[i].value + "\r\n";
+                    for (var i = 0; i < array.length; i++) result += prefix + encodeURIComponent(array[i].value) + "\r\n";
                     var box = $("#running-result");
                     var input = box.children("textarea");
                     input.val(result);
