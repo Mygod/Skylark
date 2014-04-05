@@ -4,51 +4,49 @@
 <head runat="server">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
-    <link href="/css/modern.css" rel="stylesheet" type="text/css" />
+    <link href="/css/iconFont.min.css" rel="stylesheet" type="text/css" />
+    <link href="/css/metro-bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="/css/site.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="/plugins/jquery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery/jquery.widget.min.js"></script>
     <script type="text/javascript" src="/plugins/jquery/jquery.cookie.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/x64-core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/sha512-min.js"></script>
-    <script type="text/javascript" src="/javascript/generic.js"></script>
+    <script type="text/javascript" src="/plugins/metro.min.js"></script>
+    <script type="text/javascript" src="/plugins/generic.js"></script>
     <asp:ContentPlaceHolder ID="Head" runat="server">
     </asp:ContentPlaceHolder>
 </head>
-<body class="modern-ui">
+<body class="metro">
     <form id="form" runat="server">
-    <div class="page">
-        <div class="page-header">
-            <div class="page-header-content">
-                <h1><a href="/" class="h">云雀™</a></h1>
+    <main>
+        <header><h1><a href="/" class="h">云雀™</a></h1></header>
+        <section>
+            <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture)); %>
+            <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)",
+                                    Helper.GetSize(currentDrive.AvailableFreeSpace), 
+                                    Helper.GetSize(currentDrive.TotalSize), 
+                                    100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
+            <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
+            <div>
+                您的当前身份：<a href="javascript:showLoginPanel();">[修改]</a>
+                <%=string.Format(User.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", User.Comment) %>
             </div>
-        </div>
-        <div class="page-region">
-            <div class="page-region-content" style="padding-left: 20px;">
-                <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture)); %>
-                <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)",
-                                        Helper.GetSize(currentDrive.AvailableFreeSpace), 
-                                        Helper.GetSize(currentDrive.TotalSize), 
-                                        100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
-                <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
-                <div>
-                    您的当前身份：<a href="javascript:showLoginPanel();">[修改]</a>
-                    <%=string.Format(User.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", User.Comment) %>
-                </div>
-                <div id="login-panel" style="display: none;">
-                    请输入密码：　<input id="password-box" type="password" />
-                    <a href="javascript:login();">[确认]</a>
-                </div>
-                <asp:ContentPlaceHolder ID="Body" runat="server">
-                </asp:ContentPlaceHolder>
-                <div class="center">
-                    Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
-                    <a href="/Update/">V<%=CurrentAssembly.GetName().Version %> Albatross</a>
-                </div>
+            <div id="login-panel" style="display: none;">
+                请输入密码：　<input id="password-box" type="password" />
+                <a href="javascript:login();">[确认]</a>
             </div>
-        </div>
-    </div>
+        </section>
+        <hr />
+        <asp:ContentPlaceHolder ID="Body" runat="server">
+        </asp:ContentPlaceHolder>
+        <footer>
+            Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
+            <a href="/Update/">V<%=CurrentAssembly.GetName().Version %> Bald Eagle</a>
+        </footer>
+    </main>
     </form>
     <asp:ContentPlaceHolder ID="OuterForm" runat="server">
     </asp:ContentPlaceHolder>

@@ -72,11 +72,7 @@
                                 ? Helper.Unknown : Task.PredictedRemainingTime.Value.ToString("G") %></div>
         <div>预计结束时间：<%=NeverEnds ? "地球毁灭时" : Task == null || !Task.PredictedEndTime.HasValue
                                 ? Helper.Unknown : Task.PredictedEndTime.Value.ToChineseString() %></div>
-        <div class="progress-bar">
-            <%-- ReSharper disable UnexpectedValue --%>
-            <div class="bar" style="width: <%=Task == null || !Task.Percentage.HasValue
-                                                ? 0 : Task.Percentage.Value %>%;"></div>
-            <%-- ReSharper restore UnexpectedValue --%>
-        </div>
+        <div class="progress-bar"><div class="bg-cyan bar" style="width: <%= Task == null || !Task.Percentage.HasValue
+            ? 0 : Task.Percentage.Value %>%;"></div></div>
     </ContentTemplate>
 </asp:UpdatePanel>

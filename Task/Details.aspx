@@ -3,8 +3,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
-    <hr />
-    <h2 class="center"><%=Task == null ? "未知任务" : TaskHelper.GetName(Task.Type) %> 状态</h2>
-    <asp:ScriptManager runat="server" />
-    <skylark:TaskViewer runat="server" ID="Viewer" />
+    <section>
+        <h2 class="center"><%=Task == null ? "未知任务" : TaskHelper.GetName(Task.Type) %> 状态</h2>
+        <asp:ScriptManager runat="server" />
+        <skylark:TaskViewer runat="server" ID="Viewer" />
+    </section>
 </asp:Content>

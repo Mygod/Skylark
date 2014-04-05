@@ -37,8 +37,7 @@ namespace Mygod.Skylark.Task
             }
             foreach (var id in TaskList.Items.GetSelectedItemsID())
             {
-                var pid = GeneralTask.Create(id).PID;
-                if (pid != 0) CloudTask.KillProcess(pid);
+                CloudTask.KillProcessTree(GeneralTask.Create(id).PID);
                 FileHelper.DeleteWithRetries(Server.MapPath("~/Data/" + id + ".task"));
             }
             Response.Redirect(Request.RawUrl);

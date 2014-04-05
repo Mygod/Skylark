@@ -9,13 +9,13 @@ namespace Mygod.Skylark
         {
             var relativePath = Page.RouteData.GetRelativePath();
             var dirs = relativePath.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (dirs.Length == 0) return;
             var tempPath = string.Empty;
             foreach (var dir in dirs)
             {
-                tempPath += '/' + dir;
-                Response.Write(" &gt; <a href=\"/Browse" + tempPath + "/\">" + dir + "</a>");
+                tempPath += '/' + dir.UrlEncode();
+                Response.Write("<li><a href=\"/Browse" + tempPath + "/\">" + dir + "</a></li>");
             }
-            if (FileHelper.IsFileExtended(FileHelper.GetFilePath(relativePath)) == false) Response.Write(" &gt;");
         }
     }
 }

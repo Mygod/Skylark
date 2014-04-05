@@ -7,16 +7,20 @@
     </style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
-    <h2 class="center">离线下载你管视频</h2>
-    <p><input type="text" id="link-box" value="http://www.youtube.com/results?search_query=" /></p>
-    <p class="center"><button type="button" id="magic-button">获取该页上全部视频</button></p>
-    <script type="text/javascript">
-        var url = getQueryStringRegExp("URL");
-        if (url) $("#link-box").val($.base64reversed.decode(url));
-        $("#magic-button").click(function () {
-            location.href = "?Url=" + $.base64reversed.encode($("#link-box").val());
-        });
-    </script>
-    <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/">掩耳</a>！</div>
-    <% GetEmAll(); %>
+    <section>
+        <h2 class="center">离线下载你管视频</h2>
+        <p><input type="text" id="link-box" value="http://www.youtube.com/results?search_query=" /></p>
+        <p class="center"><button type="button" id="magic-button">获取该页上全部视频</button></p>
+        <script type="text/javascript">
+            var url = getQueryStringRegExp("URL");
+            if (url) $("#link-box").val($.base64reversed.decode(url));
+            $("#magic-button").click(function () {
+                location.href = "?Url=" + $.base64reversed.encode($("#link-box").val());
+            });
+        </script>
+    </section>
+    <section>
+        <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/">掩耳</a>！</div>
+        <% GetEmAll(); %>
+    </section>
 </asp:Content>

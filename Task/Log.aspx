@@ -2,7 +2,9 @@
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
-    <h2 class="center">人事部记过处分记录</h2>
-    <pre><% var path = FileHelper.GetDataPath("error.log");
-            if (File.Exists(path)) Response.WriteFile(path); %></pre>
+    <section>
+        <h2 class="center">人事部记过处分记录</h2>
+        <pre><% var path = FileHelper.GetDataPath("error.log");
+                if (File.Exists(path)) Response.WriteFile(path); %></pre>
+    </section>
 </asp:Content>

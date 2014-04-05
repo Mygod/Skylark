@@ -6,13 +6,13 @@
     <% if (string.IsNullOrWhiteSpace(new WebClient()
            .DownloadString("http://mygod.tk/product/update/" + CurrentAssembly.GetName().Version.Revision + '/')))
        { %>
-    <div>恭喜您，您的 云雀™ 是最新版！（或者至少没有什么太大的更新）如果你想，你还是可以再次部署一次最新版。</div>
+    <div>恭喜您，您的 云雀™ 是最新版！不过你还是可以部署一次最新版。</div>
     <% }
        else
        { %>
-    <div>新版 云雀™ 现在已可用。</div>
+    <div>新版 云雀™ 现在已可用，请尽快升级。</div>
     <% } %>
-	<div>如果你想，你可以点击这里看看最近的<a href="https://github.com/Mygod/Skylark/commits/master">更新日志</a>。通常一些重要更新都会在这里显示新版可用，而一些可选的小更新则不会，只是给更新狂魔们使用的。（如果你比更新狂魔更疯狂，在 GitHub 上 watch 这个 repo 可在第一时间获得云雀更新的最新动态）</div>
+	<small>P.S. 不是所有的更新都会在这里显示，只有重大、稳定的更新才会显示，即不重大的（小 BUG 修复或小改进）或不稳定的（测试版）不会在这里显示。你可以<a href="https://github.com/Mygod/Skylark/commits/master">点击这里看看最近的更新日志</a>，那里通常会有这里不提醒的更新。如果你是个更新狂魔，在 GitHub 上 watch 这个 repo 可在第一时间获得 云雀™ 更新的最新动态。</small>
     <h3>升级须知</h3>
     <ul>
         <li>请在开始前结束当前正在执行的一切离线任务，否则升级可能失败。</li>
