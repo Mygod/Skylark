@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -495,6 +496,7 @@ namespace Mygod.Skylark.BackgroundRunner
             OfflineDownloadTask task = null;
             try
             {
+                var retried = false;
                 var protocol = url.Remove(url.IndexOf(':')).ToLowerInvariant();
                 switch (protocol)
                 {
@@ -503,8 +505,17 @@ namespace Mygod.Skylark.BackgroundRunner
                     case "ftp":
                     case "file":
                         var request = WebRequest.Create(url);
+                        var httpWebRequest = request as HttpWebRequest;
+                        if (httpWebRequest != null) httpWebRequest.Referer = url;
                         request.Timeout = Timeout.Infinite;
                         var response = request.GetResponse();
+                        if (!retried && url.StartsWith("http://goo.im", true, CultureInfo.InvariantCulture)
+                            && response.ContentType == "text/html")
+                        {
+                            retried = true;
+                            Thread.Sleep(15000);
+                            goto case "file";
+                        }
                         var stream = response.GetResponseStream();
                         var disposition = response.Headers["Content-Disposition"] ?? string.Empty;
                         var pos = disposition.IndexOf("filename=", StringComparison.Ordinal);
