@@ -1,7 +1,7 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/FileSystem.Master" AutoEventWireup="true" CodeBehind="Browse.aspx.cs" Inherits="Mygod.Skylark.Browse" %>
 <%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
-    <link href="/plugins/fineuploader/fineuploader-3.5.0.css" rel="stylesheet" />
+    <script src="/plugins/resumable.js"></script>
     <script type="text/javascript">
         function pickCore(text, defaultText) {
             var result = prompt(text, defaultText);
@@ -25,37 +25,93 @@
     <input type="hidden" id="Hidden" runat="server" ClientIDMode="Static" />
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
-            <div id="manual-fine-uploader"></div>
-            <div>
-                该目录下有
-                <%= DirectoryCount %>
-                个目录，<%= FileCount %>&nbsp;个文件，当前选中
-                <span id="selected-count">0</span>
-                个项目。点击上面的按钮或拖动要上传的文件来上传文件。（可多选，自动覆盖已有文件）
-            </div>
-            <script src="/plugins/fineuploader/jquery.fineuploader-3.5.0.min.js"></script>
+            <section class="button-set">
+                <button onclick="doSelectAll();" type="button">全选</button>
+                <button onclick="invertSelection();" type="button">反选</button>
+                <% if (CurrentUser.Download)
+                   { %>
+                <button onclick="getDownloadLink();" type="button">生成下载链接</button>
+                <% }
+                   if (CurrentUser.OperateFiles)
+                   { %>
+                <button runat="server" onclick="if (newFolder())" onServerClick="NewFolder">新建文件夹</button>
+                <button runat="server" onclick="if (pickFolder())" onServerClick="Move">移动到</button>
+                <button runat="server" onclick="if (pickFolder())" onServerClick="Copy">复制到</button>
+                <button runat="server" onclick="if (deleteConfirm())" onServerClick="Delete">删除</button>
+                <%     if (CurrentUser.OperateTasks)
+                       { %>
+                <a class="button" href="/Offline/New/<%= RelativePath %>">新建离线下载任务</a>
+                <button onclick="showCompressConfig();" type="button">压缩选中项</button>
+                <button runat="server" onServerClick="CrossAppCopy" onclick="if (pickApp())">跨云雀传输</button>
+                <button runat="server" onServerClick="FtpUpload" onclick="if (pickFtp())">上传到 FTP</button>
+                <button runat="server" onServerClick="BitTorrentDownload" onclick="if (pickFolderCore(true))">
+                    离线下载选中种子
+                </button>
+                <%     }
+                   } %>
+            </section>
+            <% if (CurrentUser.OperateFiles)
+               { %>
+            <section id="upload-panel" ondragenter="$(this).addClass('upload-dragover');"
+                     ondragleave="$(this).removeClass('upload-dragover');"
+                     ondrop="$(this).removeClass('upload-dragover');">
+                <table id="upload-file-table" class="hovered bordered table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th class="nowrap">文件名</th>
+                            <th class="nowrap">大小</th>
+                            <th class="stretch">进度</th>
+                            <th class="nowrap">状态</th>
+                            <th class="nowrap"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。</div>
+            </section>
+            <% } %>
+            <section id="running-result" style="display: none;">
+                <button type="button" onclick="hideParent();">隐藏</button><br />
+                <textarea class="stretch" style="height: 100px;"></textarea>
+            </section>
+            <section id="compress-config" style="display: none;">
+                <button type="button" onclick="hideParent();">隐藏</button>
+                <asp:DropDownList ID="CompressionLevelList" runat="server">
+                    <asp:ListItem Value="Ultra">最小</asp:ListItem>
+                    <asp:ListItem Value="High">较小</asp:ListItem>
+                    <asp:ListItem Value="Normal">普通</asp:ListItem>
+                    <asp:ListItem Value="Low">较快</asp:ListItem>
+                    <asp:ListItem Value="Fast">最快</asp:ListItem>
+                    <asp:ListItem Value="None">不压缩</asp:ListItem>
+                </asp:DropDownList>
+                <asp:TextBox ID="ArchiveFilePath" runat="server" Width="300px" />
+                <button runat="server" onServerClick="Compress">压缩到指定路径</button>
+                （请以 <a href="http://zh.wikipedia.org/wiki/7-Zip">7z</a>,
+                    <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
+                    <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
+            </section>
             <script type="text/javascript">
                 function updateSelectedCount() {
-                    $('#selected-count').text($("#file-list >>>> input:checkbox:checked").length);
+                    $('#selected-count').text($("#file-list >>>>> input:checkbox:checked").length);
                 }
-                $(function() {
-                    $('#file-list >>>> input:checkbox').change(updateSelectedCount);
+                $(function () {
+                    $('#file-list >>>>> input:checkbox').change(updateSelectedCount);
                 });
                 function newFolder() {
                     return pickCore("请输入文件夹名：", "");
                 }
                 function deleteConfirm() {
-                    return $("#file-list >>>> input:checkbox:checked").length > 0
+                    return $("#file-list >>>>> input:checkbox:checked").length > 0
                         && confirm("确定要删除吗？此操作没有后悔药吃。");
                 }
                 var selectAll = false;
                 function doSelectAll() {
-                    $('#file-list >>>> input:checkbox').prop('checked', selectAll = !selectAll);
+                    $('#file-list >>>>> input:checkbox').prop('checked', selectAll = !selectAll);
                     updateSelectedCount();
                 }
                 function invertSelection() {
-                    var checked = $("#file-list >>>> input:checkbox:checked");
-                    $("#file-list >>>> input:checkbox:not(:checked)").prop("checked", true);
+                    var checked = $("#file-list >>>>> input:checkbox:checked");
+                    $("#file-list >>>>> input:checkbox:not(:checked)").prop("checked", true);
                     checked.prop("checked", false);
                     updateSelectedCount();
                 }
@@ -63,13 +119,14 @@
                     $("#compress-config").show();
                 }
                 function getDownloadLink() {
-                    var array = $("#file-list >>>> input:checkbox:checked").parent().parent().find("input:hidden");
+                    var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().find("input:hidden");
                     var result = "";
                     uriParser.exec(location.href);
                     var prefix = (RegExp.$1 + "/Download/" + RegExp.$3).replace("\\", "/");
                     while (prefix[prefix.length - 1] == "/") prefix = prefix.substr(0, prefix.length - 1);
                     prefix = prefix + "/";
-                    for (var i = 0; i < array.length; i++) result += prefix + encodeURIComponent(array[i].value) + "\r\n";
+                    for (var i = 0; i < array.length; i++)
+                        result += prefix + encodeURIComponent(array[i].value) + "\r\n";
                     var box = $("#running-result");
                     var input = box.children("textarea");
                     input.val(result);
@@ -99,138 +156,116 @@
                     return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，" +
                                     "你的用户名和密码不会被保留，也不会在上传进度上显示）", "");
                 }
-                var manualuploader = new qq.FineUploader({
-                    element: $('#manual-fine-uploader')[0],
-                    request: {
-                        endpoint: '/Upload/<%= RelativePath.Replace("'", @"\'") %>'
-                    },
-                    autoUpload: true,
-                    text: {
-                        uploadButton: '上传文件'
-                    },
-                    chunking: {
-                        enabled: true,
-                        partSize: 2097152
-                    },
-                    resume: {
-                        enabled: true,
-                        cookiesExpiresIn: 365,
-                        id: 'uploader'
-                    }
+                var r = new Resumable({
+                    target: '/Upload/<%= RelativePath.Replace("'", @"\'") %>',
+                    permanentErrors: [401, 403, 500],
+                    simultaneousUploads: 1, // damn you race condition
+                    minFileSize: 0          // damn you documentation
                 });
-                var uploadData = manualuploader.getResumableFilesData();
-                if (uploadData.length > 0) {
-                    document.write('<div>友情提醒：您的文件“' + uploadData[0].name + '”');
-                    for (var i = 1; i < uploadData.length; i++) document.write('、“' + uploadData[i].name + '”');
-                    document.write('还没上传完毕，将它拖动进来可以继续上传。</div>');
-                }
+                var uploadFileTable = $('#upload-file-table');
+                var rows = {};
+                r.on('fileAdded', function (file) {
+                    uploadFileTable.show();
+                    uploadFileTable.find('tbody').append(rows[file.relativePath] = $('<tr><td class="nowrap">' + file.relativePath + '</td><td class="nowrap">' + getSize(file.size) + '</td><td class="stretch"><div class="progress-bar" style="height: 26px; margin-bottom: 0;"><div id="upload-progress-bar" class="bg-cyan bar" style="widtd: 0;"></div></div></td><td id="upload-progress-text" class="nowrap">等待上传</td><td class="nowrap"><button id="cancel-upload-button" type="button"><i class="icon-cancel"></i></button></td></tr>'));
+                    rows[file.relativePath].find('#cancel-upload-button').click(function () {
+                        file.cancel();
+                        rows[file.relativePath].remove();
+                        delete rows[file.relativePath];
+                    });
+                    if (!r.isUploading()) r.upload();
+                });
+                r.on('fileProgress', function (file) {
+                    rows[file.relativePath].find('#upload-progress-bar').width(file.progress() * 100 + '%');
+                    rows[file.relativePath].find('#upload-progress-text').html((file.progress() * 100).toFixed(2) + '%');
+                });
+                r.on('fileRetry', function (file) {
+                    rows[file.relativePath].find('#upload-progress-text').html('出现了奇怪的事情，重试中');
+                });
+                r.on('fileError', function (file, message) {
+                    rows[file.relativePath].find('#upload-progress-bar').removeClass('bg-cyan');
+                    rows[file.relativePath].find('#upload-progress-bar').addClass('bg-red');
+                    rows[file.relativePath].find('#upload-progress-text')
+                        .html('<span title="' + htmlEncode(message) + '">失败</a>');
+                });
+                r.on('fileSuccess', function (file) {
+                    rows[file.relativePath].find('#upload-progress-bar').width('100%');
+                    rows[file.relativePath].find('#upload-progress-text').html('完成');
+                });
+                r.assignBrowse($('#upload-browse'));
+                r.assignBrowse($('#upload-browse-dir'), true);
+                r.assignDrop($('#upload-panel'));
             </script>
-            <div>
-                <a href="javascript:doSelectAll();">[全选]</a>
-                <a href="javascript:invertSelection();">[反选]</a>
-                <% if (CurrentUser.Download)
-                   { %>
-                <a href="javascript:getDownloadLink();">[生成下载链接]</a>
-                <% }
-                   if (CurrentUser.OperateFiles)
-                   { %>
-                <asp:LinkButton runat="server" Text="[新建文件夹]" OnClick="NewFolder"
-                                OnClientClick="return newFolder();" />
-                <asp:LinkButton runat="server" Text="[移动到]" OnClick="Move" OnClientClick="return pickFolder();" />
-                <asp:LinkButton runat="server" Text="[复制到]" OnClick="Copy" OnClientClick="return pickFolder();" />
-                <asp:LinkButton runat="server" Text="[删除]" OnClick="Delete"
-                                OnClientClick="return deleteConfirm();" />
-                <%     if (CurrentUser.OperateTasks)
-                       { %>
-                <a href="/Offline/New/<%= RelativePath %>">[新建离线下载任务]</a>
-                <a href="javascript:showCompressConfig();">[压缩选中项]</a>
-                <asp:LinkButton runat="server" Text="[跨云雀传输]" OnClick="CrossAppCopy"
-                                OnClientClick="return pickApp();" />
-                <asp:LinkButton runat="server" Text="[上传到 FTP]" OnClick="FtpUpload"
-                                OnClientClick="return pickFtp();" />
-                <asp:LinkButton runat="server" Text="[离线下载选中种子]" OnClick="BitTorrentDownload"
-                                OnClientClick="return pickFolderCore(true);" />
-                <%     }
-                   } %>
-            </div>
-            <div id="running-result" style="display: none;">
-                <a href="javascript:hideParent();">[隐藏]</a><br />
-                <textarea style="width: 100%; height: 100px;"></textarea>
-            </div>
-            <div id="compress-config" style="display: none;">
-                <a href="javascript:hideParent();">[隐藏]</a>
-                <asp:DropDownList ID="CompressionLevelList" runat="server">
-                    <asp:ListItem Value="Ultra">最小</asp:ListItem>
-                    <asp:ListItem Value="High">较小</asp:ListItem>
-                    <asp:ListItem Value="Normal">普通</asp:ListItem>
-                    <asp:ListItem Value="Low">较快</asp:ListItem>
-                    <asp:ListItem Value="Fast">最快</asp:ListItem>
-                    <asp:ListItem Value="None">不压缩</asp:ListItem>
-                </asp:DropDownList>
-                <asp:TextBox ID="ArchiveFilePath" runat="server" Width="300px" />
-                <asp:LinkButton runat="server" Text="[压缩到指定路径]" OnClick="Compress" />
-                （请以 <a href="http://zh.wikipedia.org/wiki/7-Zip">7z</a>,
-                 <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
-                 <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
-            </div>
-            <table id="file-list">
-                <asp:Repeater runat="server" ID="DirectoryList" OnItemCommand="DirectoryCommand">
-                    <ItemTemplate>
-                        <tr>
-                            <td class="nowrap">
-                                <asp:CheckBox ID="Check" runat="server"
-                                              Text=' <img src="/Image/Directory.png" alt="目录" />' />
-                            </td>
-                            <td><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
-                            <td class="nowrap">&lt;DIR&gt;</td>
-                            <td class="nowrap">
-                                <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
-                                    .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
-                            </td>
-                            <td class="nowrap">
-                                <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
-                                <%  if (CurrentUser.OperateFiles)
-                                    { %>
-                                <asp:LinkButton ID="LinkButton4" runat="server" Text="[重命名]" CommandName="Rename"
-                                                OnClientClick='<%#string.Format("return rename(\"{0}\");",
-                                                                                Eval("Name"))%>' />
-                                <%  } %>
-                            </td>
-                        </tr>
-                    </ItemTemplate>
-                </asp:Repeater>
-                <asp:Repeater runat="server" ID="FileList" OnItemCommand="FileCommand">
-                    <ItemTemplate>
-                        <tr>
-                            <td class="nowrap">
-                                <asp:CheckBox ID="Check" runat="server" Text='<%#
-                                    FileHelper.IsReady(FileHelper.GetDataFilePath(FileHelper.Combine(RelativePath,
-                                        Eval("Name").ToString())))
-                                        ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
-                                        : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>' />
-                            </td>
-                            <td><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
-                            <td class="nowrap">
-                                <%#Helper.GetSize(FileHelper.GetFileSize(
-                                                  FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %>
-                            </td>
-                            <td class="nowrap">
-                                <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
-                                    .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
-                            </td>
-                            <td class="nowrap">
-                                <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
-                                <% if (CurrentUser.OperateFiles)
-                                   { %>
-                                <asp:LinkButton ID="LinkButton5" runat="server" Text="[重命名]" CommandName="Rename"
-                                                OnClientClick='<%#string.Format("return rename(\"{0}\");",
-                                                                                Eval("Name"))%>' />
-                                <% } %>
-                            </td>
-                        </tr>
-                    </ItemTemplate>
-                </asp:Repeater>
-            </table>
+            <section>
+                <table id="file-list" class="hovered bordered table">
+                    <asp:Repeater runat="server" ID="DirectoryList" OnItemCommand="DirectoryCommand">
+                        <ItemTemplate>
+                            <tr>
+                                <td class="nowrap input-control checkbox" style="min-width: 50px;">
+                                    <label>
+                                        <asp:CheckBox ID="Check" runat="server" />
+                                        <span class="check"></span>
+                                        <img src="/Image/Directory.png" alt="目录" />
+                                    </label>
+                                </td>
+                                <td class="stretch"><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
+                                <td class="nowrap">&lt;DIR&gt;</td>
+                                <td class="nowrap">
+                                    <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
+                                        .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
+                                </td>
+                                <td class="nowrap">
+                                    <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
+                                    <%  if (CurrentUser.OperateFiles)
+                                        { %>
+                                    <asp:LinkButton runat="server" Text="[重命名]" CommandName="Rename"
+                                                    OnClientClick='<%#
+                                                        string.Format("return rename(\"{0}\");", Eval("Name"))%>' />
+                                    <%  } %>
+                                </td>
+                            </tr>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                    <asp:Repeater runat="server" ID="FileList" OnItemCommand="FileCommand">
+                        <ItemTemplate>
+                            <tr>
+                                <td class="nowrap input-control checkbox" style="min-width: 50px;">
+                                    <label>
+                                        <asp:CheckBox ID="Check" runat="server" />
+                                        <span class="check"></span>
+                                        <%# FileHelper.IsReady(FileHelper.GetDataFilePath(
+                                                FileHelper.Combine(RelativePath, Eval("Name").ToString())))
+                                                    ? " <img src=\"/Image/File.png\" alt=\"文件\" />"
+                                                    : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>
+                                    </label>
+                                </td>
+                                <td class="stretch"><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
+                                <td class="nowrap">
+                                    <%#Helper.GetSize(FileHelper.GetFileSize(
+                                                      FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %>
+                                </td>
+                                <td class="nowrap">
+                                    <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
+                                        .Combine(RelativePath, Eval("Name").ToString()))).ToChineseString() %>
+                                </td>
+                                <td class="nowrap">
+                                    <input type="hidden" id="Hidden" runat="server" value='<%#Eval("Name") %>' />
+                                    <% if (CurrentUser.OperateFiles)
+                                       { %>
+                                    <asp:LinkButton runat="server" Text="[重命名]" CommandName="Rename"
+                                                    OnClientClick='<%#
+                                                        string.Format("return rename(\"{0}\");", Eval("Name"))%>' />
+                                    <% }
+                                       if (CurrentUser.Download)
+                                       { %>
+                                    <a href="/Download/<%#FileHelper.Combine(RelativePath,
+                                                                Eval("Name").ToString()) %>">[下载]</a>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        </ItemTemplate>
+                    </asp:Repeater>
+                </table>
+            </section>
         </asp:View>
         <asp:View runat="server" ID="FileView">
             <script type="text/javascript">
@@ -250,35 +285,38 @@
                     $("#convert-form").show();
                 }
             </script>
-            <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
-            <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
-            <div>
-                默认类型：<%=GetMimeType(Mime) %><% if (CurrentUser.OperateFiles)
-                   { %><asp:LinkButton runat="server" Text="[修改]" OnClick="ModifyMime"
-                                OnClientClick="return modifyMime();" />
-                <% } %>
-            </div>
-            <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
-            <div>自定义 MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
-            <div>
+            <section>
+                <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
+                <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
+                <div>
+                    默认类型：<%=GetMimeType(Mime) %><% if (CurrentUser.OperateFiles)
+                       { %>
+                    <button runat="server" OnServerClick="ModifyMime" onclick="if (modifyMime())">修改</button>
+                    <% } %>
+                </div>
+                <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
+                <div>自定义 MIME：<input type="text" id="custom-mime" value="<%=Mime %>" style="width: 200px;" /></div>
+            </section>
+            <section class="button-set">
                 <% if (CurrentUser.Download)
-                   { %>
-                <a href="/View/<%= RelativePath %>" target="_blank">[使用默认类型查看]</a>
-                <a href="/Download/<%= RelativePath %>" target="_blank">[下载链接]</a>
-                <a href="javascript:startCustomMime();">[使用自定义MIME类型查看]</a>
+                    { %>
+                <a class="button" href="/View/<%= RelativePath %>" target="_blank">使用默认类型查看</a>
+                <a class="button" href="/Download/<%= RelativePath %>" target="_blank">下载</a>
+                <button type="button" onclick="startCustomMime();">使用自定义 MIME 类型查看</button>
                 <% } %>
                 <% if (CurrentUser.OperateFiles)
-                   { %>
-                <a href="/Edit/<%= RelativePath %>" target="_blank">[以纯文本格式编辑]</a>
+                    { %>
+                <a class="button" href="/Edit/<%= RelativePath %>" target="_blank">以纯文本格式编辑</a>
                 <%     if (CurrentUser.OperateTasks)
-                       { %>
-                <asp:LinkButton runat="server" Text="[解压缩]" OnClick="Decompress"
-                                OnClientClick="return pickFolderCore(true);" />
-                <a href="javascript:showConvert();">[转换媒体文件格式]</a>
+                        { %>
+                <button runat="server" OnServerClick="Decompress" onclick="if (pickFolderCore(true))">
+                    解压缩
+                </button>
+                <button type="button" onclick="showConvert();">转换媒体文件格式</button>
                 <%     }
-                   } %>
-            </div>
-            <div id="convert-form" style="display: none;">
+                    } %>
+            </section>
+            <section id="convert-form" style="display: none;">
                 <div>输出路径：（重名将被忽略）</div>
                 <div><asp:TextBox ID="ConvertPathBox" runat="server" Width="100%"></asp:TextBox></div>
                 <div>视频大小：（如640x480，不填表示不变）</div>
@@ -308,37 +346,37 @@
                 <div class="center">
                     <asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" />
                 </div>
-            </div>
+            </section>
         </asp:View>
         <asp:View runat="server" ID="FileUploadingView">
-            <% var uploadTask = (UploadTask) Task; %>
-            <div>当前状态：　　正在上传中</div>
-            <div>开始上传时间：<%=Task == null || !Task.StartTime.HasValue
-                                    ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
-            <div>总分块数量：　<%=uploadTask.TotalParts %></div>
-            <div>已上传数量：　<%=uploadTask.FinishedParts.Count %></div>
-            <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
-                                    ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
-            <div>已上传大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
-            <div class="progress-bar">
-                <%-- ReSharper disable UnexpectedValue --%>
-                <div class="bar" style="width: <%=Task == null || !Task.Percentage.HasValue
-                                                    ? 0 : Task.Percentage.Value %>%;"></div>
-                <%-- ReSharper restore UnexpectedValue --%>
-            </div>
+            <section>
+                <% var uploadTask = (UploadTask) Task; %>
+                <div>当前状态：　　正在上传中</div>
+                <div>开始上传时间：<%=Task == null || !Task.StartTime.HasValue
+                                        ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
+                <div>总分块数量：　<%=uploadTask.TotalParts %></div>
+                <div>已上传数量：　<%=uploadTask.FinishedParts.Count %></div>
+                <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
+                                        ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
+                <div>已上传大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
+                <div class="progress-bar"><div class="bg-cyan bar" style="width: <%=
+                    Task == null || !Task.Percentage.HasValue ? 0 : Task.Percentage.Value %>%;"></div></div>
+            </section>
         </asp:View>
         <asp:View runat="server" ID="FileProcessingView">
-            <skylark:TaskViewer runat="server" ID="Viewer" />
+            <section>
+                <skylark:TaskViewer runat="server" ID="Viewer" />
+            </section>
         </asp:View>
         <asp:View runat="server" ID="GeneralTaskProcessingView">
-            <div>
+            <section>
                 <% var root = FileHelper.GetElement(FileHelper.GetDataFilePath(RelativePath)); %>
                 正在<%=TaskHelper.GetName(root.GetAttributeValue("state")) %>……
                 <a href="/Task/Details/<%=root.GetAttributeValue("id") %>">现在去看看吧！</a>
-            </div>
+            </section>
         </asp:View>
         <asp:View runat="server" ID="GoneView">
-            <div>您要查找的东西已消失！</div>
+            <section>您要查找的东西已消失！</section>
         </asp:View>
     </asp:MultiView>
 </asp:Content>

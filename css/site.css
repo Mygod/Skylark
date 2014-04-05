@@ -1,17 +1,17 @@
+body {
+    margin: 20px;
+}
+
 .left {
     text-align: left;
 }
 
-.center, .screenshots {
+footer, .center, .screenshots {
     text-align: center;
 }
 
 .right {
     text-align: right;
-}
-
-img {
-    max-width: 100%;
 }
 
 .bold {
@@ -42,10 +42,11 @@ img {
     padding: 10px !important;
     height: auto !important;
     color: white !important;
-    box-shadow: inset 0px 0px 1px #FFFFCC;
+    box-shadow: inset 0 0 1px #FFFFCC;
     white-space: nowrap;
     overflow: hidden;
 }
+
 .image-button:hover {
     outline: 3px #9f9f9f solid;
 }
@@ -64,7 +65,7 @@ img {
     width: 300px !important;
 }
 .image-button small {
-  color: #dddddd !important;
+    color: #dddddd !important;
 }
 
 .ellipsis {
@@ -87,4 +88,21 @@ img {
 
 .hidden {
     display: none;
+}
+
+.h {
+    color: black !important;
+}
+
+.stretch {
+    width: 100%;
+}
+
+.upload-dragover {
+    background-color: lime;
+}
+
+td.nowrap.input-control.checkbox {
+    display: table-cell;
+    margin-bottom: 0;
 }

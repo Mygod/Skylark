@@ -65,3 +65,28 @@ function login() {
     $.cookie('Password', CryptoJS.SHA512(psw), { expires: 365, path: '/' });
     location.reload();
 }
+
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+var units = ["字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB"];
+function getSize(size) {
+    var byt = size;
+    size = numberWithCommas(size) + ' 字节';
+    var i = 0;
+    while (byt > 1000)
+    {
+        byt /= 1024;
+        i++;
+    }
+    return i == 0 ? size : byt.toFixed(2) + " " + units[i] + " (" + size + ")";
+}
+
+function htmlEncode(value) {
+    return $('<div/>').text(value).html();
+}
+
+function htmlDecode(value) {
+    return $('<div/>').html(value).text();
+}
