@@ -50,8 +50,6 @@
                 <%     }
                    } %>
             </section>
-            <% if (CurrentUser.OperateFiles)
-               { %>
             <section id="upload-panel" ondragenter="$(this).addClass('upload-dragover');"
                      ondragleave="$(this).removeClass('upload-dragover');"
                      ondrop="$(this).removeClass('upload-dragover');">
@@ -67,9 +65,8 @@
                     </thead>
                     <tbody></tbody>
                 </table>
-                <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。</div>
+                <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。<% if (CurrentUser.OperateFiles) { %>请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。<% } %></div>
             </section>
-            <% } %>
             <section id="running-result" style="display: none;">
                 <button type="button" onclick="hideParent();">隐藏</button><br />
                 <textarea class="stretch" style="height: 100px;"></textarea>
