@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
@@ -49,18 +50,21 @@
   <ItemGroup>
     <Content Include="Admin.aspx" />
     <Content Include="Api.aspx" />
+    <Content Include="css\iconFont.min.css" />
+    <Content Include="css\metro-bootstrap.min.css" />
     <Content Include="css\site.css" />
     <Content Include="Data\Banner.png.data" />
     <Content Include="Data\readme.htm.data" />
     <Content Include="Edit.aspx" />
     <Content Include="Data\Site.config" />
     <Content Include="Files\Banner.png" />
+    <Content Include="fonts\iconFont.dev.svg" />
+    <Content Include="fonts\iconFont.svg" />
+    <Content Include="fonts\metroSysIcons.svg" />
     <Content Include="Forbidden.aspx" />
     <Content Include="plugins\7z.dll" />
     <Content Include="plugins\BackgroundRunner.exe" />
     <Content Include="Browse.aspx" />
-    <Content Include="css\modern-responsive.css" />
-    <Content Include="css\modern.css" />
     <Content Include="Default.aspx" />
     <Content Include="Download.aspx" />
     <Content Include="favicon.ico" />
@@ -69,7 +73,7 @@
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
     <Content Include="Image\File.png" />
-    <Content Include="javascript\generic.js" />
+    <Content Include="plugins\generic.js" />
     <Content Include="Offline\New.aspx" />
     <Content Include="Offline\Start.aspx" />
     <Content Include="Offline\YouTube.aspx" />
@@ -87,18 +91,15 @@
     <Content Include="plugins\ffmpeg\postproc-52.dll" />
     <Content Include="plugins\ffmpeg\swresample-0.dll" />
     <Content Include="plugins\ffmpeg\swscale-2.dll" />
-    <Content Include="plugins\fineuploader\fineuploader-3.5.0.css" />
-    <Content Include="plugins\fineuploader\iframe.xss.response-3.5.0.js" />
-    <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.js" />
-    <Content Include="plugins\fineuploader\jquery.fineuploader-3.5.0.min.js" />
-    <Content Include="plugins\fineuploader\loading.gif" />
-    <Content Include="plugins\fineuploader\processing.gif" />
     <Content Include="plugins\jquery\jquery-2.0.3.min.js" />
     <Content Include="plugins\jquery\jquery.cookie.js" />
+    <Content Include="plugins\jquery\jquery.widget.min.js" />
+    <Content Include="plugins\metro.min.js" />
     <Content Include="plugins\MonoTorrent.Dht.dll" />
     <Content Include="plugins\MonoTorrent.Dht.pdb" />
     <Content Include="plugins\MonoTorrent.dll" />
     <Content Include="plugins\MygodLibrary.dll" />
+    <Content Include="plugins\resumable.js" />
     <Content Include="plugins\SevenZipSharp.dll" />
     <Content Include="TaskViewer.ascx" />
     <Content Include="Task\Default.aspx" />
@@ -283,6 +284,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Data\Site.privileges" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fonts\iconFont.eot" />
+    <Content Include="fonts\iconFont.json" />
+    <Content Include="fonts\iconFont.ttf" />
+    <Content Include="fonts\iconFont.woff" />
+    <Content Include="fonts\metroSysIcons.ttf" />
+    <Content Include="fonts\metroSysIcons.woff" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
