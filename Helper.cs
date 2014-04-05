@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -32,8 +33,8 @@ namespace Mygod.Skylark
                 byt /= 1024;
                 i++;
             }
-            if (i == 0) return size.ToString("N0") + " 字节";
-            return byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N0") + " 字节)";
+            return i == 0 ? size.ToString("N0") + " 字节"
+                          : byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N0") + " 字节)";
         }
         public static string GetSize(double size)
         {
@@ -206,8 +207,7 @@ namespace Mygod.Skylark
                 return; // ignore non-data files
             var element = GetElement(dataPath);
             if (element.GetAttributeValue("state") == TaskType.NoTask) return;
-            var pid = element.GetAttributeValueWithDefault<int>("pid");
-            if (pid != 0) CloudTask.KillProcess(pid);
+            CloudTask.KillProcessTree(element.GetAttributeValueWithDefault<int>("pid"));
         }
         public static void CreateDirectory(string path)
         {
@@ -284,6 +284,19 @@ namespace Mygod.Skylark
             StartCore();
         }
         protected abstract void StartCore();
+
+        public static void KillProcessTree(int pid)
+        {
+            if (pid == 0) return;
+            foreach (var mbo in new ManagementObjectSearcher
+                ("Select * From Win32_Process Where ParentProcessID=" + pid).Get())
+                KillProcessTree(Int32.Parse(mbo["ProcessID"].ToString()));
+            try
+            {
+                Process.GetProcessById(pid).Kill();
+            }
+            catch { }
+        }
     }
     public abstract partial class GenerateFileTask
     {
@@ -358,12 +371,19 @@ namespace Mygod.Skylark
         {
         }
 
-        public UploadTask(string relativePath, int totalParts, long length) : base(relativePath, TaskType.UploadTask)
+        public UploadTask(string relativePath, string identifier, int totalParts, long length)
+            : base(relativePath, TaskType.UploadTask)
         {
+            Identifier = identifier;
             TotalParts = totalParts;
             FileLength = length;
         }
 
+        public string Identifier
+        {
+            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("identifier"); }
+            set { TaskXml.SetAttributeValue("identifier", value); }
+        }
         public int TotalParts
         {
             get { return TaskXml == null ? 0 : TaskXml.GetAttributeValue<int>("totalParts"); }
@@ -412,16 +432,6 @@ namespace Mygod.Skylark
             return Mappings.ContainsKey(id) ? Mappings[id] : "处理";
         }
 
-        public static void CleanUp()
-        {
-            foreach (var path in Directory.EnumerateFiles(FileHelper.GetDataPath(String.Empty), "*.task"))
-            {
-                var pid = XHelper.Load(path).Root.GetAttributeValueWithDefault<int>("pid");
-                if (pid != 0) CloudTask.KillProcess(pid);
-                FileHelper.DeleteWithRetries(path);
-            }
-        }
-
         public static long CurrentWorkers { get { return Process.GetProcessesByName("BackgroundRunner").LongLength; } }
     }
 
@@ -468,7 +478,8 @@ namespace Mygod.Skylark
                 Description = input.Substring(29);
             }
 
-            public readonly bool DecodingSupported, EncodingSupported, IntraFrameOnlyCodec, LossyCompression, LosslessCompression;
+            public readonly bool DecodingSupported, EncodingSupported, IntraFrameOnlyCodec, LossyCompression,
+                                 LosslessCompression;
             public readonly CodecType Type;
             public readonly string Name, Description;
 

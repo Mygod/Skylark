@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
@@ -29,7 +30,7 @@ namespace Mygod.Skylark
     {
         protected CloudTask(string filePath)
         {
-            if (!string.IsNullOrEmpty(FilePath = filePath) && File.Exists(filePath))
+            if (!String.IsNullOrEmpty(FilePath = filePath) && File.Exists(filePath))
                 TaskXml = XHelper.Load(filePath).Root;
         }
         protected CloudTask(string filePath, string root)
@@ -41,14 +42,6 @@ namespace Mygod.Skylark
         protected static readonly Regex
             AccountRemover = new Regex(@"^ftp:\/\/[^\/]*?:[^\/]*?@", RegexOptions.Compiled);
 
-        public static void KillProcess(int pid)
-        {
-            try
-            {
-                Process.GetProcessById(pid).Kill();
-            }
-            catch { }
-        }
         public static bool IsBackgroundRunnerKilled(int pid)
         {
             try
@@ -123,7 +116,7 @@ namespace Mygod.Skylark
                 return PID > 0
                             ? EndTime.HasValue
                                 ? TaskStatus.Done
-                                : string.IsNullOrEmpty(ErrorMessage)
+                                : String.IsNullOrEmpty(ErrorMessage)
                                     ? IsBackgroundRunnerKilled(PID) ? TaskStatus.Terminated : TaskStatus.Working
                                     : TaskStatus.Error
                             : TaskStatus.Starting;
