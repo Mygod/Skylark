@@ -116,7 +116,8 @@
                     $("#compress-config").show();
                 }
                 function getDownloadLink() {
-                    var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().find("input:hidden");
+                    var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().parent()
+                                    .find("input:hidden");
                     var result = "";
                     uriParser.exec(location.href);
                     var prefix = (RegExp.$1 + "/Download/" + RegExp.$3).replace("\\", "/");
