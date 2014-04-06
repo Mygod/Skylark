@@ -14,7 +14,7 @@ footer, .center, .screenshots {
     text-align: right;
 }
 
-.bold {
+summary, .bold {
     font-weight: bold;
 }
 
