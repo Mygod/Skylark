@@ -309,18 +309,19 @@ namespace Mygod.Skylark
     }
     public sealed partial class CrossAppCopyTask
     {
-        private readonly WebClient client = new WebClient();
+        private readonly CookieAwareWebClient client = new CookieAwareWebClient();
         private bool CopyFile(string domain, string source, string target, bool logging = true)
         {
             var targetFile = FileHelper.Combine(target, Path.GetFileName(source));
             CurrentFile = targetFile;
             try
             {
+                
                 var root = XDocument.Parse(client.DownloadString(
                     string.Format("http://{0}/Api/Details/{1}", domain, source))).Root;
                 if (root.GetAttributeValue("status") != "ok")
                     throw new ExternalException(root.GetAttributeValue("message"));
-                Program.OfflineDownload(string.Format("http://{0}/Download/{1}", domain, source), target);
+                Program.OfflineDownload(string.Format("http://{0}/Download/{1}", domain, source), target, client);
                 var file = root.Element("file");
                 FileHelper.SetDefaultMime(FileHelper.GetDataFilePath(targetFile), file.GetAttributeValue("mime"));
                 ProcessedFileCount++;
@@ -377,6 +378,7 @@ namespace Mygod.Skylark
         protected override void ExecuteCore()
         {
             ErrorMessage = string.Empty;
+            client.CookieContainer.Add(new Cookie("Password", Password, Domain, "/"));
             if (!CopyFile(Domain, Source, Target, false)) CopyDirectory(Domain, Source, Target);
             Finish();
         }
@@ -436,6 +438,30 @@ namespace Mygod.Skylark
             Finish();
         }
     }
+
+    public class CookieAwareWebClient : WebClient
+    {
+        public CookieContainer CookieContainer { get; private set; }
+
+        public CookieAwareWebClient(CookieContainer cookies = null)
+        {
+            CookieContainer = (cookies ?? new CookieContainer());
+        }
+
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var request = base.GetWebRequest(address);
+            ProcessRequest(request);
+            return request;
+        }
+        public void ProcessRequest(WebRequest request)
+        {
+            var httpRequest = request as HttpWebRequest;
+            if (httpRequest == null) return;
+            httpRequest.CookieContainer = CookieContainer;
+            httpRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+        }
+    }
 }
 
 namespace Mygod.Skylark.BackgroundRunner
@@ -490,7 +516,7 @@ namespace Mygod.Skylark.BackgroundRunner
             if (i >= 0) url = url.Substring(0, i);
             return Path.GetFileName(url);
         }
-        public static void OfflineDownload(string url, string path)
+        public static void OfflineDownload(string url, string path, CookieAwareWebClient client = null)
         {
             FileStream fileStream = null;
             OfflineDownloadTask task = null;
@@ -506,7 +532,11 @@ namespace Mygod.Skylark.BackgroundRunner
                     case "file":
                         var request = WebRequest.Create(url);
                         var httpWebRequest = request as HttpWebRequest;
-                        if (httpWebRequest != null) httpWebRequest.Referer = url;
+                        if (httpWebRequest != null)
+                        {
+                            httpWebRequest.Referer = url;
+                            if (client != null) client.ProcessRequest(request);
+                        }
                         request.Timeout = Timeout.Infinite;
                         var response = request.GetResponse();
                         if (!retried && url.StartsWith("http://goo.im", true, CultureInfo.InvariantCulture)

@@ -63,7 +63,7 @@ namespace Mygod.Skylark.Task
                     case "crossappcopy":
                         result.SetAttributeValue("id", (task = new CrossAppCopyTask(
                             Request.QueryString["Domain"].UrlDecode(), Request.QueryString["Path"].UrlDecode(),
-                            path)));
+                            path, Request.QueryString["Password"].UrlDecode() ?? Request.GetPassword())));
                         task.Start();
                         break;
                     default:

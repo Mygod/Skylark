@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
@@ -157,7 +156,7 @@ namespace Mygod.Skylark
             }
         }
 
-        private static readonly Regex ChineseSpaceTrimmer = new Regex(@"([\u4e00-\u9fa5]) ([\u4e00-\u9fa5])",
+        private static readonly Regex ChineseSpaceTrimmer = new Regex(@"([\u4e00-\u9fa5]) +([\u4e00-\u9fa5])",
                                                                       RegexOptions.Compiled);
         public string GetStatus(string type = null, Action never = null)
         {
@@ -557,10 +556,12 @@ namespace Mygod.Skylark
         public CrossAppCopyTask(string id) : base(id)
         {
         }
-        public CrossAppCopyTask(string domain, string source, string target) : base(TaskType.CrossAppCopyTask, target)
+        public CrossAppCopyTask(string domain, string source, string target, string password = null)
+            : base(TaskType.CrossAppCopyTask, target)
         {
             Domain = domain;
             Source = source;
+            Password = password;
         }
 
         public string Domain
@@ -572,6 +573,11 @@ namespace Mygod.Skylark
         {
             get { return TaskXml == null ? null : TaskXml.GetAttributeValue("source"); }
             set { TaskXml.SetAttributeValue("source", value); }
+        }
+        public string Password
+        {
+            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("password"); }
+            set { TaskXml.SetAttributeValue("password", value); }
         }
 
         public override long? FileCount { get { return null; } set { throw new NotSupportedException(); } }

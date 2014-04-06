@@ -94,11 +94,15 @@ namespace Mygod.Skylark
             return header != null && header == "XMLHttpRequest";
         }
 
-        public static User GetUser(this HttpRequest request)
+        public static string GetPassword(this HttpRequest request)
         {
             var cookie = request.Cookies["Password"];
+            return (cookie == null ? null : cookie.Value) ?? string.Empty;
+        }
+        public static User GetUser(this HttpRequest request)
+        {
             var temp = new Privileges();
-            var psw = cookie != null && temp.Contains(cookie.Value) ? cookie.Value : User.AnonymousPassword;
+            var psw = request.GetPassword();
             return temp.Contains(psw) ? temp[psw] : new User();
         }
     }
