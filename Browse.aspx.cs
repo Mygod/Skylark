@@ -188,7 +188,7 @@ namespace Mygod.Skylark
         }
 
         private static readonly Regex
-            AppParser = new Regex(@"^http:\/\/(|.*?@)(.*?)\/Browse\/(.*)$", RegexOptions.Compiled);
+            AppParser = new Regex(@"^http:\/\/((.*?)@)?(.*?)\/Browse\/(.*)$", RegexOptions.Compiled);
         protected void CrossAppCopy(object sender, EventArgs e)
         {
             if (!CurrentUser.OperateTasks)
@@ -198,9 +198,8 @@ namespace Mygod.Skylark
             }
             var match = AppParser.Match(Hidden.Value);
             if (!match.Success) return;
-            var task = new CrossAppCopyTask(match.Groups[2].Value, match.Groups[3].Value.UrlDecode(), RelativePath,
-                                            string.IsNullOrWhiteSpace(match.Groups[1].Value) ? Request.GetPassword()
-                                                                                             : match.Groups[1].Value);
+            var task = new CrossAppCopyTask(match.Groups[3].Value, match.Groups[4].Value.UrlDecode(), RelativePath,
+                                            match.Groups[2].Success ? match.Groups[2].Value : Request.GetPassword());
             task.Start();
             Response.Redirect("/Task/Details/" + task.ID);
         }
