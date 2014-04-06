@@ -103,7 +103,8 @@ namespace Mygod.Skylark
         {
             var temp = new Privileges();
             var psw = request.GetPassword();
-            return temp.Contains(psw) ? temp[psw] : new User();
+            if (temp.Contains(psw)) return temp[psw];
+            return temp.Contains(User.AnonymousPassword) ? temp[User.AnonymousPassword] : new User();
         }
     }
 
@@ -609,13 +610,7 @@ namespace Mygod.Skylark
                                 new XAttribute("operateTasks", OperateTasks), new XAttribute("admin", Admin));
         }
 
-        public static string AnonymousPassword
-        {
-            get
-            {
-                return "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
-            }
-        }
+        public static readonly string AnonymousPassword = "ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413";
     }
     public sealed class Privileges : KeyedCollection<string, User>
     {

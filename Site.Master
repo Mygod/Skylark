@@ -24,7 +24,8 @@
     <main>
         <header><h1><a href="/" class="h">云雀™</a></h1></header>
         <section>
-            <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture)); %>
+            <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture));
+               var user = Request.GetUser(); %>
             <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)",
                                     Helper.GetSize(currentDrive.AvailableFreeSpace), 
                                     Helper.GetSize(currentDrive.TotalSize), 
@@ -32,7 +33,7 @@
             <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
             <div>
                 您的当前身份：<a href="javascript:showLoginPanel();">[修改]</a>
-                <%=string.Format(User.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", User.Comment) %>
+                <%=string.Format(user.Admin ? "<a href=\"/Admin/\">{0}</a>" : "{0}", user.Comment) %>
             </div>
             <div id="login-panel" style="display: none;">
                 请输入密码：　<input id="password-box" type="password" />
