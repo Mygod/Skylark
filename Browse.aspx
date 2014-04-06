@@ -140,12 +140,13 @@
                     }
                     return false;
                 }
-                var appParser = /^http:\/\/(.*?)\/Browse\/(.*?)$/;
+                var appParser = /^http:\/\/((.*?)@)?(.*?)\/Browse\/(.*)$/;
                 function pickApp() {
                     var result = prompt("请输入目标云雀：（请使用“http://[password@]domain/Browse/......”的格式，" +
                                         "如果不输入密码，默认将使用当前的密码）", "http://skylark.apphb.com/Browse/");
                     if (appParser.test(result)) {
-                        $("#Hidden").val(result);
+                        $("#Hidden").val(RegExp.$2 ? 'http://' + CryptoJS.SHA512(RegExp.$2) + '@' + RegExp.$3
+                                                               + '/Browse/' + RegExp.$4 : result);
                         return true;
                     }
                     return false;

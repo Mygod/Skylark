@@ -378,7 +378,7 @@ namespace Mygod.Skylark
         {
             ErrorMessage = string.Empty;
             client.CookieContainer.Add(new Cookie("Password", Password, "/", Domain));
-            Password = null;
+            // Password = null;
             Save();
             if (!CopyFile(Domain, Source, Target, false)) CopyDirectory(Domain, Source, Target);
             Finish();
