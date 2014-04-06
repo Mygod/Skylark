@@ -11,8 +11,8 @@ namespace Mygod.Skylark.Offline
             if (string.IsNullOrWhiteSpace(url)) return;
             foreach (var video in Net.YouTube.Video.GetVideoFromLink(url))
             {
-                Response.Write(string.Format("<h3 title=\"{4}\"><a href=\"{1}\">{0}</a>{3}</h3>{2}", video.Title,
-                    video.Url, Environment.NewLine, video.Url.Equals(url, StringComparison.InvariantCultureIgnoreCase)
+                Response.Write(string.Format("<details><summary title=\"{3}\"><a href=\"{1}\">{0}</a>{2}</summary>",
+                    video.Title, video.Url, video.Url.Equals(url, StringComparison.InvariantCultureIgnoreCase)
                         ? string.Empty : string.Format(" <a href=\"?Url={0}\" target=\"_blank\">[查看相关视频]</a>",
                                                        Rbase64.Encode(video.Url)),
                     string.Format("标题：{0}{8}上传者：{1}{8}关键字：{2}{8}平均评分：{3}{8}观看次数：{4}{8}" +
@@ -22,12 +22,12 @@ namespace Mygod.Skylark.Offline
                 foreach (var link in video.FmtStreamMap)
                 {
                     Response.Write(string.Format(
-                        "<div title=\"{4}\"><a href=\"/Offline/Start/{2}?Url={0}\" target=\"_blank\">{1}</a></div>{3}",
-                        Rbase64.Encode(link.GetUrl(link.Parent.Title)), link,
-                        string.IsNullOrEmpty(path) ? string.Empty : (path + '/'), Environment.NewLine,
-                        link.Properties.Replace(Environment.NewLine, "&#10;")));
-                    Response.Flush();
+                        "<div title=\"{3}\"><a href=\"/Offline/Start/{2}?Url={0}\" target=\"_blank\">{1}</a></div>",
+                        Rbase64.Encode(link.GetUrl(link.Parent.Title)), link, string.IsNullOrEmpty(path)
+                            ? string.Empty : (path + '/'), link.Properties.Replace(Environment.NewLine, "&#10;")));
                 }
+                Response.Write("</details>" + Environment.NewLine);
+                Response.Flush();
             }
         }
     }
