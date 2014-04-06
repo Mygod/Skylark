@@ -316,7 +316,6 @@ namespace Mygod.Skylark
             CurrentFile = targetFile;
             try
             {
-                
                 var root = XDocument.Parse(client.DownloadString(
                     string.Format("http://{0}/Api/Details/{1}", domain, source))).Root;
                 if (root.GetAttributeValue("status") != "ok")
@@ -378,7 +377,9 @@ namespace Mygod.Skylark
         protected override void ExecuteCore()
         {
             ErrorMessage = string.Empty;
-            client.CookieContainer.Add(new Cookie("Password", Password, Domain, "/"));
+            client.CookieContainer.Add(new Cookie("Password", Password, "/", Domain));
+            Password = null;
+            Save();
             if (!CopyFile(Domain, Source, Target, false)) CopyDirectory(Domain, Source, Target);
             Finish();
         }
