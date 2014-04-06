@@ -158,7 +158,7 @@
                     target: '/Upload/<%= RelativePath.Replace("'", @"\'") %>',
                     permanentErrors: [401, 403, 500],
                     simultaneousUploads: 1, // damn you race condition
-                    minFileSize: 0          // damn you documentation
+                    minFileSize: 0          // damn you  documentation
                 });
                 var uploadFileTable = $('#upload-file-table');
                 var rows = {};
