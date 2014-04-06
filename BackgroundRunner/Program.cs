@@ -320,6 +320,7 @@ namespace Mygod.Skylark
                     string.Format("http://{0}/Api/Details/{1}", domain, source))).Root;
                 if (root.GetAttributeValue("status") != "ok")
                     throw new ExternalException(root.GetAttributeValue("message"));
+                Save();
                 Program.OfflineDownload(string.Format("http://{0}/Download/{1}", domain, source), target, client);
                 var file = root.Element("file");
                 FileHelper.SetDefaultMime(FileHelper.GetDataFilePath(targetFile), file.GetAttributeValue("mime"));
@@ -378,7 +379,7 @@ namespace Mygod.Skylark
         {
             ErrorMessage = string.Empty;
             client.CookieContainer.Add(new Cookie("Password", Password, "/", Domain));
-            // Password = null;
+            Password = null;
             Save();
             if (!CopyFile(Domain, Source, Target, false)) CopyDirectory(Domain, Source, Target);
             Finish();
@@ -629,6 +630,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 if (task == null) throw;
                 task.ErrorMessage = exc.Message;
                 task.Save();
+                if (client != null) throw;
             }
             finally
             {
