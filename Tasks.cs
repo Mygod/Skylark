@@ -169,7 +169,9 @@ namespace Mygod.Skylark
                     return ChineseSpaceTrimmer.Replace("正在 " + (type ?? "进行") + " 中", "$1$2");
                 case TaskStatus.Error:
                     if (never != null) never();
-                    return "发生错误，具体信息：<br /><pre>" + ErrorMessage + "</pre>";
+                    var result = "发生错误";
+                    if (never != null) result += "，具体信息：<br /><pre>" + ErrorMessage + "</pre>";
+                    return result;
                 case TaskStatus.Starting:
                     return "正在开始";
                 case TaskStatus.Done:
