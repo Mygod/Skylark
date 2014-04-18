@@ -16,7 +16,10 @@
     <section>
         <h2 class="center">离线下载你管视频</h2>
         <p><input type="text" id="link-box" value="http://www.youtube.com/results?search_query=" /></p>
-        <p class="center"><button type="button" id="magic-button">获取该页上全部视频</button></p>
+        <p class="center">
+            <button type="button" id="magic-button">获取该页上全部视频</button>
+            <button type="button" onclick="toggleOpen();">全部展开/合并</button>
+        </p>
         <script type="text/javascript">
             var url = getQueryStringRegExp("URL");
             if (url) $("#link-box").val($.base64reversed.decode(url));
@@ -27,7 +30,6 @@
     </section>
     <section>
         <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/">掩耳</a>！</div>
-        <div class="center"><button type="button" onclick="toggleOpen();">全部展开/合并</button></div>
         <% GetEmAll(); %>
     </section>
 </asp:Content>
