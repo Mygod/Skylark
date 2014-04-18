@@ -7,7 +7,7 @@
     <link href="/css/iconFont.min.css" rel="stylesheet" type="text/css" />
     <link href="/css/metro-bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="/css/site.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="/plugins/jquery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="/plugins/jquery/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="/plugins/jquery/jquery.widget.min.js"></script>
     <script type="text/javascript" src="/plugins/jquery/jquery.cookie.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>

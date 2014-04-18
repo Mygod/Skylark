@@ -91,7 +91,7 @@
     <Content Include="plugins\ffmpeg\postproc-52.dll" />
     <Content Include="plugins\ffmpeg\swresample-0.dll" />
     <Content Include="plugins\ffmpeg\swscale-2.dll" />
-    <Content Include="plugins\jquery\jquery-2.0.3.min.js" />
+    <Content Include="plugins\jquery\jquery-2.1.0.min.js" />
     <Content Include="plugins\jquery\jquery.cookie.js" />
     <Content Include="plugins\jquery\jquery.widget.min.js" />
     <Content Include="plugins\metro.min.js" />
@@ -280,9 +280,6 @@
     <Content Include="FileSystem.master" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="plugins\jquery\jquery-2.0.3.min.map" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Data\Site.privileges" />
   </ItemGroup>
   <ItemGroup>
@@ -292,6 +289,9 @@
     <Content Include="fonts\iconFont.woff" />
     <Content Include="fonts\metroSysIcons.ttf" />
     <Content Include="fonts\metroSysIcons.woff" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="plugins\jquery\jquery-2.1.0.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
