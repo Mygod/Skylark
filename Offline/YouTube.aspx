@@ -5,6 +5,12 @@
             width: 100%;
         }
     </style>
+    <script type="text/javascript">
+        var opened = false;
+        function toggleOpen() {
+            $('details').prop('open', opened = !opened);
+        }
+    </script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <section>
@@ -21,6 +27,7 @@
     </section>
     <section>
         <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/">掩耳</a>！</div>
+        <div class="center"><button type="button" onclick="toggleOpen();">全部展开/合并</button></div>
         <% GetEmAll(); %>
     </section>
 </asp:Content>
