@@ -56,7 +56,7 @@
         <button type="button" onclick="invertSelection();">反选</button>
         <%  if (Request.GetUser().OperateTasks)
             { %>
-        <button runat="server" OnServerClick="Delete" onclick="return deleteConfirm() |">删除任务及其相关数据</button>
+        <button runat="server" OnServerClick="Delete" onclick="return deleteConfirm() ||">删除任务及其相关数据</button>
         <%  } %>
     </section>
     <section>
