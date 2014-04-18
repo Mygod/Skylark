@@ -34,17 +34,17 @@
                 <% }
                    if (CurrentUser.OperateFiles)
                    { %>
-                <button runat="server" onclick="return newFolder() ||" onServerClick="NewFolder">新建文件夹</button>
-                <button runat="server" onclick="return pickFolder() ||" onServerClick="Move">移动到</button>
-                <button runat="server" onclick="return pickFolder() ||" onServerClick="Copy">复制到</button>
-                <button runat="server" onclick="return deleteConfirm() ||" onServerClick="Delete">删除</button>
+                <button runat="server" onclick="return newFolder() && !" onServerClick="NewFolder">新建文件夹</button>
+                <button runat="server" onclick="return pickFolder() && !" onServerClick="Move">移动到</button>
+                <button runat="server" onclick="return pickFolder() && !" onServerClick="Copy">复制到</button>
+                <button runat="server" onclick="return deleteConfirm() && !" onServerClick="Delete">删除</button>
                 <%     if (CurrentUser.OperateTasks)
                        { %>
                 <a class="button" href="/Offline/New/<%= RelativePath %>">新建离线下载任务</a>
                 <button onclick="showCompressConfig();" type="button">压缩选中项</button>
-                <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() ||">跨云雀传输</button>
-                <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() ||">上传到 FTP</button>
-                <button runat="server" onServerClick="BitTorrentDownload" onclick="return pickFolderCore(true) ||">
+                <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() && !">跨云雀传输</button>
+                <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() && !">上传到 FTP</button>
+                <button runat="server" onServerClick="BitTorrentDownload" onclick="return pickFolderCore(true) && !">
                     离线下载选中种子
                 </button>
                 <%     }
@@ -291,7 +291,7 @@
                 <div>
                     默认类型：<%=GetMimeType(Mime) %><% if (CurrentUser.OperateFiles)
                        { %>
-                    <button runat="server" OnServerClick="ModifyMime" onclick="return modifyMime() ||">修改</button>
+                    <button runat="server" OnServerClick="ModifyMime" onclick="return modifyMime() && !">修改</button>
                     <% } %>
                 </div>
                 <div>FFmpeg 分析结果：<br /><pre><%=FFmpegResult %></pre></div>
@@ -309,7 +309,7 @@
                 <a class="button" href="/Edit/<%= RelativePath %>" target="_blank">以纯文本格式编辑</a>
                 <%     if (CurrentUser.OperateTasks)
                         { %>
-                <button runat="server" OnServerClick="Decompress" onclick="return pickFolderCore(true) ||">
+                <button runat="server" OnServerClick="Decompress" onclick="return pickFolderCore(true) && !">
                     解压缩
                 </button>
                 <button type="button" onclick="showConvert();">转换媒体文件格式</button>
