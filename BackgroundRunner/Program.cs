@@ -266,7 +266,8 @@ namespace Mygod.Skylark
                 .GetActiveTcpListeners().Select(endPoint => endPoint.Port));
             var port = 10000;
             while (listenedPorts.Contains(port)) port++;
-            var engine = new ClientEngine(new EngineSettings(filePath, port) { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
+            var engine = new ClientEngine(new EngineSettings(filePath, port)
+                { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
             engine.ChangeListenEndpoint(new IPEndPoint(IPAddress.Any, port));
             var listener = new DhtListener(new IPEndPoint(IPAddress.Any, port));
             engine.RegisterDht(new DhtEngine(listener));
@@ -275,7 +276,7 @@ namespace Mygod.Skylark
             if (!Directory.Exists(engine.Settings.SavePath)) Directory.CreateDirectory(engine.Settings.SavePath);
             var allManagers = new List<TorrentManager>();
             foreach (var manager in
-                torrents.Select(torrent => new TorrentManager(torrent, filePath, new TorrentSettings(1, 150, 0, 0))))
+                torrents.Select(torrent => new TorrentManager(torrent, filePath, new TorrentSettings(1, 1, 0, 0))))
             {
                 engine.Register(manager);
                 manager.PieceHashed += (sender, e) =>
