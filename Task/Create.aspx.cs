@@ -46,11 +46,6 @@ namespace Mygod.Skylark.Task
                             (path, Request.QueryString["Target"].UrlDecode())).ID);
                         task.Start();
                         break;
-                    case "bittorrent":
-                        result.SetAttributeValue("id", (task = new BitTorrentTask(Request.QueryString["Files"]
-                            .Split('|').Select(file => file.UrlDecode()), Request.QueryString["Target"].UrlDecode())));
-                        task.Start();
-                        break;
                     case "convert":
                         ConvertTask.Create(path, Request.QueryString["Target"].UrlDecode(),
                                            Request.QueryString["Size"].UrlDecode(),

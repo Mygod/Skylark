@@ -339,8 +339,6 @@ namespace Mygod.Skylark
                     return new CrossAppCopyTask(id);
                 case TaskType.DecompressTask:
                     return new DecompressTask(id);
-                case TaskType.BitTorrentTask:
-                    return new BitTorrentTask(id);
                 default:
                     return null;
             }
@@ -409,8 +407,9 @@ namespace Mygod.Skylark
     {
         private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
 
-        public static void Create(string source, string target, string size = null, string vcodec = null, string acodec = null,
-                                  string scodec = null, string startPoint = null, string endPoint = null)
+        public static void Create(string source, string target, string size = null, string vcodec = null,
+                                  string acodec = null, string scodec = null, string startPoint = null,
+                                  string endPoint = null)
         {
             var arguments = string.Empty;
             if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
@@ -429,9 +428,9 @@ namespace Mygod.Skylark
     {
         private static readonly Dictionary<string, string> Mappings = new Dictionary<string, string>
             { { TaskType.OfflineDownloadTask, "离线下载" }, { TaskType.CompressTask, "压缩" },
-              { TaskType.BitTorrentTask, "离线下载 BT 种子" },  { TaskType.ConvertTask, "转换媒体格式" },
-              { TaskType.CrossAppCopyTask, "跨云雀复制" }, { TaskType.DecompressTask, "解压" },
-              { TaskType.FtpUploadTask, "FTP 上传" }, { TaskType.UploadTask, "上传" } };
+              { TaskType.ConvertTask, "转换媒体格式" }, { TaskType.CrossAppCopyTask, "跨云雀复制" },
+              { TaskType.DecompressTask, "解压" }, { TaskType.FtpUploadTask, "FTP 上传" },
+              { TaskType.UploadTask, "上传" } };
         public static string GetName(string id)
         {
             return Mappings.ContainsKey(id) ? Mappings[id] : "处理";

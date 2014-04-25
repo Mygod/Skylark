@@ -13,7 +13,6 @@ namespace Mygod.Skylark
     {
         public const string NoTask = "ready",
                             OfflineDownloadTask = "offline-download",
-                            BitTorrentTask = "bit-torrent",
                             CompressTask = "compress",
                             DecompressTask = "decompress",
                             FtpUploadTask = "ftp-upload",
@@ -592,23 +591,6 @@ namespace Mygod.Skylark
         }
         public DecompressTask(string source, string target) : base(TaskType.DecompressTask, source, target)
         {
-        }
-    }
-    public sealed partial class BitTorrentTask : MultipleToMultipleFilesTask
-    {
-        public BitTorrentTask(string id) : base(id)
-        {
-        }
-        public BitTorrentTask(IEnumerable<string> sources, string target)
-            : base(TaskType.BitTorrentTask, sources, target)
-        {
-        }
-
-        public override string CurrentFile { get { return null; } set { } }
-        public override long ProcessedFileCount
-        {
-            get { return Status == TaskStatus.Done ? FileCount.HasValue ? FileCount.Value : 0 : 0; }
-            set { throw new NotSupportedException(); }
         }
     }
 }

@@ -214,18 +214,6 @@ namespace Mygod.Skylark
             Response.Redirect("/Task/Details/" + new FtpUploadTask(RelativePath, SelectedPaths, Hidden.Value));
         }
 
-        protected void BitTorrentDownload(object sender, EventArgs e)
-        {
-            if (!CurrentUser.OperateTasks)
-            {
-                Response.StatusCode = 401;
-                return;
-            }
-            var task = new BitTorrentTask(SelectedPaths, Hidden.Value.UrlDecode());
-            task.Start();
-            Response.Redirect("/Task/Details/" + task.ID);
-        }
-
         #endregion
 
         #region File

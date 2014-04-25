@@ -44,9 +44,6 @@
                 <button onclick="showCompressConfig();" type="button">压缩选中项</button>
                 <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() && !">跨云雀传输</button>
                 <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() && !">上传到 FTP</button>
-                <button runat="server" onServerClick="BitTorrentDownload" onclick="return pickFolderCore(true) && !">
-                    离线下载选中种子
-                </button>
                 <%     }
                    } %>
             </section>

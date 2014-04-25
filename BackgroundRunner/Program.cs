@@ -185,7 +185,8 @@ namespace Mygod.Skylark
             {
                 StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
                     string.Format("-i \"{0}\"{2} \"{1}\" -y", FileHelper.GetFilePath(Source),
-                                  FileHelper.GetFilePath(RelativePath), Arguments ?? string.Empty)) { UseShellExecute = false, RedirectStandardError = true }
+                                  FileHelper.GetFilePath(RelativePath), Arguments ?? string.Empty))
+                    { UseShellExecute = false, RedirectStandardError = true }
             };
             process.Start();
             while (!process.StandardError.EndOfStream)
@@ -240,72 +241,6 @@ namespace Mygod.Skylark
                 if (extractor == null) throw;
                 throw new AggregateException(extractor.Exceptions);
             }
-        }
-    }
-    public sealed partial class BitTorrentTask
-    {
-        protected override void ExecuteCore()
-        {
-            var filePath = FileHelper.GetFilePath(Target);
-            long length = 0;
-            var torrents = this.GetAllSources().Select(source => Torrent.Load(FileHelper.GetFilePath(source)))
-                                               .ToList();
-            foreach (var torrent in torrents)
-            {
-                FileCount += torrent.Files.Length;
-                foreach (var file in torrent.Files)
-                {
-                    length += file.Length;
-                    StartFile(FileHelper.Combine(Target, file.Path));
-                }
-            }
-            FileLength = length;
-            Save();
-
-            var listenedPorts = new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties()
-                .GetActiveTcpListeners().Select(endPoint => endPoint.Port));
-            var port = 10000;
-            while (listenedPorts.Contains(port)) port++;
-            var engine = new ClientEngine(new EngineSettings(filePath, port)
-                { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
-            engine.ChangeListenEndpoint(new IPEndPoint(IPAddress.Any, port));
-            var listener = new DhtListener(new IPEndPoint(IPAddress.Any, port));
-            engine.RegisterDht(new DhtEngine(listener));
-            listener.Start();
-            engine.DhtEngine.Start();
-            if (!Directory.Exists(engine.Settings.SavePath)) Directory.CreateDirectory(engine.Settings.SavePath);
-            var allManagers = new List<TorrentManager>();
-            foreach (var manager in
-                torrents.Select(torrent => new TorrentManager(torrent, filePath, new TorrentSettings(1, 1, 0, 0))))
-            {
-                engine.Register(manager);
-                manager.PieceHashed += (sender, e) =>
-                {
-                    ProcessedFileLength = allManagers.Sum(m => (long)(m.Progress * length / 100));
-                    Save();
-                };
-                manager.Start();
-                allManagers.Add(manager);
-            }
-            var managers = new LinkedList<TorrentManager>(allManagers);
-            while (managers.Count > 0)
-            {
-                Thread.Sleep(1000);
-                var i = managers.First;
-                while (i != null)
-                    if (i.Value.Complete)
-                    {
-                        var temp = i;
-                        i = i.Next;
-                        managers.Remove(temp);
-                        foreach (var file in i.Value.Torrent.Files) FinishFile(FileHelper.Combine(Target, file.Path));
-                        ProcessedSourceCount++;
-                        Save();
-                    }
-                    else i = i.Next;
-            }
-            ProcessedFileLength = length;
-            Finish();
         }
     }
     public sealed partial class CrossAppCopyTask
@@ -495,9 +430,6 @@ namespace Mygod.Skylark.BackgroundRunner
                         break;
                     case TaskType.CrossAppCopyTask:
                         new CrossAppCopyTask(Console.ReadLine()).Execute();
-                        break;
-                    case TaskType.BitTorrentTask:
-                        new BitTorrentTask(Console.ReadLine()).Execute();
                         break;
                     default:
                         Console.WriteLine("无法识别。");
