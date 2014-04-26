@@ -49,12 +49,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MonoTorrent">
-      <HintPath>..\plugins\MonoTorrent.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoTorrent.Dht">
-      <HintPath>..\plugins\MonoTorrent.Dht.dll</HintPath>
-    </Reference>
     <Reference Include="MygodLibrary">
       <HintPath>..\plugins\MygodLibrary.dll</HintPath>
     </Reference>
@@ -74,7 +68,9 @@
     <Compile Include="..\Tasks.cs">
       <Link>Tasks.cs</Link>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="Program.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

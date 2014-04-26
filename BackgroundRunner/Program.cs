@@ -5,17 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml.Linq;
-using MonoTorrent;
-using MonoTorrent.Client;
-using MonoTorrent.Client.Encryption;
-using MonoTorrent.Common;
-using MonoTorrent.Dht;
-using MonoTorrent.Dht.Listeners;
 using Mygod.Skylark.BackgroundRunner;
 using Mygod.Xml.Linq;
 using SevenZip;
@@ -458,105 +451,61 @@ namespace Mygod.Skylark.BackgroundRunner
             try
             {
                 var retried = false;
-                var protocol = url.Remove(url.IndexOf(':')).ToLowerInvariant();
-                switch (protocol)
+            retry:
+                var request = WebRequest.Create(url);
+                var httpWebRequest = request as HttpWebRequest;
+                if (httpWebRequest != null)
                 {
-                    case "http":
-                    case "https":
-                    case "ftp":
-                    case "file":
-                        var request = WebRequest.Create(url);
-                        var httpWebRequest = request as HttpWebRequest;
-                        if (httpWebRequest != null)
-                        {
-                            httpWebRequest.Referer = url;
-                            if (client != null) client.ProcessRequest(request);
-                        }
-                        request.Timeout = Timeout.Infinite;
-                        var response = request.GetResponse();
-                        if (!retried && url.StartsWith("http://goo.im", true, CultureInfo.InvariantCulture)
-                            && response.ContentType == "text/html")
-                        {
-                            retried = true;
-                            Thread.Sleep(15000);
-                            goto case "file";
-                        }
-                        var stream = response.GetResponseStream();
-                        var disposition = response.Headers["Content-Disposition"] ?? string.Empty;
-                        var pos = disposition.IndexOf("filename=", StringComparison.Ordinal);
-                        long? fileLength;
-                        if (stream.CanSeek) fileLength = stream.Length;
-                        else
-                            try
-                            {
-                                fileLength = response.ContentLength;
-                            }
-                            catch
-                            {
-                                fileLength = null;
-                            }
-                        if (fileLength < 0) fileLength = null;
-
-                        var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode()
-                                                 : GetFileName(url)).ToValidPath();
-                        string mime, extension;
-                        try
-                        {
-                            mime = Helper.GetMime(response.ContentType);
-                            extension = Helper.GetDefaultExtension(mime);
-                        }
-                        catch
-                        {
-                            extension = Path.GetExtension(fileName);
-                            mime = Helper.GetDefaultExtension(extension);
-                        }
-                        if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
-                            fileName += extension;
-
-                        task = new OfflineDownloadTask(url, path = FileHelper.Combine(path, fileName))
-                            { PID = Process.GetCurrentProcess().Id };
-                        if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;
-                        if (fileLength != null) task.FileLength = fileLength;
-                        task.Save();
-                        stream.CopyTo(fileStream = File.Create(FileHelper.GetFilePath(path)));
-                        task.Finish();
-                        break;
-                    case "magnet":
-                        var magnet = new MagnetLink(url);
-                        var torrentPath = FileHelper.Combine(path, magnet.Name + ".torrent");
-                        task = new OfflineDownloadTask(url, torrentPath)
-                            { PID = Process.GetCurrentProcess().Id, FileLength = magnet.Length };
-                        task.Save();
-                        var listenedPorts = new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties()
-                            .GetActiveTcpListeners().Select(endPoint => endPoint.Port));
-                        var port = 10000;
-                        while (listenedPorts.Contains(port)) port++;
-                        var filePath = FileHelper.GetFilePath(path);
-                        var engine = new ClientEngine(new EngineSettings(filePath, port)
-                            { PreferEncryption = false, AllowedEncryption = EncryptionTypes.All });
-                        engine.ChangeListenEndpoint(new IPEndPoint(IPAddress.Any, port));
-                        var listener = new DhtListener(new IPEndPoint(IPAddress.Any, port));
-                        engine.RegisterDht(new DhtEngine(listener));
-                        listener.Start();
-                        engine.DhtEngine.Start();
-                        if (!Directory.Exists(filePath)) Directory.CreateDirectory(filePath);
-                        var manager = new TorrentManager(magnet, filePath, new TorrentSettings(1, 150, 0, 0), FileHelper.GetFilePath(torrentPath));
-                        engine.Register(manager);
-                        var stopped = false;
-                        manager.TorrentStateChanged += (sender, e) =>
-                        {
-                            if (e.NewState == TorrentState.Metadata) return;
-                            stopped = true;
-                            manager.Stop();
-                        };
-                        manager.Start();
-                        while (!stopped) Thread.Sleep(1000);
-                        if (magnet.Length.HasValue) task.ProcessedFileLength = magnet.Length.Value;
-                        task.Finish();
-                        break;
-                    default:
-                        throw new NotSupportedException("不支持的协议：" + protocol);
+                    httpWebRequest.Referer = url;
+                    if (client != null) client.ProcessRequest(request);
                 }
+                request.Timeout = Timeout.Infinite;
+                var response = request.GetResponse();
+                if (!retried && url.StartsWith("http://goo.im", true, CultureInfo.InvariantCulture)
+                    && response.ContentType == "text/html")
+                {
+                    retried = true;
+                    Thread.Sleep(15000);
+                    goto retry;
+                }
+                var stream = response.GetResponseStream();
+                var disposition = response.Headers["Content-Disposition"] ?? string.Empty;
+                var pos = disposition.IndexOf("filename=", StringComparison.Ordinal);
+                long? fileLength;
+                if (stream.CanSeek) fileLength = stream.Length;
+                else
+                    try
+                    {
+                        fileLength = response.ContentLength;
+                    }
+                    catch
+                    {
+                        fileLength = null;
+                    }
+                if (fileLength < 0) fileLength = null;
+
+                var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode()
+                                         : GetFileName(url)).ToValidPath();
+                string mime, extension;
+                try
+                {
+                    mime = Helper.GetMime(response.ContentType);
+                    extension = Helper.GetDefaultExtension(mime);
+                }
+                catch
+                {
+                    extension = Path.GetExtension(fileName);
+                    mime = Helper.GetDefaultExtension(extension);
+                }
+                if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
+                    fileName += extension;
+
+                task = new OfflineDownloadTask(url, path = FileHelper.Combine(path, fileName)) { PID = Process.GetCurrentProcess().Id };
+                if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;
+                if (fileLength != null) task.FileLength = fileLength;
+                task.Save();
+                stream.CopyTo(fileStream = File.Create(FileHelper.GetFilePath(path)));
+                task.Finish();
             }
             catch (Exception exc)
             {

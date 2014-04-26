@@ -95,9 +95,6 @@
     <Content Include="plugins\jquery\jquery.cookie.js" />
     <Content Include="plugins\jquery\jquery.widget.min.js" />
     <Content Include="plugins\metro.min.js" />
-    <Content Include="plugins\MonoTorrent.Dht.dll" />
-    <Content Include="plugins\MonoTorrent.Dht.pdb" />
-    <Content Include="plugins\MonoTorrent.dll" />
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\resumable.js" />
     <Content Include="plugins\SevenZipSharp.dll" />
