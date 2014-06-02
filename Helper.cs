@@ -117,7 +117,7 @@ namespace Mygod.Skylark
 
         public static string GetRelativePath(this RouteData data)
         {
-            return (data.GetRouteString("Path") ?? string.Empty).ToCorrectUrl();
+            return HttpUtility.UrlDecode(data.GetRouteString("Path") ?? string.Empty).ToCorrectUrl();
         }
 
         public static string GetFilePath(string path)
@@ -355,12 +355,13 @@ namespace Mygod.Skylark
         private static readonly Regex MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
         public static void Create(string url, string relativePath)
         {
-            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath, TaskType.OfflineDownloadTask));
+            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
+                        TaskType.OfflineDownloadTask));
         }
         public static void CreateMediaFire(string id, string relativePath)
         {
-            Create(MediaFireDirectLinkExtractor.Match(new WebClient().DownloadString("http://www.mediafire.com/?" + id))
-                                               .Groups[1].Value, relativePath);
+            Create(MediaFireDirectLinkExtractor.Match(new WebClient()
+                        .DownloadString("http://www.mediafire.com/?" + id)).Groups[1].Value, relativePath);
         }
 
         protected override void StartCore()

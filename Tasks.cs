@@ -214,9 +214,8 @@ namespace Mygod.Skylark
         protected GenerateFileTask(string relativePath, string state)
             : base(FileHelper.GetDataFilePath(relativePath), "file")
         {
-            RelativePath = relativePath;
             State = state;
-            Mime = Helper.GetMimeType(relativePath);
+            Mime = Helper.GetMimeType(RelativePath = relativePath);
             StartTime = DateTime.UtcNow;
             File.WriteAllText(FileHelper.GetFilePath(relativePath), string.Empty);  // temp
         }
