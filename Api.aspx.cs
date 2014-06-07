@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Web.UI;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
