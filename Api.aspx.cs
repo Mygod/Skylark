@@ -113,12 +113,17 @@ namespace Mygod.Skylark
             foreach (var video in Net.YouTube.Video.GetVideoFromLink(url))
             {
                 var element = new XElement("video", new XAttribute("title", video.Title),
-                                           new XAttribute("url", video.Url));
-                foreach (var link in video.FmtStreamMap)
+                    new XAttribute("url", video.Url), new XAttribute("author", video.Author),
+                    new XAttribute("keywords", string.Join(", ", video.Keywords)),
+                    new XAttribute("rating", video.AverageRating), new XAttribute("viewCount", video.ViewCount),
+                    new XAttribute("uploadTime", video.UploadTime.Ticks), new XAttribute("length", video.Length));
+                foreach (var link in video.Downloads)
                     element.Add(new XElement("download", new XAttribute("type", link.ToString()),
+                        new XAttribute("information", link.Properties),
                         new XAttribute("link", string.Format("{0}://{1}/Task/Create/Offline/{2}?Url={3}",
-                                                             Request.Url.Scheme, Request.Url.Host, path,
-                                                             Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
+                                       Request.Url.Scheme, Request.Url.Host,
+                                       FileHelper.Combine(path, link.GetFileName(link.Parent.Title)),
+                                       Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
                 result.Add(element);
                 Response.Write('.');    // prevent the thread from getting killed, how evil I am MUAHAHA
                 Response.Flush();

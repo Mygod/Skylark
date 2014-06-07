@@ -20,12 +20,13 @@ namespace Mygod.Skylark.Offline
                                   string.Join(", ", video.Keywords), video.AverageRating, video.ViewCount,
                                   video.UploadTime.ToChineseString(), video.Length, video.Url, "&#10;"),
                     isTarget ? " open" : string.Empty));
-                foreach (var link in video.FmtStreamMap)
+                foreach (var link in video.Downloads)
                 {
                     Response.Write(string.Format(
                         "<div title=\"{3}\"><a href=\"/Offline/Start/{2}?Url={0}\" target=\"_blank\">{1}</a></div>",
-                        Rbase64.Encode(link.GetUrl(link.Parent.Title)), link, string.IsNullOrEmpty(path)
-                            ? string.Empty : (path + '/'), link.Properties.Replace(Environment.NewLine, "&#10;")));
+                        Rbase64.Encode(link.GetUrl(link.Parent.Title)), link,
+                                       FileHelper.Combine(path, link.GetFileName(link.Parent.Title)),
+                                       link.Properties.Replace(Environment.NewLine, "&#10;")));
                 }
                 Response.Write("</details>" + Environment.NewLine);
                 Response.Flush();

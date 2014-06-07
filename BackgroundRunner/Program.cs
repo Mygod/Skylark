@@ -485,7 +485,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 if (fileLength < 0) fileLength = null;
 
                 var fileName = (pos >= 0 ? disposition.Substring(pos + 9).Trim('"', '\'').UrlDecode()
-                                         : GetFileName(url)).ToValidPath();
+                                     : GetFileName(url)).ToValidPath();
                 string mime, extension;
                 try
                 {
@@ -497,10 +497,14 @@ namespace Mygod.Skylark.BackgroundRunner
                     extension = Path.GetExtension(fileName);
                     mime = Helper.GetDefaultExtension(extension);
                 }
-                if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
-                    fileName += extension;
+                if (FileHelper.IsFileExtended(FileHelper.GetFilePath(path)) == false)
+                {
+                    if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
+                        fileName += extension;
+                    path = FileHelper.Combine(path, fileName);
+                }
 
-                task = new OfflineDownloadTask(url, path = FileHelper.Combine(path, fileName)) { PID = Process.GetCurrentProcess().Id };
+                task = new OfflineDownloadTask(url, path) { PID = Process.GetCurrentProcess().Id };
                 if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;
                 if (fileLength != null) task.FileLength = fileLength;
                 task.Save();
