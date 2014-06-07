@@ -122,7 +122,7 @@ namespace Mygod.Skylark
                         new XAttribute("information", link.Properties),
                         new XAttribute("link", string.Format("{0}://{1}/Task/Create/Offline/{2}?Url={3}",
                                        Request.Url.Scheme, Request.Url.Host,
-                                       FileHelper.Combine(path, link.GetFileName(link.Parent.Title)),
+                                       FileHelper.Combine(path, (link.Parent.Title + link.Extension).ToValidPath()),
                                        Rbase64.Encode(link.GetUrl(link.Parent.Title))))));
                 result.Add(element);
                 Response.Write('.');    // prevent the thread from getting killed, how evil I am MUAHAHA
