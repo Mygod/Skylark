@@ -25,7 +25,7 @@ namespace Mygod.Skylark.Offline
                     Response.Write(string.Format(
                         "<div title=\"{3}\"><a href=\"/Offline/Start/{2}?Url={0}\" target=\"_blank\">{1}</a></div>",
                         Rbase64.Encode(link.GetUrl(link.Parent.Title)), link,
-                        Server.UrlEncode(FileHelper.Combine(path, (link.Parent.Title + link.Extension).ToValidPath())),
+                        FileHelper.Combine(path, (link.Parent.Title + link.Extension).ToValidPath()),
                         link.Properties.Replace(Environment.NewLine, "&#10;")));
                 }
                 Response.Write("</details>" + Environment.NewLine);
