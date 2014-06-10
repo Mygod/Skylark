@@ -503,6 +503,8 @@ namespace Mygod.Skylark.BackgroundRunner
                         fileName += extension;
                     path = FileHelper.Combine(path, fileName);
                 }
+                File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
+                                                                    path, Environment.NewLine));
 
                 task = new OfflineDownloadTask(url, path) { PID = Process.GetCurrentProcess().Id };
                 if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;
