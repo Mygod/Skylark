@@ -270,7 +270,7 @@ namespace Mygod.Skylark
 
     public abstract partial class CloudTask
     {
-        public static void StartRunner(string args)
+        protected static void StartRunner(string args)
         {
             var process = new Process
             {
@@ -355,7 +355,7 @@ namespace Mygod.Skylark
         private static readonly Regex MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
         public static void Create(string url, string relativePath)
         {
-            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
+            StartRunner(string.Format("{2}\n{0}\n{1}\n", LinkConverter.Decode(url), relativePath,
                         TaskType.OfflineDownloadTask));
         }
         public static void CreateMediaFire(string id, string relativePath)

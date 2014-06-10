@@ -446,6 +446,10 @@ namespace Mygod.Skylark.BackgroundRunner
         }
         public static void OfflineDownload(string url, string path, CookieAwareWebClient client = null)
         {
+            File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
+                                                                url, Environment.NewLine));
+            File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
+                                                                path, Environment.NewLine));
             FileStream fileStream = null;
             OfflineDownloadTask task = null;
             try
