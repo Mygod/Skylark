@@ -403,26 +403,26 @@ namespace Mygod.Skylark.BackgroundRunner
         {
             try
             {
-                Console.WriteLine("恭喜你得到了这款无聊的程序！随便打点东西吧。");
+                var lines = Rbase64.Decode(Console.ReadLine()).Split('\n');
                 switch (Console.ReadLine().ToLowerInvariant())
                 {
                     case TaskType.OfflineDownloadTask:
-                        OfflineDownload(Console.ReadLine(), Console.ReadLine());
+                        OfflineDownload(lines[0], lines[1]);
                         break;
                     case TaskType.FtpUploadTask:
-                        new FtpUploadTask(Console.ReadLine()).Execute();
+                        new FtpUploadTask(lines[0]).Execute();
                         break;
                     case TaskType.DecompressTask:
-                        new DecompressTask(Console.ReadLine()).Execute();
+                        new DecompressTask(lines[0]).Execute();
                         break;
                     case TaskType.CompressTask:
-                        new CompressTask(Console.ReadLine()).Execute();
+                        new CompressTask(lines[0]).Execute();
                         break;
                     case TaskType.ConvertTask:
-                        new ConvertTask(Console.ReadLine()).Execute();
+                        new ConvertTask(lines[0]).Execute();
                         break;
                     case TaskType.CrossAppCopyTask:
-                        new CrossAppCopyTask(Console.ReadLine()).Execute();
+                        new CrossAppCopyTask(lines[0]).Execute();
                         break;
                     default:
                         Console.WriteLine("无法识别。");
@@ -446,8 +446,6 @@ namespace Mygod.Skylark.BackgroundRunner
         }
         public static void OfflineDownload(string url, string path, CookieAwareWebClient client = null)
         {
-            File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
-                                                                url, Environment.NewLine));
             File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
                                                                 path, Environment.NewLine));
             FileStream fileStream = null;
@@ -507,8 +505,6 @@ namespace Mygod.Skylark.BackgroundRunner
                         fileName += extension;
                     path = FileHelper.Combine(path, fileName);
                 }
-                File.AppendAllText(@"Data\error.log", string.Format("[{0}] {1}{2}{2}", DateTime.UtcNow,
-                                                                    path, Environment.NewLine));
 
                 task = new OfflineDownloadTask(url, path) { PID = Process.GetCurrentProcess().Id };
                 if (!string.IsNullOrWhiteSpace(mime)) task.Mime = mime;

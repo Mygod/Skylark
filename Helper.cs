@@ -279,7 +279,7 @@ namespace Mygod.Skylark
                       UseShellExecute = false }
             };
             process.Start();
-            process.StandardInput.WriteLine(args);
+            process.StandardInput.WriteLine(Rbase64.Encode(args));
             process.StandardInput.Close();
         }
 
@@ -352,11 +352,12 @@ namespace Mygod.Skylark
     
     public sealed partial class OfflineDownloadTask
     {
-        private static readonly Regex MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
+        private static readonly Regex
+            MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
         public static void Create(string url, string relativePath)
         {
-            StartRunner(string.Format("{2}\n{0}\n{1}\n", LinkConverter.Decode(url), relativePath,
-                        TaskType.OfflineDownloadTask));
+            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
+                                      TaskType.OfflineDownloadTask));
         }
         public static void CreateMediaFire(string id, string relativePath)
         {
@@ -438,19 +439,6 @@ namespace Mygod.Skylark
         }
 
         public static long CurrentWorkers { get { return Process.GetProcessesByName("BackgroundRunner").LongLength; } }
-    }
-
-    public static class Rbase64
-    {
-        public static string Encode(string value)
-        {
-            return LinkConverter.Base64Encode(LinkConverter.Reverse(value), Encoding.UTF8);
-        }
-
-        public static string Decode(string value)
-        {
-            return LinkConverter.Reverse(LinkConverter.Base64Decode(value, Encoding.UTF8));
-        }
     }
 
     public static partial class FFmpeg

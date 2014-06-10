@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using System.Xml.Linq;
 using Microsoft.Win32;
+using Mygod.Net;
 using Mygod.Xml.Linq;
 
 namespace Mygod.Skylark
@@ -173,6 +174,19 @@ namespace Mygod.Skylark
         {
             if (string.IsNullOrWhiteSpace(value)) return defaultValue;
             return value.Contains(":") ? TimeSpan.Parse(value) : TimeSpan.FromSeconds(double.Parse(value));
+        }
+    }
+
+    public static class Rbase64
+    {
+        public static string Encode(string value)
+        {
+            return LinkConverter.Base64Encode(LinkConverter.Reverse(value), Encoding.UTF8);
+        }
+
+        public static string Decode(string value)
+        {
+            return LinkConverter.Reverse(LinkConverter.Base64Decode(value, Encoding.UTF8));
         }
     }
 }
