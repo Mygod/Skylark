@@ -497,7 +497,7 @@ namespace Mygod.Skylark.BackgroundRunner
                     extension = Path.GetExtension(fileName);
                     mime = Helper.GetDefaultExtension(extension);
                 }
-                if (FileHelper.IsFileExtended(FileHelper.GetFilePath(path)) == false)
+                if (Directory.Exists(FileHelper.GetFilePath(path)))
                 {
                     if (!string.IsNullOrEmpty(extension) && !fileName.EndsWith(extension, StringComparison.Ordinal))
                         fileName += extension;
