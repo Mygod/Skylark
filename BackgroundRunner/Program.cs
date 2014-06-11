@@ -404,25 +404,25 @@ namespace Mygod.Skylark.BackgroundRunner
             try
             {
                 var lines = Rbase64.Decode(Console.ReadLine()).Split('\n');
-                switch (Console.ReadLine().ToLowerInvariant())
+                switch (lines[0].ToLowerInvariant())
                 {
                     case TaskType.OfflineDownloadTask:
-                        OfflineDownload(lines[0], lines[1]);
+                        OfflineDownload(lines[1], lines[2]);
                         break;
                     case TaskType.FtpUploadTask:
-                        new FtpUploadTask(lines[0]).Execute();
+                        new FtpUploadTask(lines[1]).Execute();
                         break;
                     case TaskType.DecompressTask:
-                        new DecompressTask(lines[0]).Execute();
+                        new DecompressTask(lines[1]).Execute();
                         break;
                     case TaskType.CompressTask:
-                        new CompressTask(lines[0]).Execute();
+                        new CompressTask(lines[1]).Execute();
                         break;
                     case TaskType.ConvertTask:
-                        new ConvertTask(lines[0]).Execute();
+                        new ConvertTask(lines[1]).Execute();
                         break;
                     case TaskType.CrossAppCopyTask:
-                        new CrossAppCopyTask(lines[0]).Execute();
+                        new CrossAppCopyTask(lines[1]).Execute();
                         break;
                     default:
                         Console.WriteLine("无法识别。");
