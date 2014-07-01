@@ -410,8 +410,8 @@ namespace Mygod.Skylark
         private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
 
         public static void Create(string source, string target, string size = null, string vcodec = null,
-                                  string acodec = null, string scodec = null, string startPoint = null,
-                                  string endPoint = null)
+                                  string acodec = null, string scodec = null, string audioPath = null,
+                                  string startPoint = null, string endPoint = null)
         {
             var arguments = string.Empty;
             if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
@@ -420,9 +420,11 @@ namespace Mygod.Skylark
             if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
             TimeSpan duration = TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
                      start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
-            if (start <= TimeSpan.Zero) start = TimeSpan.Zero; else arguments += " -ss " + startPoint;
-            if (end >= duration) end = duration; else arguments += " -to " + endPoint;
-            new ConvertTask(source, target, end - start, arguments).Start();
+            if (start <= TimeSpan.Zero) start = TimeSpan.Zero;
+            else arguments += " -ss " + startPoint;
+            if (end >= duration) end = duration;
+            else arguments += " -to " + endPoint;
+            new ConvertTask(source, target, end - start, audioPath, arguments).Start();
         }
     }
 

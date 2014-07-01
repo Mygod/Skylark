@@ -278,8 +278,9 @@ namespace Mygod.Skylark
                 Response.StatusCode = 401;
                 return;
             }
-            ConvertTask.Create(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text, ConvertVideoCodecBox.SelectedValue, 
-                               ConvertAudioCodecBox.SelectedValue, ConvertSubtitleCodecBox.SelectedValue, 
+            ConvertTask.Create(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text,
+                               ConvertVideoCodecBox.SelectedValue, ConvertAudioCodecBox.SelectedValue,
+                               ConvertSubtitleCodecBox.SelectedValue, ConvertAudioPathBox.Text,
                                ConvertStartBox.Text, ConvertEndBox.Text);
             Response.Redirect("/Browse/" + ConvertPathBox.Text.ToCorrectUrl());
         }

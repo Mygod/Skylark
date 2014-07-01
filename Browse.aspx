@@ -322,24 +322,29 @@
                 <div>
                     <asp:DropDownList ID="ConvertVideoCodecBox" runat="server">
                         <asp:ListItem Selected="True" Text="默认编码" Value="" />
+                        <asp:ListItem Text="直接复制" Value="copy" />
                     </asp:DropDownList>
                 </div>
                 <div>音频编码：</div>
                 <div>
                     <asp:DropDownList ID="ConvertAudioCodecBox" runat="server">
                         <asp:ListItem Selected="True" Text="默认编码" Value="" />
+                        <asp:ListItem Text="直接复制" Value="copy" />
                     </asp:DropDownList>
                 </div>
                 <div>字幕编码：</div>
                 <div>
                     <asp:DropDownList ID="ConvertSubtitleCodecBox" runat="server">
                         <asp:ListItem Selected="True" Text="默认编码" Value="" />
+                        <asp:ListItem Text="直接复制" Value="copy" />
                     </asp:DropDownList>
                 </div>
                 <div>起始位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示从头开始）</div>
                 <div><asp:TextBox ID="ConvertStartBox" runat="server"></asp:TextBox></div>
                 <div>结束位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示到视频结束为止）</div>
                 <div><asp:TextBox ID="ConvertEndBox" runat="server"></asp:TextBox></div>
+                <div>替换音频：（音频路径，用于混流等）</div>
+                <div><asp:TextBox ID="ConvertAudioPathBox" runat="server" Width="100%"></asp:TextBox></div>
                 <div class="center">
                     <asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" />
                 </div>

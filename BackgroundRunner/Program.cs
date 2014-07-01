@@ -177,9 +177,11 @@ namespace Mygod.Skylark
             var process = new Process
             {
                 StartInfo = new ProcessStartInfo("plugins/ffmpeg/ffmpeg.exe",
-                    string.Format("-i \"{0}\"{2} \"{1}\" -y", FileHelper.GetFilePath(Source),
-                                  FileHelper.GetFilePath(RelativePath), Arguments ?? string.Empty))
-                    { UseShellExecute = false, RedirectStandardError = true }
+                    string.Format("-i \"{0}\"{2}{3} \"{1}\" -y", FileHelper.GetFilePath(Source),
+                                  FileHelper.GetFilePath(RelativePath), string.IsNullOrWhiteSpace(AudioPath)
+                                    ? string.Empty
+                                    : " -i \"" + FileHelper.GetFilePath(AudioPath) + "\" -map 0:v -map 1:a",
+                                  Arguments ?? string.Empty)) { UseShellExecute = false, RedirectStandardError = true }
             };
             process.Start();
             while (!process.StandardError.EndOfStream)

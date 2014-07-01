@@ -52,6 +52,7 @@ namespace Mygod.Skylark.Task
                                            Request.QueryString["VCodec"].UrlDecode(),
                                            Request.QueryString["ACodec"].UrlDecode(),
                                            Request.QueryString["SCodec"].UrlDecode(),
+                                           Request.QueryString["AudioPath"].UrlDecode(),
                                            Request.QueryString["Start"].UrlDecode(),
                                            Request.QueryString["End"].UrlDecode());
                         break;

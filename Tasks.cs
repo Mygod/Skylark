@@ -352,10 +352,11 @@ namespace Mygod.Skylark
         public ConvertTask(string relativePath) : base(relativePath)
         {
         }
-        public ConvertTask(string source, string target, TimeSpan duration, string arguments = null)
-            : base(source, target, TaskType.ConvertTask)
+        public ConvertTask(string source, string target, TimeSpan duration, string audioPath = null,
+                           string arguments = null) : base(source, target, TaskType.ConvertTask)
         {
             Duration = duration;
+            AudioPath = audioPath;
             Arguments = arguments;
         }
 
@@ -368,6 +369,11 @@ namespace Mygod.Skylark
         {
             get { return new TimeSpan(TaskXml.GetAttributeValue<long>("duration")); }
             set { TaskXml.SetAttributeValue("duration", value.Ticks); }
+        }
+        public string AudioPath
+        {
+            get { return TaskXml == null ? null : TaskXml.GetAttributeValue("audioPath"); }
+            set { TaskXml.SetAttributeValue("audioPath", value); }
         }
         public string Arguments
         {
