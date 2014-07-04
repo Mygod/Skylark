@@ -106,3 +106,8 @@ td.nowrap.input-control.checkbox {
     display: table-cell;
     margin-bottom: 0;
 }
+
+.sticky {
+    background-color: white;
+    z-index: 1;
+}

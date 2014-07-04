@@ -2,6 +2,7 @@
 <%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
     <script src="/plugins/resumable.js"></script>
+    <script src="/plugins/jquery/jquery.sticky.js"></script>
     <script type="text/javascript">
         function pickCore(text, defaultText) {
             var result = prompt(text, defaultText);
@@ -25,65 +26,67 @@
     <input type="hidden" id="Hidden" runat="server" ClientIDMode="Static" />
     <asp:MultiView runat="server" ID="Views">
         <asp:View runat="server" ID="DirectoryView">
-            <section class="button-set">
-                <button onclick="doSelectAll();" type="button">全选</button>
-                <button onclick="invertSelection();" type="button">反选</button>
-                <% if (CurrentUser.Download)
-                   { %>
-                <button onclick="getDownloadLink();" type="button">生成下载链接</button>
-                <% }
-                   if (CurrentUser.OperateFiles)
-                   { %>
-                <button runat="server" onclick="return newFolder() && !" onServerClick="NewFolder">新建文件夹</button>
-                <button runat="server" onclick="return pickFolder() && !" onServerClick="Move">移动到</button>
-                <button runat="server" onclick="return pickFolder() && !" onServerClick="Copy">复制到</button>
-                <button runat="server" onclick="return deleteConfirm() && !" onServerClick="Delete">删除</button>
-                <%     if (CurrentUser.OperateTasks)
+            <div class="sticky">
+                <section class="button-set">
+                    <button onclick="doSelectAll();" type="button">全选</button>
+                    <button onclick="invertSelection();" type="button">反选</button>
+                    <% if (CurrentUser.Download)
                        { %>
-                <a class="button" href="/Offline/New/<%= RelativePath %>">新建离线下载任务</a>
-                <button onclick="showCompressConfig();" type="button">压缩选中项</button>
-                <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() && !">跨云雀传输</button>
-                <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() && !">上传到 FTP</button>
-                <%     }
-                   } %>
-            </section>
-            <section id="upload-panel" ondragenter="$(this).addClass('upload-dragover');"
-                     ondragleave="$(this).removeClass('upload-dragover');"
-                     ondrop="$(this).removeClass('upload-dragover');">
-                <table id="upload-file-table" class="hovered bordered table" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th class="nowrap">文件名</th>
-                            <th class="nowrap">大小</th>
-                            <th class="stretch">进度</th>
-                            <th class="nowrap">状态</th>
-                            <th class="nowrap"></th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。<% if (CurrentUser.OperateFiles) { %>请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。<% } %></div>
-            </section>
-            <section id="running-result" style="display: none;">
-                <button type="button" onclick="hideParent();">隐藏</button><br />
-                <textarea class="stretch" style="height: 100px;"></textarea>
-            </section>
-            <section id="compress-config" style="display: none;">
-                <button type="button" onclick="hideParent();">隐藏</button>
-                <asp:DropDownList ID="CompressionLevelList" runat="server">
-                    <asp:ListItem Value="Ultra">最小</asp:ListItem>
-                    <asp:ListItem Value="High">较小</asp:ListItem>
-                    <asp:ListItem Value="Normal">普通</asp:ListItem>
-                    <asp:ListItem Value="Low">较快</asp:ListItem>
-                    <asp:ListItem Value="Fast">最快</asp:ListItem>
-                    <asp:ListItem Value="None">不压缩</asp:ListItem>
-                </asp:DropDownList>
-                <asp:TextBox ID="ArchiveFilePath" runat="server" Width="300px" />
-                <button runat="server" onServerClick="Compress">压缩到指定路径</button>
-                （请以 <a href="http://zh.wikipedia.org/wiki/7-Zip">7z</a>,
-                    <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
-                    <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
-            </section>
+                    <button onclick="getDownloadLink();" type="button">生成下载链接</button>
+                    <% }
+                       if (CurrentUser.OperateFiles)
+                       { %>
+                    <button runat="server" onclick="return newFolder() && !" onServerClick="NewFolder">新建文件夹</button>
+                    <button runat="server" onclick="return pickFolder() && !" onServerClick="Move">移动到</button>
+                    <button runat="server" onclick="return pickFolder() && !" onServerClick="Copy">复制到</button>
+                    <button runat="server" onclick="return deleteConfirm() && !" onServerClick="Delete">删除</button>
+                    <%     if (CurrentUser.OperateTasks)
+                           { %>
+                    <a class="button" href="/Offline/New/<%= RelativePath %>">新建离线下载任务</a>
+                    <button onclick="showCompressConfig();" type="button">压缩选中项</button>
+                    <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() && !">跨云雀传输</button>
+                    <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() && !">上传到 FTP</button>
+                    <%     }
+                       } %>
+                </section>
+                <section id="upload-panel" ondragenter="$(this).addClass('upload-dragover');"
+                         ondragleave="$(this).removeClass('upload-dragover');"
+                         ondrop="$(this).removeClass('upload-dragover');">
+                    <table id="upload-file-table" class="hovered bordered table" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th class="nowrap">文件名</th>
+                                <th class="nowrap">大小</th>
+                                <th class="stretch">进度</th>
+                                <th class="nowrap">状态</th>
+                                <th class="nowrap"></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目。<% if (CurrentUser.OperateFiles) { %>请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。<% } %></div>
+                </section>
+                <section id="running-result" style="display: none;">
+                    <button type="button" onclick="hideParent();">隐藏</button><br />
+                    <textarea class="stretch" style="height: 100px;"></textarea>
+                </section>
+                <section id="compress-config" style="display: none;">
+                    <button type="button" onclick="hideParent();">隐藏</button>
+                    <asp:DropDownList ID="CompressionLevelList" runat="server">
+                        <asp:ListItem Value="Ultra">最小</asp:ListItem>
+                        <asp:ListItem Value="High">较小</asp:ListItem>
+                        <asp:ListItem Value="Normal">普通</asp:ListItem>
+                        <asp:ListItem Value="Low">较快</asp:ListItem>
+                        <asp:ListItem Value="Fast">最快</asp:ListItem>
+                        <asp:ListItem Value="None">不压缩</asp:ListItem>
+                    </asp:DropDownList>
+                    <asp:TextBox ID="ArchiveFilePath" runat="server" Width="300px" />
+                    <button runat="server" onServerClick="Compress">压缩到指定路径</button>
+                    （请以 <a href="http://zh.wikipedia.org/wiki/7-Zip">7z</a>,
+                        <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
+                        <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
+                </section>
+            </div>
             <script type="text/javascript">
                 function updateSelectedCount() {
                     $('#selected-count').text($("#file-list >>>>> input:checkbox:checked").length);
@@ -191,6 +194,8 @@
                 r.assignBrowse($('#upload-browse'));
                 r.assignBrowse($('#upload-browse-dir'), true);
                 r.assignDrop($('#upload-panel'));
+
+                $('.sticky').sticky({ topSpacing: 0 });
             </script>
             <section>
                 <table id="file-list" class="hovered bordered table">
