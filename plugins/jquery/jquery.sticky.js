@@ -141,6 +141,7 @@
     window.attachEvent('onscroll', scroller);
     window.attachEvent('onresize', resizer);
   }
+  setInterval(resizer, 500);
 
   $.fn.sticky = function(method) {
     if (methods[method]) {
