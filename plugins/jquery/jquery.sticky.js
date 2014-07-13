@@ -67,7 +67,14 @@
       }
     },
     resizer = function() {
-      windowHeight = $window.height();
+        windowHeight = $window.height();
+
+        for (var i = 0; i < sticked.length; i++) {
+            var s = sticked[i].stickyElement;
+            var p = s.parent();
+            p.css('height', s.outerHeight());
+            s.css('width', p.outerWidth());
+        }
     },
     methods = {
       init: function(options) {
