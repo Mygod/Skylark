@@ -27,8 +27,8 @@
             <% var currentDrive = new DriveInfo(Server.MapPath("/")[0].ToString(CultureInfo.InvariantCulture));
                var user = Request.GetUser(); %>
             <div>当前可用空间：<%=string.Format("{0} / {1} ({2:0.00} %)",
-                                    Helper.GetSize(currentDrive.AvailableFreeSpace), 
-                                    Helper.GetSize(currentDrive.TotalSize), 
+                                    Mygod.Helper.GetSize(currentDrive.AvailableFreeSpace, "字节"), 
+                                    Mygod.Helper.GetSize(currentDrive.TotalSize, "字节"), 
                                     100.0 * currentDrive.AvailableFreeSpace / currentDrive.TotalSize) %></div>
             <div>当前工作义工：<a href="/Task/">[管理]</a> <%=TaskHelper.CurrentWorkers %></div>
             <div>

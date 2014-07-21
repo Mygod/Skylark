@@ -60,10 +60,11 @@
             }
         %>
         <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
-                                ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
-        <div>已处理大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
-        <div>平均处理速度：<%=Task == null || !Task.SpeedFileLength.HasValue
-                            ? Helper.Unknown : Helper.GetSize(Task.SpeedFileLength.Value) %>&nbsp;每秒</div>
+                                ? Helper.Unknown : Mygod.Helper.GetSize(Task.FileLength.Value, "字节") %></div>
+        <div>已处理大小：　<%=Task == null ? Helper.Unknown
+                                          : Mygod.Helper.GetSize(Task.ProcessedFileLength, "字节") %></div>
+        <div>平均处理速度：<%=Task == null || !Task.SpeedFileLength.HasValue ? Helper.Unknown
+                                : Mygod.Helper.GetSize(Task.SpeedFileLength.Value, "字节") %>&nbsp;每秒</div>
         <div>开始时间：　　<%=Task == null || !Task.StartTime.HasValue
                                 ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
         <div>花费时间：　　<%=Task == null || !Task.SpentTime.HasValue

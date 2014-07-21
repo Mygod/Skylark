@@ -22,33 +22,6 @@ namespace Mygod.Skylark
 {
     public static partial class Helper
     {
-        private static readonly string[]
-            Units = { "字节", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "NB", "DB", "CB" };
-        public static string GetSize(long size)
-        {
-            double byt = size;
-            byte i = 0;
-            while (byt > 1000)
-            {
-                byt /= 1024;
-                i++;
-            }
-            return i == 0 ? size.ToString("N0") + " 字节"
-                          : byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N0") + " 字节)";
-        }
-        public static string GetSize(double size)
-        {
-            var byt = size;
-            byte i = 0;
-            while (byt > 1000)
-            {
-                byt /= 1024;
-                i++;
-            }
-            if (i == 0) return byt.ToString("N") + " 字节";
-            return byt.ToString("N") + " " + Units[i] + " (" + size.ToString("N") + " 字节)";
-        }
-
         public static string GetRouteString(this RouteData data, string valueName)
         {
             try

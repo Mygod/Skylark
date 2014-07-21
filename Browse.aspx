@@ -242,8 +242,8 @@
                                 </td>
                                 <td class="stretch"><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
                                 <td class="nowrap">
-                                    <%#Helper.GetSize(FileHelper.GetFileSize(
-                                                      FileHelper.Combine(RelativePath, Eval("Name").ToString()))) %>
+                                    <%#Mygod.Helper.GetSize(FileHelper.GetFileSize
+                                            (FileHelper.Combine(RelativePath, Eval("Name").ToString())), "字节") %>
                                 </td>
                                 <td class="nowrap">
                                     <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
@@ -288,7 +288,7 @@
                 }
             </script>
             <section>
-                <div>大小：　　<%=Helper.GetSize(InfoFile.Length) %></div>
+                <div>大小：　　<%=Mygod.Helper.GetSize(InfoFile.Length, "字节") %></div>
                 <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
                 <div>
                     默认类型：<%=GetMimeType(Mime) %><% if (CurrentUser.OperateFiles)
@@ -364,8 +364,9 @@
                 <div>总分块数量：　<%=uploadTask.TotalParts %></div>
                 <div>已上传数量：　<%=uploadTask.FinishedParts.Count %></div>
                 <div>文件总大小：　<%=Task == null || !Task.FileLength.HasValue
-                                        ? Helper.Unknown : Helper.GetSize(Task.FileLength.Value) %></div>
-                <div>已上传大小：　<%=Task == null ? Helper.Unknown : Helper.GetSize(Task.ProcessedFileLength) %></div>
+                                        ? Helper.Unknown : Mygod.Helper.GetSize(Task.FileLength.Value, "字节") %></div>
+                <div>已上传大小：　<%=Task == null ? Helper.Unknown
+                                                  : Mygod.Helper.GetSize(Task.ProcessedFileLength, "字节") %></div>
                 <div class="progress-bar"><div class="bg-cyan bar" style="width: <%=
                     Task == null || !Task.Percentage.HasValue ? 0 : Task.Percentage.Value %>%;"></div></div>
             </section>

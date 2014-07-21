@@ -19,7 +19,7 @@ namespace Mygod.Skylark.Task
                 return;
             }
             var info = new FileInfo(logPath = FileHelper.GetDataPath("error.log"));
-            LogSize = Helper.GetSize(info.Exists ? info.Length : 0);
+            LogSize = Mygod.Helper.GetSize(info.Exists ? info.Length : 0);
             var tasks = Directory.EnumerateFiles(Server.MapPath("~/Data"), "*.task")
                 .Select(path => GeneralTask.Create(Path.GetFileNameWithoutExtension(path))).Where(task => task != null)
                 .OrderBy(task => task.Status).ThenByDescending(task => task.StartTime).ToList();

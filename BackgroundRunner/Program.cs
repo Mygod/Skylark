@@ -459,6 +459,7 @@ namespace Mygod.Skylark.BackgroundRunner
                 if (httpWebRequest != null)
                 {
                     httpWebRequest.Referer = url;
+                    httpWebRequest.ReadWriteTimeout = Timeout.Infinite;
                     if (client != null) client.ProcessRequest(request);
                 }
                 request.Timeout = Timeout.Infinite;
