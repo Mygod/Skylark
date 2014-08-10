@@ -44,7 +44,7 @@
         <asp:ContentPlaceHolder ID="Body" runat="server">
         </asp:ContentPlaceHolder>
         <footer>
-            Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/">云雀™</a>
+            Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/" rel="noreferrer">云雀™</a>
             <a href="/Update/">V<%=CurrentAssembly.GetName().Version %> Bald Eagle</a>
         </footer>
     </main>
