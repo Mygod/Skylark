@@ -105,7 +105,6 @@
     <Content Include="Task\Details.aspx" />
     <Content Include="Task\Log.aspx" />
     <Content Include="Task\Query.aspx" />
-    <Content Include="Temp\test.txt" />
     <Content Include="Update\Default.aspx" />
     <Content Include="Upload.aspx" />
     <Content Include="View.aspx" />
