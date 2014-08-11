@@ -13,8 +13,6 @@ using Mygod.Skylark.BackgroundRunner;
 using Mygod.Xml.Linq;
 using SevenZip;
 
-// ReSharper disable ImplicitlyCapturedClosure
-
 namespace Mygod.Skylark
 {
     public static partial class FileHelper
