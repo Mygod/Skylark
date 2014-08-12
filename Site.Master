@@ -18,6 +18,9 @@
     <script type="text/javascript" src="/plugins/generic.js"></script>
     <asp:ContentPlaceHolder ID="Head" runat="server">
     </asp:ContentPlaceHolder>
+    <!--
+        tempDirectory: <%= Path.GetTempPath() %>
+    -->
 </head>
 <body class="metro">
     <form id="form" runat="server">
