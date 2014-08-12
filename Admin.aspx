@@ -15,14 +15,14 @@
             }
             if (!line) line = CryptoJS.SHA512('New') + ',' + $.base64reversed.encode('New') + ',TTTTF';
             var columns = line.split(',');
-            $('#password-list > tbody').append('<tr><td><input type="password" class="password" value="ENCRYPTED'
-                + columns[0] + '" /></td><td><input type="text" class="comment" value="' +
-                $.base64reversed.decode(columns[1]) + '" /></td><td><input type="checkbox" class="browse"'
-                + tf(columns[2][0]) + ' /></td><td><input type="checkbox" class="download"' + tf(columns[2][1])
-                + ' /></td><td><input type="checkbox" class="operateFiles"' + tf(columns[2][2])
-                + ' /></td><td><input type="checkbox" class="operateTasks"' + tf(columns[2][3])
-                + ' /></td><td><input type="checkbox" class="admin"' + tf(columns[2][4]) + ' /></td><td>'
-                + '<a href="#" class="delete" onclick="this.parentNode.parentNode.remove();">[删除]</a></td></tr>');
+            $('#password-list > tbody').append('<tr><td><input type="password" class="password" value="ENCRYPTED' +
+                columns[0] + '" /></td><td><input type="text" class="comment" value="' +
+                $.base64reversed.decode(columns[1]) + '" /></td><td><input type="checkbox" class="browse"' +
+                tf(columns[2][0]) + ' /></td><td><input type="checkbox" class="download"' + tf(columns[2][1]) +
+                ' /></td><td><input type="checkbox" class="operateFiles"' + tf(columns[2][2]) +
+                ' /></td><td><input type="checkbox" class="operateTasks"' + tf(columns[2][3]) +
+                ' /></td><td><input type="checkbox" class="admin"' + tf(columns[2][4]) + ' /></td><td>' +
+                '<a href="#" class="delete" onclick="this.parentNode.parentNode.remove();">[删除]</a></td></tr>');
         }
         $(function () {
             decodeURIComponent($('#hidden').val()).split(';').forEach(insert);
@@ -32,16 +32,22 @@
                 return i.prop('checked') ? 'T' : 'F';
             }
             var result = '';
+            var adminInaccessable = true;
             $('#password-list > tbody > tr').each(function () {
                 var $this = $(this);
                 var psw = $this.find('input.password').val();
                 if (psw.startsWith('ENCRYPTED')) result += psw.substring(9) + ',';
                 else result += CryptoJS.SHA512(psw) + ',';
-                result += $.base64reversed.encode($this.find('input.comment').val()) + ','
-                       + tf($this.find('input.browse')) + tf($this.find('input.download'))
-                       + tf($this.find('input.operateFiles')) + tf($this.find('input.operateTasks'))
-                       + tf($this.find('input.admin')) + ';';
+                result += $.base64reversed.encode($this.find('input.comment').val()) + ',' +
+                          tf($this.find('input.browse')) + tf($this.find('input.download')) +
+                          tf($this.find('input.operateFiles')) + tf($this.find('input.operateTasks')) +
+                          tf($this.find('input.admin')) + ';';
+                if ($this.find('input.admin').prop('checked')) adminInaccessable = false;
             });
+            if (adminInaccessable) {
+                alert('对不起，您至少要允许一种成员访问董事会！');
+                return;
+            }
             $('#hidden').val(result);
             $('#data').submit();
         }
