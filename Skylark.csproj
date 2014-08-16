@@ -99,6 +99,7 @@
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\resumable.js" />
     <Content Include="plugins\SevenZipSharp.dll" />
+    <Content Include="robots.txt" />
     <Content Include="TaskViewer.ascx" />
     <Content Include="Task\Default.aspx" />
     <Content Include="Task\Create.aspx" />
