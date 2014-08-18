@@ -111,3 +111,9 @@ td.nowrap.input-control.checkbox {
     background-color: white;
     z-index: 1;
 }
+
+.help {
+    text-decoration: none;
+    border-bottom: 1px #999 dotted;
+    cursor: help;
+}

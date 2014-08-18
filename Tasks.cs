@@ -69,7 +69,7 @@ namespace Mygod.Skylark
         public abstract string Type { get; }
 
         public abstract DateTime? StartTime { get; set; }   // leave it for derived classes
-        public virtual DateTime? EndTime
+        public DateTime? EndTime
         {
             get
             {

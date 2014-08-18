@@ -108,10 +108,12 @@ namespace Mygod.Skylark
         {
             return GetDataPath(path) + ".data";
         }
+/*
         public static string GetDataDirectoryPath(string path)
         {
             return Path.Combine(GetDataPath(path), "Settings.directory");
         }
+*/
         public static string GetTaskPath(string id)
         {
             return GetDataPath(id + ".task");
@@ -171,6 +173,10 @@ namespace Mygod.Skylark
                 Thread.Sleep(100);
                 goto retry;
             }
+        }
+        public static void DeleteWithRetries(IEnumerable<string> paths)
+        {
+            foreach (var path in paths) DeleteWithRetries(path);
         }
 
         public static void CancelControl(string dataPath)
@@ -237,6 +243,10 @@ namespace Mygod.Skylark
             CancelControl(dataPath);
             DeleteWithRetries(GetFilePath(path));
             DeleteWithRetries(dataPath);
+            if (!isFile.Value) return;
+            string dirPath = GetDataPath(Path.GetDirectoryName(path)), fileName = Path.GetFileName(path);
+            DeleteWithRetries(Directory.EnumerateFiles(dirPath, fileName + ".incomplete.part*")
+                      .Concat(Directory.EnumerateFiles(dirPath, fileName + ".complete.part*")));
         }
     }
 
@@ -361,21 +371,23 @@ namespace Mygod.Skylark
             get { return TaskXml == null ? null : TaskXml.GetAttributeValue("identifier"); }
             set { TaskXml.SetAttributeValue("identifier", value); }
         }
+
         public int TotalParts
         {
             get { return TaskXml == null ? 0 : TaskXml.GetAttributeValue<int>("totalParts"); }
             set { TaskXml.SetAttributeValue("totalParts", value); }
         }
-        public HashSet<int> FinishedParts
+        public int FinishedParts
         {
             get
             {
-                return TaskXml == null ? null
-                    : new HashSet<int>((TaskXml.GetAttributeValue("finishedParts") ?? string.Empty)
-                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+                return Directory.EnumerateFiles(FileHelper.GetDataPath(Path.GetDirectoryName(RelativePath)),
+                                                Path.GetFileName(RelativePath) + ".complete.part*").Count();
             }
-            set { TaskXml.SetAttributeValue("finishedParts", string.Join(",", value)); }
         }
+        public override long ProcessedFileLength
+            { get { throw new NotSupportedException(); } set { throw new NotSupportedException(); } }
+        public override double? Percentage { get { return (double) FinishedParts / TotalParts; } }
     }
     public sealed partial class ConvertTask
     {

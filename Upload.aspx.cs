@@ -18,39 +18,50 @@ namespace Mygod.Skylark
             var data = upload ? Request.Form : Request.QueryString;
             string id = data["resumableIdentifier"], path = FileHelper.Combine
                         (RouteData.GetRelativePath(), data["resumableRelativePath"].ToValidPath(false)),
-                   filePath = FileHelper.GetFilePath(path), dataPath = FileHelper.GetDataFilePath(path);
+                   filePath = FileHelper.GetFilePath(path), dataPath = FileHelper.GetDataFilePath(path),
+                   state = FileHelper.GetState(dataPath);
             Directory.CreateDirectory(Path.GetDirectoryName(filePath));
             Directory.CreateDirectory(Path.GetDirectoryName(dataPath));
-            UploadTask task = null;
-            if (FileHelper.GetState(dataPath) == TaskType.UploadTask
-                && (task = new UploadTask(path)).Identifier != id) task = null;
-            if (task == null)
+            if (state != TaskType.UploadTask || state == TaskType.UploadTask && new UploadTask(path).Identifier != id)
             {
-                FileHelper.CancelControl(dataPath);
-                FileHelper.DeleteWithRetries(filePath);
-                FileHelper.DeleteWithRetries(dataPath);
-                (task = new UploadTask(path, id, int.Parse(data["resumableTotalChunks"]),
-                                       long.Parse(data["resumableTotalSize"]))).Save();
+                FileHelper.Delete(path);
+                File.WriteAllBytes(filePath, new byte[0]);
+                try
+                {
+                    new UploadTask(path, id, int.Parse(data["resumableTotalChunks"]),
+                                   long.Parse(data["resumableTotalSize"])).Save();
+                }
+                catch (IOException) { } // another save in progress
             }
-            else task = new UploadTask(path);
             var index = int.Parse(data["resumableChunkNumber"]) - 1;
             if (upload)
             {
-                long chunkSize = long.Parse(data["resumableChunkSize"]), offset = chunkSize * index;
-                using (var input = Request.Files[Request.Files.AllKeys.Single()].InputStream)
-                using (var output = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Read))
+                string basePath = FileHelper.GetDataPath(path), partSuffix = ".part" + index,
+                       partPath = basePath + ".incomplete" + partSuffix;
+                try
                 {
-                    if (output.Length < offset) output.SetLength(offset);
-                    output.Position = offset;
-                    input.CopyTo(output);
+                    using (var output = new FileStream(partPath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                        Request.Files[Request.Files.AllKeys.Single()].InputStream.CopyTo(output);
+                    File.Move(partPath, basePath + ".complete" + partSuffix);
                 }
-                task.ProcessedFileLength += chunkSize;
-                var parts = task.FinishedParts;
-                parts.Add(index);
-                if ((task.FinishedParts = parts).Count == task.TotalParts) task.Finish();
-                else task.Save();
+                catch
+                {
+                    FileHelper.DeleteWithRetries(partPath); // delete imcomplete file
+                }
+                var task = new UploadTask(path);
+                if (task.FinishedParts != task.TotalParts) return;
+                using (var output = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read))
+                    for (var i = 0; i < task.TotalParts; ++i)
+                    {
+                        using (var input = new FileStream(
+                            partPath = FileHelper.GetDataPath(path + ".complete.part" + i),
+                            FileMode.Open, FileAccess.Read, FileShare.Read)) input.CopyTo(output);
+                        FileHelper.DeleteWithRetries(partPath);
+                    }
+                task.Finish();
             }
-            else Response.StatusCode = task.FinishedParts.Contains(index) ? 200 : 204;  // test
+            else Response.StatusCode = File.Exists(FileHelper.GetDataPath(path + ".complete.part" + index))
+                                           ? 200 : 204;  // test
         }
     }
 }
