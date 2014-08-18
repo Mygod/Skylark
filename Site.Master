@@ -46,7 +46,9 @@
         </asp:ContentPlaceHolder>
         <footer>
             Copyright &copy; 2013-2014 <a href="http://mygod.tk/skylark/" rel="noreferrer">云雀™</a>
-            <a href="/Update/">V<%=CurrentAssembly.GetName().Version %> Bald Eagle</a>
+            <% if (user.Admin) Response.Write("<a href=\"/Update/\">"); %>
+                V<%=CurrentAssembly.GetName().Version %> Bald Eagle
+            <% if (user.Admin) Response.Write("</a>"); %>
         </footer>
     </main>
     </form>
