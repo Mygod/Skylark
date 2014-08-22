@@ -87,7 +87,7 @@
                         <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
                 </section>
                 <section id="batch-merge-va-config" style="display: none;">
-                    <div><button type="button" onclick="hideParent();">隐藏</button></div>
+                    <button type="button" onclick="hideParent();">隐藏</button>
                     <div>视频文件匹配模式（完整路径，不区分大小写）：<asp:TextBox runat="server" ID="VideoPatternBox" Text="^(.*) \[V\]\.(.*)$" /></div>
                     <div>音频文件替换模式（可列出多个，排在前面的优先）：</div>
                     <div>
