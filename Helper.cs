@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using System.Web.UI.HtmlControls;
@@ -160,38 +157,7 @@ namespace Mygod.Skylark
                     DirectoryCopy(subdir.FullName, temppath);
                 }
         }
-        public static void DeleteWithRetries(string path)
-        {
-        retry:
-            try
-            {
-                if (File.Exists(path)) File.Delete(path);
-                else if (Directory.Exists(path)) Directory.Delete(path, true);
-            }
-            catch
-            {
-                Thread.Sleep(100);
-                goto retry;
-            }
-        }
-        public static void DeleteWithRetries(IEnumerable<string> paths)
-        {
-            foreach (var path in paths) DeleteWithRetries(path);
-        }
 
-        public static void CancelControl(string dataPath)
-        {
-            if (Directory.Exists(dataPath))
-            {
-                foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath)) CancelControl(stuff);
-                return;
-            }
-            if (!File.Exists(dataPath) || !dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture))
-                return; // ignore non-data files
-            var element = GetElement(dataPath);
-            if (element.GetAttributeValue("state") == TaskType.NoTask) return;
-            CloudTask.KillProcessTree(element.GetAttributeValueWithDefault<int>("pid"));
-        }
         public static void CreateDirectory(string path)
         {
             Directory.CreateDirectory(GetFilePath(path));
@@ -234,56 +200,16 @@ namespace Mygod.Skylark
                 DirectoryCopy(dataPath, GetDataPath(target));
             }
         }
-        public static void Delete(string path)
-        {
-            var filePath = GetFilePath(path);
-            var isFile = IsFileExtended(filePath);
-            if (!isFile.HasValue) return;
-            var dataPath = isFile.Value ? GetDataFilePath(path) : GetDataPath(path);
-            CancelControl(dataPath);
-            DeleteWithRetries(GetFilePath(path));
-            DeleteWithRetries(dataPath);
-            if (!isFile.Value) return;
-            string dirPath = GetDataPath(Path.GetDirectoryName(path)), fileName = Path.GetFileName(path);
-            DeleteWithRetries(Directory.EnumerateFiles(dirPath, fileName + ".incomplete.part*")
-                      .Concat(Directory.EnumerateFiles(dirPath, fileName + ".complete.part*")));
-        }
     }
 
     public abstract partial class CloudTask
     {
-        protected static void StartRunner(string args)
-        {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
-                    { WorkingDirectory = HttpContext.Current.Server.MapPath("~/"), RedirectStandardInput = true, 
-                      UseShellExecute = false }
-            };
-            process.Start();
-            process.StandardInput.WriteLine(Rbase64.Encode(args));
-            process.StandardInput.Close();
-        }
-
         public void Start()
         {
             Save();
             StartCore();
         }
         protected abstract void StartCore();
-
-        public static void KillProcessTree(int pid)
-        {
-            if (pid == 0) return;
-            foreach (var mbo in new ManagementObjectSearcher
-                ("Select * From Win32_Process Where ParentProcessID=" + pid).Get())
-                KillProcessTree(Int32.Parse(mbo["ProcessID"].ToString()));
-            try
-            {
-                Process.GetProcessById(pid).Kill();
-            }
-            catch { }
-        }
     }
     public abstract partial class GenerateFileTask
     {
@@ -306,7 +232,7 @@ namespace Mygod.Skylark
 
         protected override void StartCore()
         {
-            StartRunner(Type + '\n' + RelativePath);
+            TaskHelper.StartRunner(Type + '\n' + RelativePath);
         }
     }
     public abstract partial class GeneralTask
@@ -328,7 +254,7 @@ namespace Mygod.Skylark
 
         protected override void StartCore()
         {
-            StartRunner(Type + '\n' + ID);
+            TaskHelper.StartRunner(Type + '\n' + ID);
         }
     }
     
@@ -338,7 +264,7 @@ namespace Mygod.Skylark
             MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
         public static void Create(string url, string relativePath)
         {
-            StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
+            TaskHelper.StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
                                       TaskType.OfflineDownloadTask));
         }
         public static void CreateMediaFire(string id, string relativePath)
@@ -389,28 +315,6 @@ namespace Mygod.Skylark
             { get { throw new NotSupportedException(); } set { throw new NotSupportedException(); } }
         public override double? Percentage { get { return (double) FinishedParts / TotalParts; } }
     }
-    public sealed partial class ConvertTask
-    {
-        private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
-
-        public static void Create(string source, string target, string size = null, string vcodec = null,
-                                  string acodec = null, string scodec = null, string audioPath = null,
-                                  string startPoint = null, string endPoint = null)
-        {
-            var arguments = string.Empty;
-            if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
-            if (!string.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
-            if (!string.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
-            if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
-            TimeSpan duration = TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
-                     start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
-            if (start <= TimeSpan.Zero) start = TimeSpan.Zero;
-            else arguments += " -ss " + startPoint;
-            if (end >= duration) end = duration;
-            else arguments += " -to " + endPoint;
-            new ConvertTask(source, target, end - start, audioPath, arguments).Start();
-        }
-    }
 
     public static class TaskHelper
     {
@@ -425,6 +329,22 @@ namespace Mygod.Skylark
         }
 
         public static long CurrentWorkers { get { return Process.GetProcessesByName("BackgroundRunner").LongLength; } }
+
+        public static void StartRunner(string args)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo(HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe"))
+                {
+                    WorkingDirectory = HttpContext.Current.Server.MapPath("~/"),
+                    RedirectStandardInput = true,
+                    UseShellExecute = false
+                }
+            };
+            process.Start();
+            process.StandardInput.WriteLine(Rbase64.Encode(args));
+            process.StandardInput.Close();
+        }
     }
 
     public static partial class FFmpeg
@@ -491,6 +411,8 @@ namespace Mygod.Skylark
             Unknown, Video, Audio, Subtitle
         }
 
+        public static readonly List<Codec> Codecs = new List<Codec>();
+
         static FFmpeg()
         {
             lock (Codecs)
@@ -504,33 +426,6 @@ namespace Mygod.Skylark
                 {
                 }
                 while (!process.StandardOutput.EndOfStream) Codecs.Add(new Codec(process.StandardOutput.ReadLine()));
-            }
-        }
-
-        private static readonly string Root, Ffprobe;
-        public static readonly List<Codec> Codecs = new List<Codec>();
-
-        private static Process CreateProcess(string path, string arguments)
-        {
-            var result = new Process { StartInfo = new ProcessStartInfo(path, arguments)
-                { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, WorkingDirectory = Root } };
-            result.Start();
-            return result;
-        }
-
-        public static string Analyze(string path)
-        {
-            try
-            {
-                var process = CreateProcess(Ffprobe, '"' + path + '"');
-                while (!process.StandardError.ReadLine().StartsWith("Input", StringComparison.Ordinal))
-                {
-                }
-                return process.StandardError.ReadToEnd();
-            }
-            catch
-            {
-                return "分析失败。";
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Mygod.Xml.Linq;
@@ -18,7 +19,8 @@ namespace Mygod.Skylark
                             FtpUploadTask = "ftp-upload",
                             ConvertTask = "convert",
                             CrossAppCopyTask = "cross-app-copy",
-                            UploadTask = "upload";
+                            UploadTask = "upload",
+                            BatchMergeVATask = "batch-merge-va";
     }
     public enum TaskStatus
     {
@@ -189,6 +191,18 @@ namespace Mygod.Skylark
         }
 
         public abstract void Finish();
+
+        public static void KillProcessTree(int pid)
+        {
+            if (pid == 0) return;
+            foreach (var mbo in new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" +
+                                    pid).Get()) KillProcessTree(int.Parse(mbo["ProcessID"].ToString()));
+            try
+            {
+                Process.GetProcessById(pid).Kill();
+            }
+            catch { }
+        }
     }
     public interface IRemoteTask
     {
@@ -382,6 +396,26 @@ namespace Mygod.Skylark
         }
 
         public override double? Percentage { get { return 100.0 * ProcessedDuration.Ticks / Duration.Ticks; } }
+
+        private static readonly Regex DurationParser = new Regex("Duration: (.*?),", RegexOptions.Compiled);
+        public static ConvertTask Create(string source, string target, string size = null, string vcodec = null,
+                                         string acodec = null, string scodec = null, string audioPath = null,
+                                         string startPoint = null, string endPoint = null)
+        {
+            var arguments = string.Empty;
+            if (!string.IsNullOrWhiteSpace(size)) arguments += " -s " + size;
+            if (!string.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
+            if (!string.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
+            if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
+            TimeSpan duration =
+                TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
+                     start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
+            if (start <= TimeSpan.Zero) start = TimeSpan.Zero;
+            else arguments += " -ss " + startPoint;
+            if (end >= duration) end = duration;
+            else arguments += " -to " + endPoint;
+            return new ConvertTask(source, target, end - start, audioPath, arguments);
+        }
     }
 
     public abstract partial class GeneralTask : CloudTask

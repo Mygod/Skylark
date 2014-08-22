@@ -54,7 +54,7 @@ namespace Mygod.Skylark.Task
                                            Request.QueryString["SCodec"].UrlDecode(),
                                            Request.QueryString["AudioPath"].UrlDecode(),
                                            Request.QueryString["Start"].UrlDecode(),
-                                           Request.QueryString["End"].UrlDecode());
+                                           Request.QueryString["End"].UrlDecode()).Start();
                         break;
                     case "crossappcopy":
                         result.SetAttributeValue("id", (task = new CrossAppCopyTask(

@@ -45,6 +45,7 @@
                     <button onclick="showCompressConfig();" type="button">压缩选中项</button>
                     <button runat="server" onServerClick="CrossAppCopy" onclick="return pickApp() && !">跨云雀传输</button>
                     <button runat="server" onServerClick="FtpUpload" onclick="return pickFtp() && !">上传到 FTP</button>
+                    <button onclick="showBatchMergeVAConfig();" type="button">批量合并此目录下音视频</button>
                     <%     }
                        } %>
                 </section>
@@ -85,6 +86,30 @@
                         <a href="http://zh.wikipedia.org/wiki/ZIP格式">zip</a> 或
                         <a href="http://zh.wikipedia.org/wiki/Tar">tar</a> 作为扩展名）
                 </section>
+                <section id="batch-merge-va-config" style="display: none;">
+                    <div><button type="button" onclick="hideParent();">隐藏</button></div>
+                    <div>视频文件匹配模式（完整路径，不区分大小写）：<asp:TextBox runat="server" ID="VideoPatternBox" Text="^(.*) \[V\]\.(.*)$" /></div>
+                    <div>音频文件替换模式（可列出多个，排在前面的优先）：</div>
+                    <div>
+                        <asp:TextBox runat="server" ID="AudioPatternBox" CssClass="stretch" TextMode="MultiLine"
+                                     style="height: 150px;" Text="$1 [A].$2
+$1 [A].m4a
+$1 [A].webm
+$1.$2
+$1.m4a
+$1.webm
+$1.mp4" />
+                    </div>
+                    <div>合并文件替换模式：<asp:TextBox runat="server" ID="ResultPatternBox" Text="$1.$2" /></div>
+                    <div>
+                        <label>
+                            <asp:CheckBox runat="server" ID="DeleteSourceBox" />
+                            <span class="check"></span>
+                            合并完成后删除源文件
+                        </label>
+                    </div>
+                    <div class="center"><button runat="server" onServerClick="BatchMerge">批量合并</button></div>
+                </section>
             </div>
             <script type="text/javascript">
                 function updateSelectedCount() {
@@ -113,6 +138,9 @@
                 }
                 function showCompressConfig() {
                     $("#compress-config").show();
+                }
+                function showBatchMergeVAConfig() {
+                    $("#batch-merge-va-config").show();
                 }
                 function getDownloadLink() {
                     var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().parent()

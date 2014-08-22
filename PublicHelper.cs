@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -161,6 +163,51 @@ namespace Mygod.Skylark
             if (result.HasValue) return result.Value;
             throw new FileNotFoundException();
         }
+        public static void DeleteWithRetries(string path)
+        {
+        retry:
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+                else if (Directory.Exists(path)) Directory.Delete(path, true);
+            }
+            catch
+            {
+                Thread.Sleep(100);
+                goto retry;
+            }
+        }
+        public static void DeleteWithRetries(IEnumerable<string> paths)
+        {
+            foreach (var path in paths) DeleteWithRetries(path);
+        }
+        public static void CancelControl(string dataPath)
+        {
+            if (Directory.Exists(dataPath))
+            {
+                foreach (var stuff in Directory.EnumerateFileSystemEntries(dataPath)) CancelControl(stuff);
+                return;
+            }
+            if (!File.Exists(dataPath) || !dataPath.EndsWith(".data", true, CultureInfo.InvariantCulture))
+                return; // ignore non-data files
+            var element = GetElement(dataPath);
+            if (element.GetAttributeValue("state") == TaskType.NoTask) return;
+            CloudTask.KillProcessTree(element.GetAttributeValueWithDefault<int>("pid"));
+        }
+        public static void Delete(string path)
+        {
+            var filePath = GetFilePath(path);
+            var isFile = IsFileExtended(filePath);
+            if (!isFile.HasValue) return;
+            var dataPath = isFile.Value ? GetDataFilePath(path) : GetDataPath(path);
+            CancelControl(dataPath);
+            DeleteWithRetries(GetFilePath(path));
+            DeleteWithRetries(dataPath);
+            if (!isFile.Value) return;
+            string dirPath = GetDataPath(Path.GetDirectoryName(path)), fileName = Path.GetFileName(path);
+            DeleteWithRetries(Directory.EnumerateFiles(dirPath, fileName + ".incomplete.part*")
+                      .Concat(Directory.EnumerateFiles(dirPath, fileName + ".complete.part*")));
+        }
 
         public static void SetDefaultMime(string path, string value)
         {
@@ -170,6 +217,34 @@ namespace Mygod.Skylark
 
     public static partial class FFmpeg
     {
+        private static readonly string Root, Ffprobe;
+
+        private static Process CreateProcess(string path, string arguments)
+        {
+            var result = new Process
+            {
+                StartInfo = new ProcessStartInfo(path, arguments) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true, WorkingDirectory = Root }
+            };
+            result.Start();
+            return result;
+        }
+
+        public static string Analyze(string path)
+        {
+            try
+            {
+                var process = CreateProcess(Ffprobe, '"' + path + '"');
+                while (!process.StandardError.ReadLine().StartsWith("Input", StringComparison.Ordinal))
+                {
+                }
+                return process.StandardError.ReadToEnd();
+            }
+            catch
+            {
+                return "分析失败。";
+            }
+        }
+
         public static TimeSpan Parse(string value, TimeSpan defaultValue = default(TimeSpan))
         {
             if (string.IsNullOrWhiteSpace(value)) return defaultValue;

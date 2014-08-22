@@ -58,6 +58,42 @@ namespace Mygod.Skylark {
         protected global::System.Web.UI.WebControls.TextBox ArchiveFilePath;
         
         /// <summary>
+        /// VideoPatternBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox VideoPatternBox;
+        
+        /// <summary>
+        /// AudioPatternBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox AudioPatternBox;
+        
+        /// <summary>
+        /// ResultPatternBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ResultPatternBox;
+        
+        /// <summary>
+        /// DeleteSourceBox 控件。
+        /// </summary>
+        /// <remarks>
+        /// 自动生成的字段。
+        /// 若要进行修改，请将字段声明从设计器文件移到代码隐藏文件。
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox DeleteSourceBox;
+        
+        /// <summary>
         /// DirectoryList 控件。
         /// </summary>
         /// <remarks>

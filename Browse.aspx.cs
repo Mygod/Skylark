@@ -187,6 +187,19 @@ namespace Mygod.Skylark
             Response.Redirect("/Browse/" + ArchiveFilePath.Text.ToCorrectUrl());
         }
 
+        protected void BatchMerge(object sender, EventArgs e)
+        {
+            if (!CurrentUser.OperateTasks)
+            {
+                Response.StatusCode = 401;
+                return;
+            }
+            TaskHelper.StartRunner(string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}", TaskType.BatchMergeVATask,
+                                                 RelativePath, DeleteSourceBox.Checked, VideoPatternBox.Text,
+                                                 ResultPatternBox.Text, AudioPatternBox.Text.Replace("\r\n", "\n")));
+            Response.Redirect(Request.RawUrl);
+        }
+
         private static readonly Regex
             AppParser = new Regex(@"^http:\/\/((.*?)@)?(.*?)\/Browse\/(.*)$", RegexOptions.Compiled);
         protected void CrossAppCopy(object sender, EventArgs e)
@@ -280,7 +293,7 @@ namespace Mygod.Skylark
             ConvertTask.Create(RelativePath, ConvertPathBox.Text, ConvertSizeBox.Text,
                                ConvertVideoCodecBox.SelectedValue, ConvertAudioCodecBox.SelectedValue,
                                ConvertSubtitleCodecBox.SelectedValue, ConvertAudioPathBox.Text,
-                               ConvertStartBox.Text, ConvertEndBox.Text);
+                               ConvertStartBox.Text, ConvertEndBox.Text).Start();
             Response.Redirect("/Browse/" + ConvertPathBox.Text.ToCorrectUrl());
         }
 
