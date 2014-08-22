@@ -555,17 +555,14 @@ namespace Mygod.Skylark.BackgroundRunner
                 {
                     var audioPath = (from audioPattern in audioPatterns let aPath = pointer.Value.Result(audioPattern)
                                      where File.Exists(FileHelper.GetFilePath(aPath)) select aPath).FirstOrDefault();
-                    if (audioPath != null)
+                    if (audioPath == null || !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Value)) ||
+                        !FileHelper.IsReady(FileHelper.GetDataFilePath(audioPath))) continue;
+                    ConvertTask.Create(pointer.Value.Value, pointer.Value.Result(resultPattern), null,
+                                       "copy", "copy", null, audioPath).Execute();
+                    if (deleteSource)
                     {
-                        if (!FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Value)) ||
-                            !FileHelper.IsReady(FileHelper.GetDataFilePath(audioPath))) continue;
-                        ConvertTask.Create(pointer.Value.Value, pointer.Value.Result(resultPattern), null,
-                                           "copy", "copy", null, audioPath).Execute();
-                        if (deleteSource)
-                        {
-                            FileHelper.Delete(pointer.Value.Value);
-                            FileHelper.Delete(audioPath);
-                        }
+                        FileHelper.Delete(pointer.Value.Value);
+                        FileHelper.Delete(audioPath);
                     }
                     var previous = pointer;
                     pointer = pointer.Next;
