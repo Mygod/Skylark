@@ -42,18 +42,6 @@ namespace Mygod.Skylark
         protected static readonly Regex
             AccountRemover = new Regex(@"^ftp:\/\/[^\/]*?:[^\/]*?@", RegexOptions.Compiled);
 
-        public static bool IsBackgroundRunnerKilled(int pid)
-        {
-            try
-            {
-                return Process.GetProcessById(pid).ProcessName != "BackgroundRunner";
-            }
-            catch
-            {
-                return true;
-            }
-        }
-
         protected readonly XElement TaskXml;
         protected readonly string FilePath;
 
@@ -102,85 +90,7 @@ namespace Mygod.Skylark
             set { TaskXml.SetAttributeValue("sizeProcessed", value); }
         }
 
-        public double? SpeedFileLength
-        {
-            get { return SpentTime.HasValue ? (double?)ProcessedFileLength / SpentTime.Value.TotalSeconds : null; }
-        }
-
         public virtual double? Percentage { get { return 100.0 * ProcessedFileLength / FileLength; } }
-
-        public TaskStatus Status
-        {
-            get
-            {
-                return PID > 0
-                            ? EndTime.HasValue
-                                ? TaskStatus.Done
-                                : String.IsNullOrEmpty(ErrorMessage)
-                                    ? IsBackgroundRunnerKilled(PID) ? TaskStatus.Terminated : TaskStatus.Working
-                                    : TaskStatus.Error
-                            : TaskStatus.Starting;
-            }
-        }
-
-        public TimeSpan? SpentTime
-        {
-            get
-            {
-                return Status == TaskStatus.Working ? DateTime.UtcNow - StartTime
-                                                    : EndTime.HasValue ? EndTime.Value - StartTime : null;
-            }
-        }
-        public TimeSpan? PredictedRemainingTime
-        {
-            get
-            {
-                return EndTime.HasValue
-                    ? new TimeSpan()
-                    : Percentage > 0 && SpentTime.HasValue
-                        ? (TimeSpan?)new TimeSpan((long)((100 - Percentage) / Percentage * SpentTime.Value.Ticks))
-                        : null;
-            }
-        }
-        public DateTime? PredictedEndTime
-        {
-            get
-            {
-                try
-                {
-                    return EndTime.HasValue ? EndTime.Value : StartTime + PredictedRemainingTime;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    return DateTime.MaxValue;
-                }
-            }
-        }
-
-        private static readonly Regex ChineseSpaceTrimmer = new Regex(@"([\u4e00-\u9fa5]) +([\u4e00-\u9fa5])",
-                                                                      RegexOptions.Compiled);
-        public string GetStatus(string type = null, Action never = null)
-        {
-            switch (Status)
-            {
-                case TaskStatus.Terminated:
-                    if (never != null) never();
-                    return "已被终止（请删除后重新开始任务）";
-                case TaskStatus.Working:
-                    return ChineseSpaceTrimmer.Replace("正在 " + (type ?? "进行") + " 中", "$1$2");
-                case TaskStatus.Error:
-                    if (never != null) never();
-                    var result = "发生错误";
-                    if (never != null) result += "，具体信息：<br /><pre>" + ErrorMessage + "</pre>";
-                    return result;
-                case TaskStatus.Starting:
-                    return "正在开始";
-                case TaskStatus.Done:
-                    return type + " 完毕";
-                default:
-                    return Helper.Unknown;
-            }
-        }
 
         public void Save()
         {

@@ -210,6 +210,97 @@ namespace Mygod.Skylark
             StartCore();
         }
         protected abstract void StartCore();
+
+        public TaskStatus Status
+        {
+            get
+            {
+                return PID > 0
+                            ? EndTime.HasValue
+                                ? TaskStatus.Done
+                                : string.IsNullOrEmpty(ErrorMessage)
+                                    ? IsBackgroundRunnerKilled(PID) ? TaskStatus.Terminated : TaskStatus.Working
+                                    : TaskStatus.Error
+                            : TaskStatus.Starting;
+            }
+        }
+
+        public static bool IsBackgroundRunnerKilled(int pid)
+        {
+            try
+            {
+                return HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe").Equals
+                    (Process.GetProcessById(pid).Modules[0].FileName, StringComparison.InvariantCultureIgnoreCase);
+            }
+            catch
+            {
+                return true;
+            }
+        }
+
+        public double? SpeedFileLength
+        {
+            get { return SpentTime.HasValue ? (double?)ProcessedFileLength / SpentTime.Value.TotalSeconds : null; }
+        }
+
+        public TimeSpan? SpentTime
+        {
+            get
+            {
+                return Status == TaskStatus.Working ? DateTime.UtcNow - StartTime
+                                                    : EndTime.HasValue ? EndTime.Value - StartTime : null;
+            }
+        }
+        public TimeSpan? PredictedRemainingTime
+        {
+            get
+            {
+                return EndTime.HasValue
+                    ? new TimeSpan()
+                    : Percentage > 0 && SpentTime.HasValue
+                        ? (TimeSpan?)new TimeSpan((long)((100 - Percentage) / Percentage * SpentTime.Value.Ticks))
+                        : null;
+            }
+        }
+        public DateTime? PredictedEndTime
+        {
+            get
+            {
+                try
+                {
+                    return EndTime.HasValue ? EndTime.Value : StartTime + PredictedRemainingTime;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return DateTime.MaxValue;
+                }
+            }
+        }
+
+        private static readonly Regex ChineseSpaceTrimmer = new Regex(@"([\u4e00-\u9fa5]) +([\u4e00-\u9fa5])",
+                                                                      RegexOptions.Compiled);
+        public string GetStatus(string type = null, Action never = null)
+        {
+            switch (Status)
+            {
+                case TaskStatus.Terminated:
+                    if (never != null) never();
+                    return "已被终止（请删除后重新开始任务）";
+                case TaskStatus.Working:
+                    return ChineseSpaceTrimmer.Replace("正在 " + (type ?? "进行") + " 中", "$1$2");
+                case TaskStatus.Error:
+                    if (never != null) never();
+                    var result = "发生错误";
+                    if (never != null) result += "，具体信息：<br /><pre>" + ErrorMessage + "</pre>";
+                    return result;
+                case TaskStatus.Starting:
+                    return "正在开始";
+                case TaskStatus.Done:
+                    return type + " 完毕";
+                default:
+                    return Helper.Unknown;
+            }
+        }
     }
     public abstract partial class GenerateFileTask
     {
@@ -328,7 +419,15 @@ namespace Mygod.Skylark
             return Mappings.ContainsKey(id) ? Mappings[id] : "处理";
         }
 
-        public static long CurrentWorkers { get { return Process.GetProcessesByName("BackgroundRunner").LongLength; } }
+        public static long CurrentWorkers
+        {
+            get
+            {
+                return Process.GetProcessesByName("BackgroundRunner").Where(process => process.Modules.Count > 0 &&
+                    HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe")
+                    .Equals(process.Modules[0].FileName, StringComparison.InvariantCultureIgnoreCase)).LongCount();
+            }
+        }
 
         public static void StartRunner(string args)
         {
