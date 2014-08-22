@@ -552,8 +552,8 @@ namespace Mygod.Skylark.BackgroundRunner
                 var audioPath = (from audioPattern in audioPatterns let aPath = match.Result(audioPattern)
                                  where File.Exists(FileHelper.GetFilePath(aPath)) select aPath).FirstOrDefault();
                 if (audioPath == null) continue;
-                FileHelper.WaitForReady(FileHelper.GetDataPath(match.Value));
-                FileHelper.WaitForReady(FileHelper.GetDataPath(audioPath));
+                FileHelper.WaitForReady(FileHelper.GetDataFilePath(match.Value));
+                FileHelper.WaitForReady(FileHelper.GetDataFilePath(audioPath));
                 ConvertTask.Create(match.Value, match.Result(resultPattern), null, "copy", "copy", null,
                                    audioPath).Execute();
                 if (keepSource) continue;
