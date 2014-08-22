@@ -435,7 +435,7 @@ namespace Mygod.Skylark.BackgroundRunner
                         new CrossAppCopyTask(lines[1]).Execute();
                         break;
                     case TaskType.BatchMergeVATask:
-                        BatchMergeVA(lines[1], "false".Equals(lines[2], StringComparison.InvariantCultureIgnoreCase),
+                        BatchMergeVA(lines[1], "true".Equals(lines[2], StringComparison.InvariantCultureIgnoreCase),
                                      lines[3], lines.Skip(5).Where(line => !string.IsNullOrWhiteSpace(line)).ToList(),
                                      lines[4]);
                         break;
@@ -540,25 +540,38 @@ namespace Mygod.Skylark.BackgroundRunner
             }
         }
 
-        private static void BatchMergeVA(string path, bool keepSource, string videoPattern,
+        private static void BatchMergeVA(string path, bool deleteSource, string videoPattern,
                                          List<string> audioPatterns, string resultPattern)
         {
             var videoMatcher = new Regex(videoPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            foreach (var match in from fullPath in Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*",
-                                                                            SearchOption.AllDirectories)
-                                  let match = videoMatcher.Match(fullPath.Substring(6)) where match.Success
-                                  select match)
+            var queue = new LinkedList<Match>(from fullPath in Directory.EnumerateFiles(FileHelper.GetFilePath(path),
+                                                                    "*", SearchOption.AllDirectories)
+                                              let match = videoMatcher.Match(fullPath.Substring(6)) where match.Success
+                                              select match);
+            while (queue.Count > 0)
             {
-                var audioPath = (from audioPattern in audioPatterns let aPath = match.Result(audioPattern)
-                                 where File.Exists(FileHelper.GetFilePath(aPath)) select aPath).FirstOrDefault();
-                if (audioPath == null) continue;
-                FileHelper.WaitForReady(FileHelper.GetDataFilePath(match.Value));
-                FileHelper.WaitForReady(FileHelper.GetDataFilePath(audioPath));
-                ConvertTask.Create(match.Value, match.Result(resultPattern), null, "copy", "copy", null,
-                                   audioPath).Execute();
-                if (keepSource) continue;
-                FileHelper.Delete(match.Value);
-                FileHelper.Delete(audioPath);
+                var pointer = queue.First;
+                while (pointer != null)
+                {
+                    var audioPath = (from audioPattern in audioPatterns let aPath = pointer.Value.Result(audioPattern)
+                                     where File.Exists(FileHelper.GetFilePath(aPath)) select aPath).FirstOrDefault();
+                    if (audioPath != null)
+                    {
+                        if (!FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Value)) ||
+                            !FileHelper.IsReady(FileHelper.GetDataFilePath(audioPath))) continue;
+                        ConvertTask.Create(pointer.Value.Value, pointer.Value.Result(resultPattern), null,
+                                           "copy", "copy", null, audioPath).Execute();
+                        if (deleteSource)
+                        {
+                            FileHelper.Delete(pointer.Value.Value);
+                            FileHelper.Delete(audioPath);
+                        }
+                    }
+                    var previous = pointer;
+                    pointer = pointer.Next;
+                    queue.Remove(previous);
+                }
+                Thread.Sleep(1000);
             }
         }
     }
