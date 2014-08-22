@@ -31,8 +31,7 @@
                 <button type="button" id="niguan-button">获取该页上全部视频</button>
                 <script type="text/javascript">
                     $("#niguan-button").click(function () {
-                        uriParser.exec(location.href);
-                        location.href = RegExp.$1 + "/Offline/NiGuan/" + RegExp.$3 + "?Url="
+                        location.href = uriParser[1] + "/Offline/NiGuan/" + uriParser[3] + "?Url="
                                       + $.base64reversed.encode($("#link-box").val());
                     });
                 </script>
