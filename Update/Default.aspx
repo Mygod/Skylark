@@ -20,6 +20,7 @@
         <li>升级将不会产生最初部署时产生的演示文件。如果你想要找回他们，<a href="https://github.com/Mygod/Skylark/tree/master/Files">去这里看看</a>。</li>
         <li>如果您的 云雀™ 出现了异常且无法通过升级修复，请尝试通过重新部署的方式重装 云雀™。</li>
         <li>升级过程中会产生一定的临时文件，你需要在升级完成后点击下面的“清理升级文件”来删除它们。</li>
+        <li>升级需要半分钟左右，若过程中出现任何错误请忽略，若过了两分钟仍未成功请与我们联系。</li>
     </ul>
     <div class="center">
         <asp:Button ID="UpdateButton" runat="server" Text="云端下载并部署最新版" OnClick="Update" />
