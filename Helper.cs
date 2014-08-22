@@ -229,7 +229,7 @@ namespace Mygod.Skylark
         {
             try
             {
-                return HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe").Equals
+                return !HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe").Equals
                     (Process.GetProcessById(pid).Modules[0].FileName, StringComparison.InvariantCultureIgnoreCase);
             }
             catch
