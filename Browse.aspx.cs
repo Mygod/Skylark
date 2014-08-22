@@ -223,7 +223,6 @@ namespace Mygod.Skylark
         private void RefreshFile()
         {
             FFmpegResult = FFmpeg.Analyze(FileHelper.GetFilePath(RelativePath));
-            ConvertPathBox.Text = RelativePath;
             foreach (var codec in FFmpeg.Codecs.Where(codec => codec.EncodingSupported))
             {
                 var listItem = new ListItem(codec.ToString(), codec.Name);

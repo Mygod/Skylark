@@ -288,6 +288,20 @@
                     window.open("/View/<%=RelativePath %>?Mime=" + $("#custom-mime")[0].value);
                 }
                 function convert() {
+                    $('#ConvertPathBox').val(unescape(uriParser[3]));
+                    $('#ConvertVideoCodecBox').val('');
+                    $('#ConvertAudioCodecBox').val('');
+                    $('#ConvertAudioPathBox').val('');
+                    $("#convert-form").show();
+                }
+                function mergeVA() {
+                    var path = unescape(uriParser[3]),
+                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path);
+                    $('#ConvertPathBox').val(result ? result[1] + '.' + result[2] : path);
+                    $('#ConvertVideoCodecBox').val('copy');
+                    $('#ConvertAudioCodecBox').val('copy');
+                    $('#ConvertAudioPathBox').val(result ? result[1] + ' [A].' +
+                                                  (result[2].toLowerCase() == 'mp4' ? 'm4a' : result[2]) : path);
                     $("#convert-form").show();
                 }
             </script>
@@ -319,6 +333,7 @@
                     解压缩
                 </button>
                 <button type="button" onclick="convert();">转换媒体文件格式</button>
+                <button type="button" onclick="mergeVA();">合并音频</button>
                 <%     }
                     } %>
             </section>
