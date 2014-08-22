@@ -62,6 +62,13 @@ namespace Mygod.Skylark.Task
                             path, Request.QueryString["Password"].UrlDecode() ?? Request.GetPassword())));
                         task.Start();
                         break;
+                    case "batchmergeva":
+                        TaskHelper.StartRunner(string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}", TaskType.BatchMergeVATask,
+                                               path, Request.QueryString["DeleteSource"],
+                                               Request.QueryString["VideoPattern"],
+                                               Request.QueryString["ResultPattern"],
+                                               Request.QueryString["AudioPatterns"]));
+                        break;
                     default:
                         throw new FormatException("无法识别的 Type！");
                 }
