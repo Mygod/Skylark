@@ -332,6 +332,26 @@ $1.mp4" />
                                                   (result[2].toLowerCase() == 'mp4' ? 'm4a' : result[2]) : path);
                     $("#convert-form").show();
                 }
+
+                $(function() {
+                    var list = $('#output-paths'), path = decodeURIComponent(uriParser[3]),
+                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path), temp;
+                    list.empty();
+                    list.append($('<option></option>').attr('value', path));
+                    if (result) {
+                        if ((temp = result[1] + '.' + result[2]) != path)
+                            list.append($('<option></option>').attr('value', temp));
+                        list.append($('<option></option>').attr('value', result[1] + ' [R].' + result[2]));
+                    } else list.append($('<option></option>').attr('value', path + ' [R]'));
+                    (list = $('#audio-paths')).empty();
+                    list.append($('<option></option>').attr('value', path));
+                    if (result) {
+                        if (result[2].toLowerCase() == 'mp4' && (temp = result[1] + ' [A].m4a') != path)
+                            list.append($('<option></option>').attr('value', temp));
+                        if ((temp = result[1] + ' [A].' + result[2]) != path)
+                            list.append($('<option></option>').attr('value', temp));
+                    } else list.append($('<option></option>').attr('value', path + ' [A]'));
+                });
             </script>
             <section>
                 <div>大小：　　<%=Mygod.Helper.GetSize(InfoFile.Length, "字节") %></div>
@@ -367,7 +387,8 @@ $1.mp4" />
             </section>
             <section id="convert-form" style="display: none;">
                 <div>输出路径：（重名将被忽略）</div>
-                <div><asp:TextBox ID="ConvertPathBox" runat="server" Width="100%" ClientIDMode="Static" /></div>
+                <div><asp:TextBox ID="ConvertPathBox" runat="server" Width="100%" ClientIDMode="Static" list="output-paths" /></div>
+                <datalist id="output-paths"></datalist>
                 <div>视频大小：（如640x480，不填表示不变）</div>
                 <div><asp:TextBox ID="ConvertSizeBox" runat="server" /></div>
                 <div>视频编码：</div>
@@ -396,7 +417,8 @@ $1.mp4" />
                 <div>结束位置：（秒数，或使用 hh:mm:ss[.xxx] 的形式，不填表示到视频结束为止）</div>
                 <div><asp:TextBox ID="ConvertEndBox" runat="server" /></div>
                 <div>替换音频：（音频路径，用于混流等）</div>
-                <div><asp:TextBox ID="ConvertAudioPathBox" runat="server" Width="100%" ClientIDMode="Static" /></div>
+                <div><asp:TextBox ID="ConvertAudioPathBox" runat="server" Width="100%" ClientIDMode="Static" list="audio-paths" /></div>
+                <datalist id="audio-paths"></datalist>
                 <div class="center">
                     <asp:Button ID="ConvertButton" runat="server" Text="转换" OnClick="Convert" />
                 </div>
@@ -408,7 +430,7 @@ $1.mp4" />
                 <div>当前状态：　　正在上传中</div>
                 <div>开始上传时间：<%=Task == null || !Task.StartTime.HasValue
                                         ? Helper.Unknown : Task.StartTime.Value.ToChineseString() %></div>
-                <div>总分块数量：　<%=uploadTask.TotalParts %> (默认分块大小为 1MB)</div>
+                <div>总分块数量：　<%=uploadTask.TotalParts %>&nbsp;(默认分块大小为 1MB)</div>
                 <div>已上传数量：　<%=uploadTask.FinishedParts %></div>
                 <div class="progress-bar"><div class="bg-cyan bar" style="width: <%=
                     Task == null || !Task.Percentage.HasValue ? 0 : Task.Percentage.Value %>%;"></div></div>
