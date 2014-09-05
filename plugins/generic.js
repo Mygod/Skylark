@@ -11,7 +11,7 @@ function getQueryString() {
 
 function getQueryStringRegExp(name) {
     var reg = new RegExp("(^|\\?|&)" + name + "=([^&]*)(\\s|&|$)", "i").exec(location.href);
-    return reg ? unescape(reg[2].replace(/\+/g, " ")) : "";
+    return reg ? decodeURIComponent(reg[2].replace(/\+/g, " ")) : "";
 };
 
 $.base64 = {
@@ -46,7 +46,7 @@ if (typeof String.prototype.startsWith != 'function') {
 var uriParser = /^(.*)\/(Browse|Download|Offline\/New|Offline\/NiGuan|Offline\/Start|Upload|View)\/(.*)(\?.*)?$/i.exec(location.href);
 
 function changePath() {
-    var result = prompt("请输入新的位置：", unescape(uriParser[3]));
+    var result = prompt("请输入新的位置：", decodeURIComponent(uriParser[3]));
     if (result) location.href = uriParser[1] + "/" + uriParser[2] + "/" + result + uriParser[4];
 }
 

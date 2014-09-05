@@ -10,7 +10,7 @@
             return !!result;
         }
         function pickFolderCore(stripExtension) {
-            var target = unescape(uriParser[3]);
+            var target = decodeURIComponent(uriParser[3]);
             if (stripExtension) target = target.replace(/\.[^\.]+?$/, "");
             return pickCore("请输入目标文件夹：（重名文件/文件夹将被跳过）", target);
         }
@@ -184,7 +184,7 @@ $1.mp4" />
                 }
                 function getUploadThreads() { return localStorage.uploadThreads ? localStorage.uploadThreads : 10; }
                 var r = new Resumable({
-                    target: '/Upload/<%= RelativePath.Replace("'", @"\'") %>',
+                    target: '/Upload/' + uriParser[3],
                     permanentErrors: [401, 403, 500],
                     simultaneousUploads: getUploadThreads(),
                     minFileSize: 0  // damn you documentation
@@ -313,10 +313,10 @@ $1.mp4" />
                     return false;
                 }
                 function startCustomMime() {
-                    window.open("/View/<%=RelativePath %>?Mime=" + $("#custom-mime")[0].value);
+                    window.open("/View/" + decodeURIComponent(uriParser[3]) + "?Mime=" + $("#custom-mime")[0].value);
                 }
                 function convert() {
-                    $('#ConvertPathBox').val(unescape(uriParser[3]));
+                    $('#ConvertPathBox').val(decodeURIComponent(uriParser[3]));
                     $('#ConvertVideoCodecBox').val('');
                     $('#ConvertAudioCodecBox').val('');
                     $('#ConvertAudioPathBox').val('');
