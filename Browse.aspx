@@ -323,7 +323,7 @@ $1.mp4" />
                     $("#convert-form").show();
                 }
                 function mergeVA() {
-                    var path = unescape(uriParser[3]),
+                    var path = decodeURIComponent(uriParser[3]),
                         result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path);
                     $('#ConvertPathBox').val(result ? result[1] + '.' + result[2] : path);
                     $('#ConvertVideoCodecBox').val('copy');
