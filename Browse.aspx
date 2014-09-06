@@ -88,19 +88,19 @@
                 </section>
                 <section id="batch-merge-va-config" style="display: none;">
                     <button type="button" onclick="hideParent();">隐藏</button>
-                    <div>视频文件匹配模式（完整路径，不区分大小写）：<asp:TextBox runat="server" ID="VideoPatternBox" Text="^(.*) \[V\]\.(.*)$" /></div>
+                    <div class="label-text-line"><label>视频文件匹配模式（完整路径，不区分大小写）：</label><span><asp:TextBox runat="server" ID="VideoPatternBox" Text="^(.*) \[V\](\.(.*))?$" /></span></div>
                     <div>音频文件替换模式（可列出多个，排在前面的优先）：</div>
                     <div>
                         <asp:TextBox runat="server" ID="AudioPatternBox" CssClass="stretch" TextMode="MultiLine"
-                                     style="height: 150px;" Text="$1 [A].$2
+                                     style="height: 150px;" Text="$1 [A]$2
 $1 [A].m4a
 $1 [A].webm
-$1.$2
+$1$2
 $1.m4a
 $1.webm
 $1.mp4" />
                     </div>
-                    <div>合并文件替换模式：<asp:TextBox runat="server" ID="ResultPatternBox" Text="$1.$2" /></div>
+                    <div class="label-text-line"><label>合并文件替换模式：</label><span><asp:TextBox runat="server" ID="ResultPatternBox" Text="$1$2" /></span></div>
                     <div>
                         <label>
                             <asp:CheckBox runat="server" ID="DeleteSourceBox" />
@@ -346,11 +346,22 @@ $1.mp4" />
                     (list = $('#audio-paths')).empty();
                     list.append($('<option></option>').attr('value', path));
                     if (result) {
-                        if (result[2].toLowerCase() == 'mp4' && (temp = result[1] + ' [A].m4a') != path)
+                        list.append($('<option></option>').attr('value', result[1] + ' [A].' + result[2]));
+                        list.append($('<option></option>').attr('value', result[1] + ' [A].m4a'));
+                        list.append($('<option></option>').attr('value', result[1] + ' [A].webm'));
+                        if ((temp = result[1] + '.' + result[2]) != path)
                             list.append($('<option></option>').attr('value', temp));
-                        if ((temp = result[1] + ' [A].' + result[2]) != path)
+                        if ((temp = result[1] + '.m4a') != path)
                             list.append($('<option></option>').attr('value', temp));
-                    } else list.append($('<option></option>').attr('value', path + ' [A]'));
+                        if ((temp = result[1] + '.webm') != path)
+                            list.append($('<option></option>').attr('value', temp));
+                        if ((temp = result[1] + '.mp4') != path)
+                            list.append($('<option></option>').attr('value', temp));
+                    } else {
+                        list.append($('<option></option>').attr('value', path + ' [A]'));
+                        list.append($('<option></option>').attr('value', path + ' [A].m4a'));
+                        list.append($('<option></option>').attr('value', path + ' [A].webm'));
+                    }
                 });
             </script>
             <section>

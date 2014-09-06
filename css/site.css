@@ -117,3 +117,21 @@ td.nowrap.input-control.checkbox {
     border-bottom: 1px #999 dotted;
     cursor: help;
 }
+
+.label-text-line {
+    overflow: hidden;
+}
+
+.label-text-line label {
+    float: left;
+}
+
+.label-text-line span {
+    display: block;
+    overflow: hidden;
+}
+
+.label-text-line input {
+    width: 100%;
+    box-sizing: border-box;
+}
