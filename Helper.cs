@@ -268,7 +268,7 @@ namespace Mygod.Skylark
             {
                 try
                 {
-                    return EndTime.HasValue ? EndTime.Value : StartTime + PredictedRemainingTime;
+                    return EndTime.HasValue ? EndTime.Value : DateTime.UtcNow + PredictedRemainingTime;
                 }
                 catch (ArgumentOutOfRangeException)
                 {

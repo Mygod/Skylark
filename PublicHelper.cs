@@ -73,7 +73,8 @@ namespace Mygod.Skylark
 
         public static DateTime Deshorten(string value)
         {
-            return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))), DateTimeKind.Utc);
+            return new DateTime(long.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(value))),
+                                DateTimeKind.Utc);
         }
     }
 
