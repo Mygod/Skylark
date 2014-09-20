@@ -335,32 +335,33 @@ $1.mp4" />
 
                 $(function() {
                     var list = $('#output-paths'), path = decodeURIComponent(uriParser[3]),
-                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path), temp;
+                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path), set = new Set();
+                    function add(value) {
+                        if (set.has(value)) return;
+                        list.append($('<option></option>').attr('value', value));
+                        set.add(value);
+                    }
                     list.empty();
-                    list.append($('<option></option>').attr('value', path));
+                    add(path);
                     if (result) {
-                        if ((temp = result[1] + '.' + result[2]) != path)
-                            list.append($('<option></option>').attr('value', temp));
-                        list.append($('<option></option>').attr('value', result[1] + ' [R].' + result[2]));
-                    } else list.append($('<option></option>').attr('value', path + ' [R]'));
+                        add(result[1] + '.' + result[2]);
+                        add(result[1] + ' [R].' + result[2]);
+                    } else add(list, set, path + ' [R]');
                     (list = $('#audio-paths')).empty();
-                    list.append($('<option></option>').attr('value', path));
+                    set.clear();
+                    add(list, set, path);
                     if (result) {
-                        list.append($('<option></option>').attr('value', result[1] + ' [A].' + result[2]));
-                        list.append($('<option></option>').attr('value', result[1] + ' [A].m4a'));
-                        list.append($('<option></option>').attr('value', result[1] + ' [A].webm'));
-                        if ((temp = result[1] + '.' + result[2]) != path)
-                            list.append($('<option></option>').attr('value', temp));
-                        if ((temp = result[1] + '.m4a') != path)
-                            list.append($('<option></option>').attr('value', temp));
-                        if ((temp = result[1] + '.webm') != path)
-                            list.append($('<option></option>').attr('value', temp));
-                        if ((temp = result[1] + '.mp4') != path)
-                            list.append($('<option></option>').attr('value', temp));
+                        add(result[1] + ' [A].' + result[2]);
+                        add(result[1] + ' [A].m4a');
+                        add(result[1] + ' [A].webm');
+                        add(result[1] + '.' + result[2]);
+                        add(result[1] + '.m4a');
+                        add(result[1] + '.webm');
+                        add(result[1] + '.mp4');
                     } else {
-                        list.append($('<option></option>').attr('value', path + ' [A]'));
-                        list.append($('<option></option>').attr('value', path + ' [A].m4a'));
-                        list.append($('<option></option>').attr('value', path + ' [A].webm'));
+                        add(path + ' [A]');
+                        add(path + ' [A].m4a');
+                        add(path + ' [A].webm');
                     }
                 });
             </script>
