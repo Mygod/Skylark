@@ -404,7 +404,7 @@ namespace Mygod.Skylark
         }
         public override long ProcessedFileLength
             { get { throw new NotSupportedException(); } set { throw new NotSupportedException(); } }
-        public override double? Percentage { get { return (double) FinishedParts / TotalParts; } }
+        public override double? Percentage { get { return 100.0 * FinishedParts / TotalParts; } }
     }
 
     public static class TaskHelper
