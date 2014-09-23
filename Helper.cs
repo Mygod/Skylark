@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Routing;
@@ -423,9 +426,33 @@ namespace Mygod.Skylark
         {
             get
             {
-                return Process.GetProcessesByName("BackgroundRunner").Where(process => process.Modules.Count > 0 &&
-                    HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe")
-                    .Equals(process.Modules[0].FileName, StringComparison.InvariantCultureIgnoreCase)).LongCount();
+                var runnerPath = HttpContext.Current.Server.MapPath("~/plugins/BackgroundRunner.exe");
+                return Process.GetProcessesByName("BackgroundRunner").Where(process =>
+                {
+                    try
+                    {
+                        return process.Modules.Count > 0 && runnerPath.Equals(process.Modules[0].FileName,
+                            StringComparison.InvariantCultureIgnoreCase);
+                    }
+                    catch (Win32Exception)
+                    {
+                        var buffer = new StringBuilder(1024);
+                        var p = NativeMethods.OpenProcess(0x1000, false, process.Id);
+                        if (p != IntPtr.Zero)
+                            try
+                            {
+                                var size = buffer.Capacity;
+                                if (NativeMethods.QueryFullProcessImageName(p, 0, buffer, ref size))
+                                    return runnerPath.Equals(buffer.ToString());
+                            }
+                            catch { }   // ignore errors and return false
+                            finally
+                            {
+                                NativeMethods.CloseHandle(p);
+                            }
+                        return false;
+                    }
+                }).LongCount();
             }
         }
 
@@ -645,5 +672,17 @@ namespace Mygod.Skylark
         {
             element.Save(ConfigPath);
         }
+    }
+
+    public static class NativeMethods
+    {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr OpenProcess(int dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+                                                int dwProcessId);
+
+        public static extern bool CloseHandle(IntPtr hObject);
+
+        public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] int dwFlags,
+                                                            [Out] StringBuilder lpExeName, ref int lpdwSize);
     }
 }
