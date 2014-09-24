@@ -14,6 +14,7 @@ using System.Web.Routing;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml.Linq;
+using Microsoft.Win32.SafeHandles;
 using Mygod.Net;
 using Mygod.Xml.Linq;
 
@@ -438,7 +439,7 @@ namespace Mygod.Skylark
                     {
                         var buffer = new StringBuilder(1024);
                         var p = NativeMethods.OpenProcess(0x1000, false, process.Id);
-                        if (p != IntPtr.Zero)
+                        if (!p.IsInvalid)
                             try
                             {
                                 var size = buffer.Capacity;
@@ -446,10 +447,6 @@ namespace Mygod.Skylark
                                     return runnerPath.Equals(buffer.ToString());
                             }
                             catch { }   // ignore errors and return false
-                            finally
-                            {
-                                NativeMethods.CloseHandle(p);
-                            }
                         return false;
                     }
                 }).LongCount();
@@ -677,12 +674,12 @@ namespace Mygod.Skylark
     public static class NativeMethods
     {
         [DllImport("kernel32.dll")]
-        public static extern IntPtr OpenProcess(int dwDesiredAccess, [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
-                                                int dwProcessId);
+        public static extern SafeFileHandle OpenProcess(int dwDesiredAccess,
+                                                        [MarshalAs(UnmanagedType.Bool)] bool bInheritHandle,
+                                                        int dwProcessId);
 
-        public static extern bool CloseHandle(IntPtr hObject);
-
-        public static extern bool QueryFullProcessImageName([In] IntPtr hProcess, [In] int dwFlags,
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool QueryFullProcessImageName([In] SafeFileHandle hProcess, [In] int dwFlags,
                                                             [Out] StringBuilder lpExeName, ref int lpdwSize);
     }
 }
