@@ -73,6 +73,9 @@
     <Content Include="Image\Busy.png" />
     <Content Include="Image\Directory.png" />
     <Content Include="Image\File.png" />
+    <Content Include="plugins\browse-dir.js" />
+    <Content Include="plugins\browse-file.js" />
+    <Content Include="plugins\browse.js" />
     <Content Include="plugins\generic.js" />
     <Content Include="Offline\New.aspx" />
     <Content Include="Offline\Start.aspx" />

@@ -257,6 +257,7 @@ namespace Mygod.Skylark
         protected static string GetMimeType(string mime)
         {
             var extension = Helper.GetDefaultExtension(mime);
+            mime = string.Format("<span id=\"current-mime\">{0}</span>", mime);
             return extension != null ? string.Format("{0} ({1})", mime, extension) : mime;
         }
 

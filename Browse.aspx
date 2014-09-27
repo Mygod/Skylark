@@ -1,24 +1,9 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/FileSystem.Master" AutoEventWireup="true" CodeBehind="Browse.aspx.cs" Inherits="Mygod.Skylark.Browse" %>
 <%@ Register TagPrefix="skylark" tagName="TaskViewer" src="/TaskViewer.ascx" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="Head" runat="server">
-    <script src="/plugins/resumable.js"></script>
-    <script src="/plugins/jquery/jquery.sticky.js"></script>
-    <script type="text/javascript">
-        function pickCore(text, defaultText) {
-            var result = prompt(text, defaultText);
-            if (result) $("#Hidden").val(result);
-            return !!result;
-        }
-        function pickFolderCore(stripExtension) {
-            var target = decodeURIComponent(uriParser[3]);
-            if (stripExtension) target = target.replace(/\.[^\.]+?$/, "");
-            return pickCore("请输入目标文件夹：（重名文件/文件夹将被跳过）", target);
-        }
-        function pickFolder() {
-            if ($("input:checked").length == 0) return true;
-            return pickFolderCore();
-        }
-    </script>
+    <script type="text/javascript" src="/plugins/resumable.js"></script>
+    <script type="text/javascript" src="/plugins/jquery/jquery.sticky.js"></script>
+    <script type="text/javascript" src="/plugins/browse.js"></script>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <asp:ScriptManager runat="server" />
@@ -115,124 +100,7 @@ $1.mp4" />
                     <div class="center"><button runat="server" onServerClick="BatchMerge">批量合并</button></div>
                 </section>
             </div>
-            <script type="text/javascript">
-                function updateSelectedCount() {
-                    $('#selected-count').text($("#file-list >>>>> input:checkbox:checked").length);
-                }
-                $(function () {
-                    $('#file-list >>>>> input:checkbox').change(updateSelectedCount);
-                });
-                function newFolder() {
-                    return pickCore("请输入文件夹名：", "");
-                }
-                function deleteConfirm() {
-                    return $("#file-list >>>>> input:checkbox:checked").length > 0
-                        && confirm("确定要删除吗？此操作没有后悔药吃。");
-                }
-                var selectAll = false;
-                function doSelectAll() {
-                    $('#file-list >>>>> input:checkbox').prop('checked', selectAll = !selectAll);
-                    updateSelectedCount();
-                }
-                function invertSelection() {
-                    var checked = $("#file-list >>>>> input:checkbox:checked");
-                    $("#file-list >>>>> input:checkbox:not(:checked)").prop("checked", true);
-                    checked.prop("checked", false);
-                    updateSelectedCount();
-                }
-                function showCompressConfig() {
-                    $("#compress-config").show();
-                }
-                function showBatchMergeVAConfig() {
-                    $("#batch-merge-va-config").show();
-                }
-                function getDownloadLink() {
-                    var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().parent()
-                                    .find("input:hidden");
-                    var result = "";
-                    var prefix = (uriParser[1] + "/Download/" + uriParser[3]).replace("\\", "/");
-                    while (prefix[prefix.length - 1] == "/") prefix = prefix.substr(0, prefix.length - 1);
-                    prefix = prefix + "/";
-                    for (var i = 0; i < array.length; i++)
-                        result += prefix + encodeURIComponent(array[i].value) + "\r\n";
-                    var box = $("#running-result");
-                    var input = box.children("textarea");
-                    input.val(result);
-                    box.show();
-                    input.select();
-                    input.focus();
-                }
-                function rename(oldName) {
-                    var result = prompt("请输入新的名字：", oldName);
-                    if (result && result != oldName) {
-                        $("#Hidden").val(result);
-                        return true;
-                    }
-                    return false;
-                }
-                var appParser = /^http:\/\/((.*?)@)?(.*?)\/Browse\/(.*)$/;
-                function pickApp() {
-                    var result = prompt("请输入目标云雀：（请使用“http://[password@]domain/Browse/......”的格式，" +
-                                        "如果不输入密码，默认将使用当前的密码）", "http://skylark.apphb.com/Browse/");
-                    var match = appParser.exec(result);
-                    if (match) {
-                        $("#Hidden").val(match[2] ? 'http://' + CryptoJS.SHA512(match[2]) + '@' + match[3]
-                                                              + '/Browse/' + match[4] : result);
-                        return true;
-                    }
-                    return false;
-                }
-                function pickFtp() {
-                    return pickCore("请输入目标 FTP 目录：（格式为 ftp://[username:password@]host/dir/file，" +
-                                    "你的用户名和密码不会被保留，也不会在上传进度上显示）", "");
-                }
-                function getUploadThreads() { return localStorage.uploadThreads ? localStorage.uploadThreads : 10; }
-                var r = new Resumable({
-                    target: '/Upload/' + uriParser[3],
-                    permanentErrors: [401, 403, 500],
-                    simultaneousUploads: getUploadThreads(),
-                    minFileSize: 0  // damn you documentation
-                });
-                var uploadFileTable = $('#upload-file-table');
-                var rows = {};
-                r.on('fileAdded', function (file) {
-                    uploadFileTable.show();
-                    uploadFileTable.find('tbody').append(rows[file.relativePath] = $('<tr><td class="nowrap">' + file.relativePath + '</td><td class="nowrap">' + getSize(file.size) + '</td><td class="stretch"><div class="progress-bar" style="height: 26px; margin-bottom: 0;"><div id="upload-progress-bar" class="bg-cyan bar" style="widtd: 0;"></div></div></td><td id="upload-progress-text" class="nowrap">等待上传</td><td class="nowrap"><button id="cancel-upload-button" type="button"><i class="icon-cancel"></i></button></td></tr>'));
-                    rows[file.relativePath].find('#cancel-upload-button').click(function () {
-                        file.cancel();
-                        rows[file.relativePath].remove();
-                        delete rows[file.relativePath];
-                    });
-                    if (!r.isUploading()) r.upload();
-                });
-                r.on('fileProgress', function (file) {
-                    rows[file.relativePath].find('#upload-progress-bar').width(file.progress() * 100 + '%');
-                    rows[file.relativePath].find('#upload-progress-text').html((file.progress() * 100).toFixed(2) + '%');
-                });
-                r.on('fileRetry', function (file) {
-                    rows[file.relativePath].find('#upload-progress-text').html('出现了奇怪的事情，重试中');
-                });
-                r.on('fileError', function (file, message) {
-                    rows[file.relativePath].find('#upload-progress-bar').removeClass('bg-cyan');
-                    rows[file.relativePath].find('#upload-progress-bar').addClass('bg-red');
-                    rows[file.relativePath].find('#upload-progress-text')
-                        .html('<span title="' + htmlEncode(message) + '">失败</a>');
-                });
-                r.on('fileSuccess', function (file) {
-                    rows[file.relativePath].find('#upload-progress-bar').width('100%');
-                    rows[file.relativePath].find('#upload-progress-text').html('完成');
-                });
-                r.assignBrowse($('#upload-browse'));
-                r.assignBrowse($('#upload-browse-dir'), true);
-                r.assignDrop($('#upload-panel'));
-
-                function changeUploadThreads() {
-                    var result = prompt("请输入上传线程数：", getUploadThreads());
-                    if (result) r.simultaneousUploads = localStorage.uploadThreads = parseInt(result);
-                }
-
-                $('.sticky').sticky({ topSpacing: 0 });
-            </script>
+            <script type="text/javascript" src="/plugins/browse-dir.js"></script>
             <section>
                 <table id="file-list" class="hovered bordered table">
                     <asp:Repeater runat="server" ID="DirectoryList" OnItemCommand="DirectoryCommand">
@@ -306,69 +174,7 @@ $1.mp4" />
             </section>
         </asp:View>
         <asp:View runat="server" ID="FileView">
-            <script type="text/javascript">
-                function modifyMime() {
-                    var oldValue = "<%=Mime %>";
-                    var result = prompt("请输入新的 MIME 类型：", oldValue);
-                    if (result && result != oldValue) {
-                        $("#Hidden").val(result);
-                        return true;
-                    }
-                    return false;
-                }
-                function startCustomMime() {
-                    window.open("/View/" + decodeURIComponent(uriParser[3]) + "?Mime=" + $("#custom-mime")[0].value);
-                }
-                function convert() {
-                    $('#ConvertPathBox').val(decodeURIComponent(uriParser[3]));
-                    $('#ConvertVideoCodecBox').val('');
-                    $('#ConvertAudioCodecBox').val('');
-                    $('#ConvertAudioPathBox').val('');
-                    $("#convert-form").show();
-                }
-                function mergeVA() {
-                    var path = decodeURIComponent(uriParser[3]),
-                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path);
-                    $('#ConvertPathBox').val(result ? result[1] + '.' + result[2] : path);
-                    $('#ConvertVideoCodecBox').val('copy');
-                    $('#ConvertAudioCodecBox').val('copy');
-                    $('#ConvertAudioPathBox').val(result ? result[1] + ' [A].' +
-                                                  (result[2].toLowerCase() == 'mp4' ? 'm4a' : result[2]) : path);
-                    $("#convert-form").show();
-                }
-
-                $(function() {
-                    var list = $('#output-paths'), path = decodeURIComponent(uriParser[3]),
-                        result = /^(.*) \[V\]\.(.*)$/i.exec(path) || /^(.*)\.(.*)$/.exec(path), set = new Set();
-                    function add(value) {
-                        if (set.has(value)) return;
-                        list.append($('<option></option>').attr('value', value));
-                        set.add(value);
-                    }
-                    list.empty();
-                    add(path);
-                    if (result) {
-                        add(result[1] + '.' + result[2]);
-                        add(result[1] + ' [R].' + result[2]);
-                    } else add(path + ' [R]');
-                    (list = $('#audio-paths')).empty();
-                    set.clear();
-                    add(path);
-                    if (result) {
-                        add(result[1] + ' [A].' + result[2]);
-                        add(result[1] + ' [A].m4a');
-                        add(result[1] + ' [A].webm');
-                        add(result[1] + '.' + result[2]);
-                        add(result[1] + '.m4a');
-                        add(result[1] + '.webm');
-                        add(result[1] + '.mp4');
-                    } else {
-                        add(path + ' [A]');
-                        add(path + ' [A].m4a');
-                        add(path + ' [A].webm');
-                    }
-                });
-            </script>
+            <script type="text/javascript" src="/plugins/browse-file.js"></script>
             <section>
                 <div>大小：　　<%=Mygod.Helper.GetSize(InfoFile.Length, "字节") %></div>
                 <div>修改日期：<%=InfoFile.LastWriteTimeUtc.ToChineseString() %></div>
