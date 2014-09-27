@@ -35,7 +35,7 @@ namespace Mygod.Skylark
 
         public static IEnumerable<string> GetSelectedItemsID(this RepeaterItemCollection collection)
         {
-            return from RepeaterItem item in collection where ((CheckBox) item.FindControl("Check")).Checked
+            return from RepeaterItem item in collection where ((HtmlInputCheckBox) item.FindControl("Check")).Checked
                    select ((HtmlInputHidden)item.FindControl("Hidden")).Value;
         }
 

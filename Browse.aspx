@@ -137,8 +137,9 @@ $1.mp4" />
                             <tr>
                                 <td class="nowrap input-control checkbox" style="min-width: 50px;">
                                     <label>
-                                        <input type="checkbox" ID="Check" runat="server" data-size='<%#FileHelper.GetFileSize
-                                            (FileHelper.Combine(RelativePath, Eval("Name").ToString())) %>' />
+                                        <input type="checkbox" ID="Check" runat="server"
+                                               data-size='<%#FileHelper.GetFileSize(FileHelper.Combine(RelativePath,
+                                                                                    Eval("Name").ToString())) %>' />
                                         <span class="check"></span>
                                         <%# FileHelper.IsReady(FileHelper.GetDataFilePath(
                                                 FileHelper.Combine(RelativePath, Eval("Name").ToString())))

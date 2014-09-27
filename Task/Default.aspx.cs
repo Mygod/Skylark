@@ -47,10 +47,5 @@ namespace Mygod.Skylark.Task
         {
             FileHelper.DeleteWithRetries(logPath);
         }
-
-        protected static string AddSpace(string coolHax)
-        {
-            return ' ' + coolHax;
-        }
     }
 }

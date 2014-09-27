@@ -77,8 +77,11 @@
                         <tr>
                             <td class="nowrap">
                                 <input type="hidden" id="Hidden" runat="server" value='<%#Eval("ID") %>' />
-                                <asp:CheckBox ID="Check" runat="server"
-                                              Text='<%#AddSpace(TaskHelper.GetName(Eval("Type").ToString())) %>' />
+                                <label>
+                                    <input type="checkbox" ID="Check" runat="server" />
+                                    <span class="check"></span>
+                                    <%#TaskHelper.GetName(Eval("Type").ToString()) %>
+                                </label>
                             </td>
                             <td>
                                 <a href="/Task/Details/<%#Eval("ID") %>">
