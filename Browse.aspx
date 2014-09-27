@@ -49,7 +49,7 @@
                         </thead>
                         <tbody></tbody>
                     </table>
-                    <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目，占用 <span id="selected-size">0 字节</span>。</div>
+                    <div>该目录下有 <%= DirectoryCount %> 个目录，<%= FileCount %>&nbsp;个文件，当前选中 <span id="selected-count">0</span> 个项目，占用 <span id="selected-size" class="help" title="不含目录大小，由于空间是共享的，处理中的文件大小并不一定代表实际占用空间等原因，您的所有文件大小之和不会等于已用空间的大小。">0 字节</span>。</div>
                     <% if (CurrentUser.OperateFiles) { %><div>请将要上传的文件或文件夹拖动到这里，或者你也可以<a id="upload-browse" href="#">点击这里浏览你要上传的文件</a>或<a id="upload-browse-dir" href="#">文件夹</a>。如果上传速度过慢，请<a href="javascript:changeUploadThreads();">点击这里</a>调整<span class="help" title="上传线程数默认为 10，增大线程数可在一定程度上加快上传速度，但线程数过多可能会使上传反而变慢。推荐普通用户保留默认值。">上传线程数</span>。</div><% } %>
                 </section>
                 <section id="running-result" style="display: none;">
