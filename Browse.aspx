@@ -350,10 +350,10 @@ $1.mp4" />
                     if (result) {
                         add(result[1] + '.' + result[2]);
                         add(result[1] + ' [R].' + result[2]);
-                    } else add(list, set, path + ' [R]');
+                    } else add(path + ' [R]');
                     (list = $('#audio-paths')).empty();
                     set.clear();
-                    add(list, set, path);
+                    add(path);
                     if (result) {
                         add(result[1] + ' [A].' + result[2]);
                         add(result[1] + ' [A].m4a');
