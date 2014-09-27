@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -435,7 +434,7 @@ namespace Mygod.Skylark
                         return process.Modules.Count > 0 && runnerPath.Equals(process.Modules[0].FileName,
                             StringComparison.InvariantCultureIgnoreCase);
                     }
-                    catch (Win32Exception)
+                    catch (SystemException)
                     {
                         var buffer = new StringBuilder(1024);
                         var p = NativeMethods.OpenProcess(0x1000, false, process.Id);
