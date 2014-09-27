@@ -1,15 +1,31 @@
-﻿function updateSelectedCount() {
-    $('#selected-count').text($("#file-list >>>>> input:checkbox:checked").length);
+﻿function getSize(size) {
+    var n = size, i = 0;
+    while (n > 1000) {
+        n /= 1024;
+        ++i;
+    }
+    size = size.toLocaleString() + '  字节';
+    return i == 0 ? size : n.toFixed(2) + ' ' +
+        ['字节', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB', 'BB', 'NB', 'DB', 'CB'][i] + ' (' + size + ')';
+}
+function updateSelectedCount() {
+    var query = $("#file-list input:checkbox:checked");
+    $('#selected-count').text(query.length);
+    var size = 0;
+    query.each(function () {
+        var i = $(this).data('size');
+        if (i) size += i;
+    });
+    $('#selected-size').text(getSize(size));
 }
 $(function () {
-    $('#file-list >>>>> input:checkbox').change(updateSelectedCount);
+    $('#file-list input:checkbox').change(updateSelectedCount);
 });
 function newFolder() {
     return pickCore("请输入文件夹名：", "");
 }
 function deleteConfirm() {
-    return $("#file-list >>>>> input:checkbox:checked").length > 0
-        && confirm("确定要删除吗？此操作没有后悔药吃。");
+    return $("#file-list input:checkbox:checked").length > 0 && confirm("确定要删除吗？此操作没有后悔药吃。");
 }
 var selectAll = false;
 function doSelectAll() {
@@ -17,8 +33,8 @@ function doSelectAll() {
     updateSelectedCount();
 }
 function invertSelection() {
-    var checked = $("#file-list >>>>> input:checkbox:checked");
-    $("#file-list >>>>> input:checkbox:not(:checked)").prop("checked", true);
+    var checked = $("#file-list input:checkbox:checked");
+    $("#file-list input:checkbox:not(:checked)").prop("checked", true);
     checked.prop("checked", false);
     updateSelectedCount();
 }
@@ -29,14 +45,12 @@ function showBatchMergeVAConfig() {
     $("#batch-merge-va-config").show();
 }
 function getDownloadLink() {
-    var array = $("#file-list >>>>> input:checkbox:checked").parent().parent().parent()
-                    .find("input:hidden");
+    var array = $("#file-list input:checkbox:checked").parent().parent().parent().find("input:hidden");
     var result = "";
     var prefix = (uriParser[1] + "/Download/" + uriParser[3]).replace("\\", "/");
     while (prefix[prefix.length - 1] == "/") prefix = prefix.substr(0, prefix.length - 1);
     prefix = prefix + "/";
-    for (var i = 0; i < array.length; i++)
-        result += prefix + encodeURIComponent(array[i].value) + "\r\n";
+    for (var i = 0; i < array.length; i++) result += prefix + encodeURIComponent(array[i].value) + "\r\n";
     var box = $("#running-result");
     var input = box.children("textarea");
     input.val(result);
@@ -58,8 +72,8 @@ function pickApp() {
                         "如果不输入密码，默认将使用当前的密码）", "http://skylark.apphb.com/Browse/");
     var match = appParser.exec(result);
     if (match) {
-        $("#Hidden").val(match[2] ? 'http://' + CryptoJS.SHA512(match[2]) + '@' + match[3]
-                                              + '/Browse/' + match[4] : result);
+        $("#Hidden").val(match[2] ? 'http://' + CryptoJS.SHA512(match[2]) + '@' + match[3] + '/Browse/' + match[4]
+                                  : result);
         return true;
     }
     return false;
@@ -79,7 +93,11 @@ var uploadFileTable = $('#upload-file-table');
 var rows = {};
 r.on('fileAdded', function (file) {
     uploadFileTable.show();
-    uploadFileTable.find('tbody').append(rows[file.relativePath] = $('<tr><td class="nowrap">' + file.relativePath + '</td><td class="nowrap">' + getSize(file.size) + '</td><td class="stretch"><div class="progress-bar" style="height: 26px; margin-bottom: 0;"><div id="upload-progress-bar" class="bg-cyan bar" style="widtd: 0;"></div></div></td><td id="upload-progress-text" class="nowrap">等待上传</td><td class="nowrap"><button id="cancel-upload-button" type="button"><i class="icon-cancel"></i></button></td></tr>'));
+    uploadFileTable.find('tbody').append(rows[file.relativePath] = $('<tr><td class="nowrap">' + file.relativePath +
+        '</td><td class="nowrap">' + getSize(file.size) + '</td><td class="stretch"><div class="progress-bar" ' +
+        'style="height: 26px; margin-bottom: 0;"><div id="upload-progress-bar" class="bg-cyan bar" style="widtd: 0;"' +
+        '></div></div></td><td id="upload-progress-text" class="nowrap">等待上传</td><td class="nowrap"><button ' +
+        'id="cancel-upload-button" type="button"><i class="icon-cancel"></i></button></td></tr>'));
     rows[file.relativePath].find('#cancel-upload-button').click(function () {
         file.cancel();
         rows[file.relativePath].remove();
@@ -97,8 +115,7 @@ r.on('fileRetry', function (file) {
 r.on('fileError', function (file, message) {
     rows[file.relativePath].find('#upload-progress-bar').removeClass('bg-cyan');
     rows[file.relativePath].find('#upload-progress-bar').addClass('bg-red');
-    rows[file.relativePath].find('#upload-progress-text')
-        .html('<span title="' + htmlEncode(message) + '">失败</a>');
+    rows[file.relativePath].find('#upload-progress-text').html('<span title="' + htmlEncode(message) + '">失败</a>');
 });
 r.on('fileSuccess', function (file) {
     rows[file.relativePath].find('#upload-progress-bar').width('100%');
