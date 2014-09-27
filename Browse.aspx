@@ -100,7 +100,11 @@ $1.m4a
 $1.webm
 $1.mp4" />
                     </div>
-                    <div class="label-text-line"><label>合并文件替换模式：</label><span><asp:TextBox runat="server" ID="ResultPatternBox" Text="$1$2" /></span></div>
+                    <datalist id="merge-paths">
+                        <option value="$1$2" />
+                        <option value="$1 [R]$2" />
+                    </datalist>
+                    <div class="label-text-line"><label>合并文件替换模式：</label><span><asp:TextBox runat="server" ID="ResultPatternBox" Text="$1$2" list="merge-paths" /></span></div>
                     <div>
                         <label>
                             <asp:CheckBox runat="server" ID="DeleteSourceBox" />
