@@ -81,7 +81,6 @@
     <Content Include="Offline\Start.aspx" />
     <Content Include="Offline\YouTube.aspx" />
     <Content Include="plugins\CryptoJS\core-min.js" />
-    <Content Include="plugins\CryptoJS\enc-base64-min.js" />
     <Content Include="plugins\CryptoJS\sha512-min.js" />
     <Content Include="plugins\CryptoJS\x64-core-min.js" />
     <Content Include="plugins\ffmpeg\avcodec-55.dll" />
@@ -98,6 +97,7 @@
     <Content Include="plugins\jquery\jquery.cookie.js" />
     <Content Include="plugins\jquery\jquery.sticky.js" />
     <Content Include="plugins\jquery\jquery.widget.min.js" />
+    <Content Include="plugins\jsbase64.js" />
     <Content Include="plugins\metro.min.js" />
     <Content Include="plugins\MygodLibrary.dll" />
     <Content Include="plugins\resumable.js" />

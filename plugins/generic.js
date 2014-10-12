@@ -16,10 +16,10 @@ function getQueryStringRegExp(name) {
 
 $.base64 = {
     encode: function (str) {
-        return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(str));
+        return B64.encode(str);
     },
     decode: function (str) {
-        return CryptoJS.enc.Base64.parse(str).toString(CryptoJS.enc.Utf8);
+        return B64.decode(str);
     }
 };
 

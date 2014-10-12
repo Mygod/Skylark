@@ -13,8 +13,8 @@
     <script type="text/javascript" src="/plugins/jquery/jquery.cookie.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/core-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/x64-core-min.js"></script>
-    <script type="text/javascript" src="/plugins/CryptoJS/enc-base64-min.js"></script>
     <script type="text/javascript" src="/plugins/CryptoJS/sha512-min.js"></script>
+    <script type="text/javascript" src="/plugins/jsbase64.js"></script>
     <script type="text/javascript" src="/plugins/metro.min.js"></script>
     <script type="text/javascript" src="/plugins/generic.js"></script>
     <asp:ContentPlaceHolder ID="Head" runat="server">
