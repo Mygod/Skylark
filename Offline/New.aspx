@@ -36,10 +36,6 @@
                     });
                 </script>
             </li>
-            <li>
-                http://www.mediafire.com/?<asp:TextBox runat="server" ID="MediaFireBox" Width="400px" />
-                <asp:Button runat="server" OnClick="MediaFire" Text="下载 MediaFire 网盘文件" />
-            </li>
         </ul>
     </section>
 </asp:Content>

@@ -26,9 +26,6 @@ namespace Mygod.Skylark.Task
                     case "offline":
                         OfflineDownloadTask.Create(Rbase64.Decode(Request.QueryString["Url"]), path);
                         break;
-                    case "offline-mediafire":
-                        OfflineDownloadTask.CreateMediaFire(Request.QueryString["ID"], path);
-                        break;
                     case "ftpupload":
                         result.SetAttributeValue("id", (task = new FtpUploadTask(path,
                             Request.QueryString["Files"].Split('|').Select(file => file.UrlDecode()),

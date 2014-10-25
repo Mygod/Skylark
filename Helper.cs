@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -354,17 +353,10 @@ namespace Mygod.Skylark
     
     public sealed partial class OfflineDownloadTask
     {
-        private static readonly Regex
-            MediaFireDirectLinkExtractor = new Regex("kNO = \"(.*?)\";", RegexOptions.Compiled);
         public static void Create(string url, string relativePath)
         {
             TaskHelper.StartRunner(string.Format("{2}\n{0}\n{1}", LinkConverter.Decode(url), relativePath,
                                       TaskType.OfflineDownloadTask));
-        }
-        public static void CreateMediaFire(string id, string relativePath)
-        {
-            Create(MediaFireDirectLinkExtractor.Match(new WebClient()
-                        .DownloadString("http://www.mediafire.com/?" + id)).Groups[1].Value, relativePath);
         }
 
         protected override void StartCore()

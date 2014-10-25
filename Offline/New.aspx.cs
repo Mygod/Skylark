@@ -24,11 +24,5 @@ namespace Mygod.Skylark.Offline
                 .Where(link => !string.IsNullOrWhiteSpace(link))) OfflineDownloadTask.Create(link, path);
             Response.Redirect("/Browse/" + path + '/');
         }
-
-        protected void MediaFire(object sender, EventArgs e)
-        {
-            OfflineDownloadTask.CreateMediaFire(MediaFireBox.Text, path);
-            Response.Redirect("/Browse/" + path + '/');
-        }
     }
 }
