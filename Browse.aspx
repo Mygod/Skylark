@@ -114,7 +114,7 @@ $1.mp4" />
                                         <img src="/Image/Directory.png" alt="目录" />
                                     </label>
                                 </td>
-                                <td class="stretch"><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
+                                <td class="stretch wrap-word"><a href="<%#Eval("Name") %>/"><%#Eval("Name") %></a></td>
                                 <td class="nowrap">&lt;DIR&gt;</td>
                                 <td class="nowrap">
                                     <%#File.GetLastWriteTimeUtc(FileHelper.GetFilePath(FileHelper
@@ -147,7 +147,7 @@ $1.mp4" />
                                                     : " <img src=\"/Image/Busy.png\" alt=\"文件 (处理中)\" />" %>
                                     </label>
                                 </td>
-                                <td class="stretch"><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
+                                <td class="stretch wrap-word"><a href="<%#Eval("Name") %>"><%#Eval("Name") %></a></td>
                                 <td class="nowrap">
                                     <%#Mygod.Helper.GetSize(FileHelper.GetFileSize
                                             (FileHelper.Combine(RelativePath, Eval("Name").ToString())), "字节") %>
