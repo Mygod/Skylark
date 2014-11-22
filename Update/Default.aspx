@@ -4,7 +4,7 @@
 <asp:Content ID="Content2" ContentPlaceHolderID="Body" runat="server">
     <h2 class="center">升级</h2>
     <% if (string.IsNullOrWhiteSpace(new WebClient()
-           .DownloadString("http://mygod.tk/product/update/" + CurrentAssembly.GetName().Version.Revision + '/')))
+           .DownloadString("https://mygod.tk/product/update/" + CurrentAssembly.GetName().Version.Revision + '/')))
        { %>
     <div>恭喜您，您的 云雀™ 是最新版！不过你还是可以部署一次最新版。</div>
     <% }

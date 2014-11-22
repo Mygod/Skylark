@@ -29,7 +29,7 @@
         </script>
     </section>
     <section>
-        <div>想要直接下载你管视频？试试<a href="http://mygod.tk/product/hide-ear/" rel="noreferrer">掩耳</a>！提示：显示比特率的是只有视频/音频的，你可以手动/批量合并。</div>
+        <div>想要直接下载你管视频？试试<a href="https://mygod.tk/product/hide-ear/" rel="noreferrer">掩耳</a>！提示：显示比特率的是只有视频/音频的，你可以手动/批量合并。</div>
         <% GetEmAll(); %>
     </section>
 </asp:Content>
