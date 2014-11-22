@@ -435,9 +435,10 @@ namespace Mygod.Skylark.BackgroundRunner
                         new CrossAppCopyTask(lines[1]).Execute();
                         break;
                     case TaskType.BatchMergeVATask:
+                        var splitter = new[] {'\t'};
                         BatchMergeVA(lines[1], "true".Equals(lines[2], StringComparison.InvariantCultureIgnoreCase),
-                                     lines[3], lines.Skip(5).Where(line => !string.IsNullOrWhiteSpace(line)).ToList(),
-                                     lines[4]);
+                                     lines[3].Split(splitter, StringSplitOptions.RemoveEmptyEntries),
+                                     lines[4].Split(splitter, StringSplitOptions.RemoveEmptyEntries), lines[5]);
                         break;
                     default:
                         Console.WriteLine("无法识别。");
@@ -540,14 +541,15 @@ namespace Mygod.Skylark.BackgroundRunner
             }
         }
 
-        private static void BatchMergeVA(string path, bool deleteSource, string videoPattern,
-                                         List<string> audioPatterns, string resultPattern)
+        private static void BatchMergeVA(string path, bool deleteSource, string[] videoPatterns,
+                                         string[] audioPatterns, string resultPattern)
         {
-            var videoMatcher = new Regex(videoPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var queue = new LinkedList<Match>(from fullPath in Directory.EnumerateFiles(FileHelper.GetFilePath(path),
-                                                                    "*", SearchOption.AllDirectories)
-                                              let match = videoMatcher.Match(fullPath.Substring(6)) where match.Success
-                                              select match);
+            var videoMatchers = videoPatterns
+                .Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
+            var queue = new LinkedList<Match>(from fullPath in
+                     Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
+                 let match = (from matcher in videoMatchers let m = matcher.Match(fullPath.Substring(6))
+                              where m.Success select m).FirstOrDefault() where match != null select match);
             while (queue.Count > 0)
             {
                 var pointer = queue.First;

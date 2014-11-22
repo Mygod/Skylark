@@ -75,7 +75,7 @@
                 <section id="batch-merge-va-config" style="display: none;">
                     <button type="button" onclick="hideParent();">隐藏</button>
                     <div class="label-text-line"><label>视频文件匹配模式（完整路径，不区分大小写）：</label><span><asp:TextBox runat="server" ID="VideoPatternBox" Text="^(.*) \[V\](\.(.*))?$" /></span></div>
-                    <div>音频文件替换模式（可列出多个，排在前面的优先）：</div>
+                    <div>音频文件替换模式（可列出多个，排在前面的优先，若不存在则使用之后的）：</div>
                     <div>
                         <asp:TextBox runat="server" ID="AudioPatternBox" CssClass="stretch" TextMode="MultiLine"
                                      style="height: 150px;" Text="$1 [A]$2
@@ -86,11 +86,12 @@ $1.m4a
 $1.webm
 $1.mp4" />
                     </div>
-                    <datalist id="merge-paths">
-                        <option value="$1$2" />
-                        <option value="$1 [R]$2" />
-                    </datalist>
-                    <div class="label-text-line"><label>合并文件替换模式：</label><span><asp:TextBox runat="server" ID="ResultPatternBox" Text="$1$2" list="merge-paths" /></span></div>
+                    <div>合并文件替换模式（可列出多个，排在前面的优先，若已存在则使用之后的）：</div>
+                    <div>
+                        <asp:TextBox runat="server" ID="ResultPatternBox" CssClass="stretch" TextMode="MultiLine"
+                                     style="height: 50px;" Text="$1$2
+$1 [R]$2" />
+                    </div>
                     <div>
                         <label>
                             <asp:CheckBox runat="server" ID="DeleteSourceBox" />
