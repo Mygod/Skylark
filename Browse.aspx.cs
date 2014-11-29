@@ -196,8 +196,8 @@ namespace Mygod.Skylark
             }
             TaskHelper.StartRunner(string.Format("{0}\n{1}\n{2}\n{3}\n{4}\n{5}", TaskType.BatchMergeVATask,
                                    RelativePath, DeleteSourceBox.Checked, VideoPatternBox.Text,
-                                   ResultPatternBox.Text.Replace("\r", string.Empty).Replace('\n', '\t'),
-                                   AudioPatternBox.Text.Replace("\r", string.Empty).Replace('\n', '\t')));
+                                   AudioPatternBox.Text.Replace("\r", string.Empty).Replace('\n', '\t'),
+                                   ResultPatternBox.Text.Replace("\r", string.Empty).Replace('\n', '\t')));
             Response.Redirect(Request.RawUrl);
         }
 
