@@ -437,8 +437,8 @@ namespace Mygod.Skylark.BackgroundRunner
                     case TaskType.BatchMergeVATask:
                         var splitter = new[] {'\t'};
                         BatchMergeVA(lines[1], "true".Equals(lines[2], StringComparison.InvariantCultureIgnoreCase),
-                                     lines[3].Split(splitter, StringSplitOptions.RemoveEmptyEntries),
-                                     lines[4].Split(splitter, StringSplitOptions.RemoveEmptyEntries), lines[5]);
+                                     lines[3], lines[4].Split(splitter, StringSplitOptions.RemoveEmptyEntries),
+                                     lines[5].Split(splitter, StringSplitOptions.RemoveEmptyEntries));
                         break;
                     default:
                         Console.WriteLine("无法识别。");
@@ -541,29 +541,31 @@ namespace Mygod.Skylark.BackgroundRunner
             }
         }
 
-        private static void BatchMergeVA(string path, bool deleteSource, string[] videoPatterns,
-                                         string[] audioPatterns, string resultPattern)
+        private static void BatchMergeVA(string path, bool deleteSource, string videoPattern,
+                                         string[] audioPatterns, string[] resultPatterns)
         {
-            var videoMatchers = videoPatterns
-                .Select(p => new Regex(p, RegexOptions.Compiled | RegexOptions.IgnoreCase)).ToList();
-            var queue = new LinkedList<Match>(from fullPath in
-                     Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
-                 let match = (from matcher in videoMatchers let m = matcher.Match(fullPath.Substring(6))
-                              where m.Success select m).FirstOrDefault() where match != null select match);
+            var videoMatcher = new Regex(videoPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var queue = new LinkedList<Tuple<Match, string>>
+                (from input in Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
+                 let match = videoMatcher.Match(input) where match.Success
+                 let output = (from p in resultPatterns let r = match.Result(p)
+                               where !File.Exists(FileHelper.GetFilePath(r)) select r).FirstOrDefault()
+                 where output != null select new Tuple<Match, string>(match, output));
             while (queue.Count > 0)
             {
                 var pointer = queue.First;
                 while (pointer != null)
                 {
-                    var audioPath = (from audioPattern in audioPatterns let aPath = pointer.Value.Result(audioPattern)
-                                     where File.Exists(FileHelper.GetFilePath(aPath)) select aPath).FirstOrDefault();
-                    if (audioPath == null || !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Value)) ||
+                    var audioPath = (from audioPattern in audioPatterns
+                                     let p = pointer.Value.Item1.Result(audioPattern)
+                                     where File.Exists(FileHelper.GetFilePath(p)) select p).FirstOrDefault();
+                    if (audioPath == null || !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item1.Value)) ||
                         !FileHelper.IsReady(FileHelper.GetDataFilePath(audioPath))) continue;
-                    ConvertTask.Create(pointer.Value.Value, pointer.Value.Result(resultPattern), null,
+                    ConvertTask.Create(pointer.Value.Item1.Value, pointer.Value.Item2, null,
                                        "copy", "copy", null, audioPath).Execute();
                     if (deleteSource)
                     {
-                        FileHelper.Delete(pointer.Value.Value);
+                        FileHelper.Delete(pointer.Value.Item1.Value);
                         FileHelper.Delete(audioPath);
                     }
                     var previous = pointer;
