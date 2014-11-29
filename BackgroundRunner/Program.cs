@@ -545,32 +545,28 @@ namespace Mygod.Skylark.BackgroundRunner
                                          string[] audioPatterns, string[] resultPatterns)
         {
             var videoMatcher = new Regex(videoPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var queue = new LinkedList<Tuple<Match, string>>
+            var queue = new LinkedList<Tuple<string, string, string>>
                 (from input in Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
                  let match = videoMatcher.Match(input) where match.Success
-                 let output = (from p in resultPatterns let r = match.Result(p)
-                               where !File.Exists(FileHelper.GetFilePath(r)) select r).FirstOrDefault()
-                 where output != null select new Tuple<Match, string>(match, output));
+                 let audio = (from ap in audioPatterns let ar = match.Result(ap)
+                              where File.Exists(FileHelper.GetFilePath(ar)) select ar).FirstOrDefault()
+                 let output = (from op in resultPatterns let or = match.Result(op)
+                               where !File.Exists(FileHelper.GetFilePath(or)) select or).FirstOrDefault()
+                 where audio != null && output != null select new Tuple<string, string, string>(input, audio, output));
             while (queue.Count > 0)
             {
-                var pointer = queue.First;
-                while (pointer != null)
+                for (var pointer = queue.First; pointer != null; pointer = pointer.Next)
                 {
-                    var audioPath = (from audioPattern in audioPatterns
-                                     let p = pointer.Value.Item1.Result(audioPattern)
-                                     where File.Exists(FileHelper.GetFilePath(p)) select p).FirstOrDefault();
-                    if (audioPath == null || !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item1.Value)) ||
-                        !FileHelper.IsReady(FileHelper.GetDataFilePath(audioPath))) continue;
-                    ConvertTask.Create(pointer.Value.Item1.Value, pointer.Value.Item2, null,
-                                       "copy", "copy", null, audioPath).Execute();
+                    if (!FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item1)) ||
+                        !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item2))) continue;
+                    ConvertTask.Create(pointer.Value.Item1, pointer.Value.Item3, null,
+                                       "copy", "copy", null, pointer.Value.Item2).Execute();
                     if (deleteSource)
                     {
-                        FileHelper.Delete(pointer.Value.Item1.Value);
-                        FileHelper.Delete(audioPath);
+                        FileHelper.Delete(pointer.Value.Item1);
+                        FileHelper.Delete(pointer.Value.Item2);
                     }
-                    var previous = pointer;
-                    pointer = pointer.Next;
-                    queue.Remove(previous);
+                    queue.Remove(pointer);
                 }
                 Thread.Sleep(1000);
             }
