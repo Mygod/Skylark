@@ -546,27 +546,34 @@ namespace Mygod.Skylark.BackgroundRunner
         {
             var videoMatcher = new Regex(videoPattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             var queue = new LinkedList<Tuple<string, string, string>>
-                (from input in Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
-                 let match = videoMatcher.Match(input) where match.Success
+                (from p in Directory.EnumerateFiles(FileHelper.GetFilePath(path), "*", SearchOption.AllDirectories)
+                 let input = p.Substring(6) let match = videoMatcher.Match(input) where match.Success
                  let audio = (from ap in audioPatterns let ar = match.Result(ap)
-                              where File.Exists(ar) select ar).FirstOrDefault()
+                     where File.Exists(FileHelper.GetFilePath(ar)) select ar).FirstOrDefault() where audio != null
                  let output = (from op in resultPatterns let or = match.Result(op)
-                               where !File.Exists(or) select or).FirstOrDefault()
-                 where audio != null && output != null select new Tuple<string, string, string>(input, audio, output));
+                     where !File.Exists(FileHelper.GetFilePath(or)) select or).FirstOrDefault() where output != null
+                 select new Tuple<string, string, string>(input, audio, output));
             while (queue.Count > 0)
             {
-                for (var pointer = queue.First; pointer != null; pointer = pointer.Next)
+                var node = queue.First;
+                while (node != null)
                 {
-                    if (!FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item1)) ||
-                        !FileHelper.IsReady(FileHelper.GetDataFilePath(pointer.Value.Item2))) continue;
-                    ConvertTask.Create(pointer.Value.Item1, pointer.Value.Item3, null,
-                                       "copy", "copy", null, pointer.Value.Item2).Execute();
+                    if (!FileHelper.IsReady(FileHelper.GetDataFilePath(node.Value.Item1)) ||
+                        !FileHelper.IsReady(FileHelper.GetDataFilePath(node.Value.Item2)))
+                    {
+                        node = node.Next;
+                        continue;
+                    }
+                    ConvertTask.Create(node.Value.Item1, node.Value.Item3, null, "copy", "copy", null,
+                                       node.Value.Item2).Execute();
                     if (deleteSource)
                     {
-                        FileHelper.Delete(pointer.Value.Item1);
-                        FileHelper.Delete(pointer.Value.Item2);
+                        FileHelper.Delete(node.Value.Item1);
+                        FileHelper.Delete(node.Value.Item2);
                     }
-                    queue.Remove(pointer);
+                    var previous = node;
+                    node = node.Next;
+                    queue.Remove(previous);
                 }
                 Thread.Sleep(1000);
             }

@@ -317,9 +317,10 @@ namespace Mygod.Skylark
             if (!string.IsNullOrWhiteSpace(vcodec)) arguments += " -vcodec " + vcodec;
             if (!string.IsNullOrWhiteSpace(acodec)) arguments += " -acodec " + acodec;
             if (!string.IsNullOrWhiteSpace(scodec)) arguments += " -scodec " + scodec;
-            TimeSpan duration =
-                TimeSpan.Parse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value),
-                     start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
+            TimeSpan duration;
+            TimeSpan.TryParse(DurationParser.Match(FFmpeg.Analyze(FileHelper.GetFilePath(source))).Groups[1].Value,
+                              out duration);    // silent fail with TimeSpan.Zero
+            TimeSpan start = FFmpeg.Parse(startPoint), end = FFmpeg.Parse(endPoint, duration);
             if (start <= TimeSpan.Zero) start = TimeSpan.Zero;
             else arguments += " -ss " + startPoint;
             if (end >= duration) end = duration;
