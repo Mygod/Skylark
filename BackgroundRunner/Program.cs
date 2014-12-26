@@ -401,6 +401,7 @@ namespace Mygod.Skylark
             if (httpRequest == null) return;
             httpRequest.CookieContainer = CookieContainer;
             httpRequest.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            httpRequest.ServicePoint.Expect100Continue = false;
         }
     }
 }
