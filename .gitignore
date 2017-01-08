@@ -168,5 +168,5 @@ pip-log.txt
 *.vshost.*
 
 # Skylark
-/Data/Site.privileges
+/Data/Site.*
 /plugins/BackgroundRunner.*
