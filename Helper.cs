@@ -555,6 +555,7 @@ namespace Mygod.Skylark
         {
             Password = AnonymousPassword;
             Comment = "游客";
+            Browse = Download = OperateFiles = OperateTasks = Admin = true;
         }
         public User(XElement user)
         {
@@ -578,7 +579,7 @@ namespace Mygod.Skylark
         }
 
         public readonly string Password, Comment;
-        public readonly bool Browse, Download, OperateFiles, OperateTasks, Admin;
+        public bool Browse, Download, OperateFiles, OperateTasks, Admin;
 
         public override string ToString()
         {
@@ -604,12 +605,19 @@ namespace Mygod.Skylark
         }
         public Privileges(XContainer root)
         {
-            foreach (var user in root.ElementsCaseInsensitive("user").Select(e => new User(e))
-                                     .Where(user => !Contains(user.Password))) Add(user);
+            if (root == null) Add(new User());  // creates default config
+            else foreach (var user in root.ElementsCaseInsensitive("user").Select(e => new User(e))
+                                          .Where(user => !Contains(user.Password))) Add(user);
         }
 
-        public Privileges(string path = null) : this(XHelper.Load(path ?? Path).Root)
+        public Privileges(string path = null) : this(LoadOrDefault(path))
         {
+        }
+
+        private static XElement LoadOrDefault(string path = null)
+        {
+            if (path == null) path = Path;
+            return (File.Exists(path) ? XHelper.Load(path).Root : null);
         }
 
         public static Privileges Parse(string value)
@@ -634,9 +642,9 @@ namespace Mygod.Skylark
             return new XElement("privileges", this.Select(user => user.ToElement()));
         }
 
-        public void Save(string path = null)
+        public void Save()
         {
-            ToElement().Save(path ?? Path);
+            ToElement().Save(Path);
         }
     }
 
@@ -647,7 +655,8 @@ namespace Mygod.Skylark
 
         public Config()
         {
-            element = FileHelper.GetElement(ConfigPath);
+            element = File.Exists(ConfigPath) ? FileHelper.GetElement(ConfigPath)
+                : new XElement("config", new XAttribute("root", "/Browse/"));   // creates default
         }
 
         public string Root
