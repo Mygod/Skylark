@@ -105,8 +105,16 @@ namespace Mygod.Skylark
         public static void KillProcessTree(int pid)
         {
             if (pid == 0) return;
-            foreach (var mbo in new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" +
-                                    pid).Get()) KillProcessTree(int.Parse(mbo["ProcessID"].ToString()));
+            try
+            {
+                foreach (var mbo in
+                    new ManagementObjectSearcher("Select * From Win32_Process Where ParentProcessID=" + pid).Get())
+                    KillProcessTree(int.Parse(mbo["ProcessID"].ToString()));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Process.Start(new ProcessStartInfo("taskkill", "/F /T /PID " + pid));
+            }
             try
             {
                 Process.GetProcessById(pid).Kill();

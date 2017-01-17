@@ -295,6 +295,7 @@
   <ItemGroup>
     <None Include="LICENSE" />
     <None Include="mygod-skylark - Web Deploy.pubxml" />
+    <None Include="skylark-eastasia - Web Deploy.pubxml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
