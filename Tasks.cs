@@ -113,7 +113,7 @@ namespace Mygod.Skylark
             }
             catch (UnauthorizedAccessException)
             {
-                Process.Start(new ProcessStartInfo("taskkill", "/F /T /PID " + pid));
+                // TODO: better cancel signal? http://stackoverflow.com/a/15281070
             }
             try
             {
